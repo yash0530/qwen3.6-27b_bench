@@ -29,14 +29,13 @@ def main():
     args = ap.parse_args()
 
     os.makedirs(C.JUDGING, exist_ok=True)
-    recs = [r for r in load_recs() if r.get("error") is None and r.get("answer_text")]
+    recs = [r for r in load_recs() if r.get("error") is None]
+    # Canonical answers come from the full-length phase (8192 cap, off config).
+    recs = [r for r in recs if r.get("phase") == "full" and (r.get("answer_text") or r.get("thinking_text"))]
 
     items, seen = [], set()
     for r in recs:
-        if not args.all and not (r["pass"] == 1 and r["draft_n"] == 0):
-            continue
-        key = (r["quant"], r["question_id"]) if not args.all else \
-              (r["quant"], r["question_id"], r["draft_n"], r["pass"])
+        key = (r["quant"], r["question_id"])
         if key in seen:
             continue
         seen.add(key)

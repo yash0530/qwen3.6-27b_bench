@@ -28,17 +28,26 @@ QUANT_ORDER = ["q5", "q6", "q8"]
 # draft_n == 0 is the special "MTP off" baseline (--spec-type none).
 DRAFT_NS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
-# Two full passes: with a fixed seed the *outputs* are identical across passes,
-# so the 2nd pass exists purely to average timing noise (tok/s, TTFT) and report spread.
-PASSES = [1, 2]
+# Single pass. (Outputs are deterministic across draft-n with a fixed seed, so the
+# speed sweep needs only one measurement per cell.)
+PASSES = [1]
 
 # --- Decoding (fixed across every run) -----------------------------------------
 SEED = 42
 TEMP = 0.6
 TOP_P = 0.95
 TOP_K = 20
-N_PREDICT = 8192          # generation cap per answer
-CTX = 16384               # safely holds prompt (~1-2k) + 8192 generated
+CTX = 16384               # safely holds prompt (~1-2k) + up to 8192 generated
+
+# Two-phase design (keeps the run to ~5-6h while preserving every metric):
+#   * phase "speed": short cap on the FULL grid (quants x draft_n x questions) -- tok/s,
+#     prompt speed, TTFT, MTP acceptance. tok/s is cap-independent, so a short cap is
+#     sufficient and fair (all configs generate the same deterministic prefix).
+#   * phase "full":  the real 8192 cap, but only off-config x quant x question (15 runs)
+#     -- complete answers for judging + true thinking/answer token totals. Draft-n does
+#     not change the output, so one config suffices.
+SPEED_N_PREDICT = 1024
+FULL_N_PREDICT = 8192
 
 # Smoke test overrides (fast end-to-end pipeline validation)
 SMOKE_QUANTS = ["q5"]

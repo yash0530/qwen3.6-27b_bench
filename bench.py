@@ -248,7 +248,7 @@ def done_keys(path: str) -> set:
             except Exception:
                 continue
             if r.get("error") is None:
-                seen.add((r["pass"], r["quant"], r["draft_n"], r["question_id"]))
+                seen.add((r.get("phase"), r["pass"], r["quant"], r["draft_n"], r["question_id"]))
     return seen
 
 
@@ -262,7 +262,7 @@ def config_label(draft_n: int) -> str:
 
 
 # ------------------------------------------------------------------------- main
-def run(passes, quants, draft_ns, question_ids, n_predict):
+def run(passes, quants, draft_ns, question_ids, n_predict, phase):
     ensure_dirs()
     seen = done_keys(C.RESULTS_JSONL)
     qs = [QUESTION_BY_ID[qid] for qid in question_ids]
@@ -270,24 +270,24 @@ def run(passes, quants, draft_ns, question_ids, n_predict):
     total = len(passes) * len(quants) * len(draft_ns) * len(qs)
     done = 0
     t_start = time.time()
-    log(f"START run: {total} generations "
-        f"(passes={passes} quants={quants} draft_ns={draft_ns} n_predict={n_predict})")
+    log(f"START phase={phase}: {total} generations "
+        f"(passes={passes} quants={quants} draft_ns={draft_ns} cap={n_predict})")
 
     for p in passes:
         for quant in quants:
             for dn in draft_ns:
-                pending = [q for q in qs if (p, quant, dn, q["id"]) not in seen]
+                pending = [q for q in qs if (phase, p, quant, dn, q["id"]) not in seen]
                 if not pending:
                     done += len(qs)
-                    log(f"skip {quant} {config_label(dn)} pass{p} (already done)")
+                    log(f"skip [{phase}] {quant} {config_label(dn)} pass{p} (already done)")
                     continue
 
                 srv = Server(quant, dn)
-                log(f"launch {quant} {config_label(dn)} pass{p} ...")
+                log(f"launch [{phase}] {quant} {config_label(dn)} pass{p} ...")
                 if not srv.start():
                     for q in pending:
                         append_record({
-                            "pass": p, "quant": quant, "draft_n": dn,
+                            "phase": phase, "pass": p, "quant": quant, "draft_n": dn,
                             "config": config_label(dn), "question_id": q["id"],
                             "category": q["category"], "error": "server_start_failed",
                             "ts": datetime.now(timezone.utc).isoformat(),
@@ -302,10 +302,10 @@ def run(passes, quants, draft_ns, question_ids, n_predict):
                         {"role": "user", "content": q["user"]},
                     ]
                     rec = {
-                        "pass": p, "quant": quant, "draft_n": dn,
+                        "phase": phase, "pass": p, "quant": quant, "draft_n": dn,
                         "config": config_label(dn), "question_id": q["id"],
                         "category": q["category"], "seed": C.SEED,
-                        "model_path": C.MODELS[quant],
+                        "n_predict_cap": n_predict, "model_path": C.MODELS[quant],
                         "ts": datetime.now(timezone.utc).isoformat(),
                         "error": None,
                     }
@@ -369,7 +369,8 @@ def consolidate():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--smoke", action="store_true", help="tiny end-to-end validation run")
-    ap.add_argument("--pass", dest="passes", type=int, choices=[1, 2], default=None)
+    ap.add_argument("--phase", choices=["speed", "full"], default=None,
+                    help="run only one phase (default: both, speed then full)")
     ap.add_argument("--quant", choices=list(C.MODELS), default=None)
     ap.add_argument("--consolidate-only", action="store_true")
     args = ap.parse_args()
@@ -380,13 +381,18 @@ def main():
         return
 
     if args.smoke:
-        run(C.SMOKE_PASSES, C.SMOKE_QUANTS, C.SMOKE_DRAFT_NS,
-            C.SMOKE_QUESTION_IDS, C.SMOKE_N_PREDICT)
+        run([1], C.SMOKE_QUANTS, C.SMOKE_DRAFT_NS,
+            C.SMOKE_QUESTION_IDS, C.SMOKE_N_PREDICT, phase="speed")
         return
 
-    passes = [args.passes] if args.passes else C.PASSES
     quants = [args.quant] if args.quant else C.QUANT_ORDER
-    run(passes, quants, C.DRAFT_NS, [q["id"] for q in QUESTIONS], C.N_PREDICT)
+    allq = [q["id"] for q in QUESTIONS]
+    # Phase 1: speed sweep over the full grid at a short cap.
+    if args.phase in (None, "speed"):
+        run([1], quants, C.DRAFT_NS, allq, C.SPEED_N_PREDICT, phase="speed")
+    # Phase 2: full-length generations (off config only) for token totals + judging.
+    if args.phase in (None, "full"):
+        run([1], quants, [0], allq, C.FULL_N_PREDICT, phase="full")
 
 
 if __name__ == "__main__":

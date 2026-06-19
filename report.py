@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""Aggregate benchmark results, render charts, and write REPORT.md + summary.json.
+"""Aggregate two-phase benchmark results, render charts, write REPORT.md + summary.json.
 
-Reads results/results.json (or results.jsonl). If judge scores are present (either
-merged onto records as `judge`, or in results/judging/scores.json) a quality axis is
-added. Safe to re-run any time (e.g. after judging).
+Speed metrics (tok/s, prompt speed, TTFT, MTP acceptance) come from phase="speed"
+records (full grid, short cap). Token totals + answer text come from phase="full"
+records (off config, 8192 cap). Judge scores (if present in results/judging/scores.json)
+add a quality axis. Safe to re-run any time.
 """
 import json
 import os
 import statistics as stats
 
+import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 import config as C
-from questions import QUESTIONS
 
 QUANTS = C.QUANT_ORDER
 QUANT_LABEL = {"q5": "Q5_K_XL", "q6": "Q6_K_XL", "q8": "Q8_0"}
@@ -22,7 +23,7 @@ COLORS = {"q5": "#2563eb", "q6": "#16a34a", "q8": "#dc2626"}
 
 
 # ------------------------------------------------------------------- load/group
-def load_records():
+def load_all():
     if os.path.exists(C.RESULTS_JSON):
         with open(C.RESULTS_JSON) as f:
             recs = json.load(f)
@@ -34,7 +35,7 @@ def load_records():
                     recs.append(json.loads(ln))
                 except Exception:
                     pass
-    return [r for r in recs if r.get("error") is None and "predicted_per_second" in r]
+    return [r for r in recs if r.get("error") is None]
 
 
 def fmean(xs):
@@ -47,12 +48,7 @@ def fstd(xs):
     return stats.pstdev(xs) if len(xs) > 1 else 0.0
 
 
-def group(recs, quant, dn):
-    return [r for r in recs if r["quant"] == quant and r["draft_n"] == dn]
-
-
 def load_scores():
-    """quant -> question_id -> {scores..., overall, rationale}. From merged judge field or scores.json."""
     out = {}
     sp = os.path.join(C.JUDGING, "scores.json")
     if os.path.exists(sp):
@@ -64,11 +60,15 @@ def load_scores():
 
 
 # ----------------------------------------------------------------------- aggregate
-def build_summary(recs, scores):
+def build_summary(speed, full, scores):
+    def sgroup(quant, dn):
+        return [r for r in speed if r["quant"] == quant and r["draft_n"] == dn
+                and "predicted_per_second" in r]
+
     per_cell = []
     for quant in QUANTS:
         for dn in C.DRAFT_NS:
-            g = group(recs, quant, dn)
+            g = sgroup(quant, dn)
             if not g:
                 continue
             per_cell.append({
@@ -79,10 +79,20 @@ def build_summary(recs, scores):
                 "prompt_tok_s_mean": fmean([r.get("prompt_per_second") for r in g]),
                 "ttft_ms_mean": fmean([r.get("ttft_ms") for r in g]),
                 "acceptance_mean": fmean([r.get("acceptance_rate") for r in g]),
-                "thinking_tokens_mean": fmean([r.get("thinking_tokens") for r in g]),
-                "answer_tokens_mean": fmean([r.get("answer_tokens") for r in g]),
-                "predicted_n_mean": fmean([r.get("predicted_n") for r in g]),
             })
+
+    # full-length token totals per quant
+    tokens = {}
+    for quant in QUANTS:
+        fg = [r for r in full if r["quant"] == quant]
+        if fg:
+            tokens[quant] = {
+                "thinking_tokens_mean": fmean([r.get("thinking_tokens") for r in fg]),
+                "answer_tokens_mean": fmean([r.get("answer_tokens") for r in fg]),
+                "total_tokens_mean": fmean([r.get("predicted_n") for r in fg]),
+                "answered": sum(1 for r in fg if (r.get("answer_tokens") or 0) > 0),
+                "n": len(fg),
+            }
 
     per_quant = []
     for quant in QUANTS:
@@ -90,68 +100,53 @@ def build_summary(recs, scores):
         if not cells:
             continue
         off = next((c for c in cells if c["draft_n"] == 0), None)
-        mtp_cells = [c for c in cells if c["draft_n"] > 0 and c["tok_s_mean"]]
-        best = max(mtp_cells, key=lambda c: c["tok_s_mean"]) if mtp_cells else None
+        mtp = [c for c in cells if c["draft_n"] > 0 and c["tok_s_mean"]]
+        best = max(mtp, key=lambda c: c["tok_s_mean"]) if mtp else None
         off_tok = off["tok_s_mean"] if off else None
         q_scores = scores.get(quant, {})
         overall = fmean([s.get("overall") for s in q_scores.values()]) if q_scores else None
         per_quant.append({
-            "quant": quant,
-            "label": QUANT_LABEL[quant],
+            "quant": quant, "label": QUANT_LABEL[quant],
             "off_tok_s": off_tok,
             "best_draft_n": best["draft_n"] if best else None,
             "best_tok_s": best["tok_s_mean"] if best else None,
             "speedup_vs_off": (best["tok_s_mean"] / off_tok) if best and off_tok else None,
             "best_acceptance": best["acceptance_mean"] if best else None,
             "quality_overall": overall,
+            **(tokens.get(quant, {})),
         })
 
-    determinism = determinism_check(recs)
     summary = {
         "meta": {
-            "passes": C.PASSES, "quants": QUANTS, "draft_ns": C.DRAFT_NS,
-            "seed": C.SEED, "temp": C.TEMP, "top_p": C.TOP_P, "top_k": C.TOP_K,
-            "n_predict": C.N_PREDICT, "ctx": C.CTX, "n_records": len(recs),
+            "quants": QUANTS, "draft_ns": C.DRAFT_NS, "seed": C.SEED, "temp": C.TEMP,
+            "top_p": C.TOP_P, "top_k": C.TOP_K, "speed_cap": C.SPEED_N_PREDICT,
+            "full_cap": C.FULL_N_PREDICT, "ctx": C.CTX,
+            "n_speed": len(speed), "n_full": len(full),
         },
         "per_quant_config": per_cell,
         "per_quant": per_quant,
-        "determinism": determinism,
+        "determinism": determinism_check(speed),
     }
     with open(C.SUMMARY_JSON, "w") as f:
         json.dump(summary, f, indent=2)
     return summary
 
 
-def determinism_check(recs):
-    """How often pass-2 output != pass-1, and draft-n output != off baseline."""
-    by_key = {}
-    for r in recs:
-        by_key.setdefault((r["quant"], r["draft_n"], r["question_id"]), {})[r["pass"]] = r.get("output_sha256")
-    cross_pass_total = cross_pass_diff = 0
-    for k, byp in by_key.items():
-        if 1 in byp and 2 in byp:
-            cross_pass_total += 1
-            if byp[1] != byp[2]:
-                cross_pass_diff += 1
-
-    baseline = {}
-    for r in recs:
-        if r["draft_n"] == 0 and r["pass"] == 1:
-            baseline[(r["quant"], r["question_id"])] = r.get("output_sha256")
-    vs_base_total = vs_base_diff = 0
-    for r in recs:
-        if r["draft_n"] > 0 and r["pass"] == 1:
-            b = baseline.get((r["quant"], r["question_id"]))
-            if b is not None:
-                vs_base_total += 1
-                if r.get("output_sha256") != b:
-                    vs_base_diff += 1
-    return {
-        "cross_pass_compared": cross_pass_total,
-        "cross_pass_diverged": cross_pass_diff,
-        "mtp_vs_off_compared": vs_base_total,
-        "mtp_vs_off_diverged": vs_base_diff,
-    }
+def determinism_check(speed):
+    """Within the speed phase: how often does an MTP run differ from its off baseline?"""
+    base = {}
+    for r in speed:
+        if r["draft_n"] == 0:
+            base[(r["quant"], r["question_id"])] = r.get("output_sha256")
+    total = diff = 0
+    for r in speed:
+        if r["draft_n"] > 0:
+            b = base.get((r["quant"], r["question_id"]))
+            if b is not None and r.get("output_sha256") is not None:
+                total += 1
+                if r["output_sha256"] != b:
+                    diff += 1
+    return {"mtp_vs_off_compared": total, "mtp_vs_off_diverged": diff}
 
 
 # --------------------------------------------------------------------------- charts
@@ -159,13 +154,17 @@ def _xlabels():
     return ["off" if d == 0 else str(d) for d in C.DRAFT_NS]
 
 
+def _cell(summary, quant, dn):
+    return next((c for c in summary["per_quant_config"]
+                 if c["quant"] == quant and c["draft_n"] == dn), None)
+
+
 def chart_tok_s(summary):
     plt.figure(figsize=(9, 5.5))
     for quant in QUANTS:
         xs, ys, es = [], [], []
         for i, dn in enumerate(C.DRAFT_NS):
-            c = next((c for c in summary["per_quant_config"]
-                      if c["quant"] == quant and c["draft_n"] == dn), None)
+            c = _cell(summary, quant, dn)
             if c and c["tok_s_mean"]:
                 xs.append(i); ys.append(c["tok_s_mean"]); es.append(c["tok_s_std"])
         if xs:
@@ -174,7 +173,7 @@ def chart_tok_s(summary):
     plt.xticks(range(len(C.DRAFT_NS)), _xlabels())
     plt.xlabel("MTP draft tokens (--spec-draft-n-max)")
     plt.ylabel("Decode speed (tokens/sec)")
-    plt.title("Decode throughput vs MTP draft depth (mean +/- sd over 2 passes x 5 Qs)")
+    plt.title("Decode throughput vs MTP draft depth (mean over 5 questions)")
     plt.grid(True, alpha=0.3); plt.legend()
     _save("01_decode_tok_s.png")
 
@@ -182,16 +181,14 @@ def chart_tok_s(summary):
 def chart_speedup(summary):
     plt.figure(figsize=(9, 5.5))
     for quant in QUANTS:
-        off = next((c for c in summary["per_quant_config"]
-                    if c["quant"] == quant and c["draft_n"] == 0), None)
+        off = _cell(summary, quant, 0)
         if not off or not off["tok_s_mean"]:
             continue
         xs, ys = [], []
         for i, dn in enumerate(C.DRAFT_NS):
             if dn == 0:
                 continue
-            c = next((c for c in summary["per_quant_config"]
-                      if c["quant"] == quant and c["draft_n"] == dn), None)
+            c = _cell(summary, quant, dn)
             if c and c["tok_s_mean"]:
                 xs.append(i); ys.append(c["tok_s_mean"] / off["tok_s_mean"])
         if xs:
@@ -210,8 +207,7 @@ def chart_acceptance(summary):
         for i, dn in enumerate(C.DRAFT_NS):
             if dn == 0:
                 continue
-            c = next((c for c in summary["per_quant_config"]
-                      if c["quant"] == quant and c["draft_n"] == dn), None)
+            c = _cell(summary, quant, dn)
             if c and c["acceptance_mean"] is not None:
                 xs.append(i); ys.append(c["acceptance_mean"] * 100)
         if xs:
@@ -224,11 +220,8 @@ def chart_acceptance(summary):
 
 def chart_prompt_speed(summary):
     plt.figure(figsize=(7, 5))
-    vals = []
-    for quant in QUANTS:
-        cells = [c["prompt_tok_s_mean"] for c in summary["per_quant_config"]
-                 if c["quant"] == quant and c["prompt_tok_s_mean"]]
-        vals.append(fmean(cells) or 0)
+    vals = [fmean([c["prompt_tok_s_mean"] for c in summary["per_quant_config"]
+                   if c["quant"] == q and c["prompt_tok_s_mean"]]) or 0 for q in QUANTS]
     plt.bar([QUANT_LABEL[q] for q in QUANTS], vals, color=[COLORS[q] for q in QUANTS])
     plt.ylabel("Prompt processing (tokens/sec)")
     plt.title("Prompt processing speed by quant")
@@ -242,8 +235,7 @@ def chart_ttft(summary):
     for quant in QUANTS:
         xs, ys = [], []
         for i, dn in enumerate(C.DRAFT_NS):
-            c = next((c for c in summary["per_quant_config"]
-                      if c["quant"] == quant and c["draft_n"] == dn), None)
+            c = _cell(summary, quant, dn)
             if c and c["ttft_ms_mean"]:
                 xs.append(i); ys.append(c["ttft_ms_mean"])
         if xs:
@@ -255,17 +247,15 @@ def chart_ttft(summary):
 
 
 def chart_tokens(summary):
-    plt.figure(figsize=(8, 5.5))
-    import numpy as np
+    pq = {q["quant"]: q for q in summary["per_quant"]}
     x = np.arange(len(QUANTS)); w = 0.6
-    think = [fmean([c["thinking_tokens_mean"] for c in summary["per_quant_config"]
-                    if c["quant"] == q]) or 0 for q in QUANTS]
-    ans = [fmean([c["answer_tokens_mean"] for c in summary["per_quant_config"]
-                  if c["quant"] == q]) or 0 for q in QUANTS]
+    think = [(pq.get(q, {}).get("thinking_tokens_mean") or 0) for q in QUANTS]
+    ans = [(pq.get(q, {}).get("answer_tokens_mean") or 0) for q in QUANTS]
+    plt.figure(figsize=(8, 5.5))
     plt.bar(x, think, w, label="thinking tokens", color="#9333ea")
     plt.bar(x, ans, w, bottom=think, label="answer tokens", color="#f59e0b")
     plt.xticks(x, [QUANT_LABEL[q] for q in QUANTS])
-    plt.ylabel("Mean tokens per answer")
+    plt.ylabel("Mean tokens per answer (full 8192 cap)")
     plt.title("Thinking vs answer token volume by quant")
     plt.legend()
     _save("06_tokens.png")
@@ -276,13 +266,12 @@ def chart_quality(summary):
     if not pq:
         return False
     plt.figure(figsize=(7, 5))
-    qs = [q["quant"] for q in pq]
-    vals = [q["quality_overall"] for q in pq]
-    plt.bar([QUANT_LABEL[q] for q in qs], vals, color=[COLORS[q] for q in qs])
+    plt.bar([QUANT_LABEL[q["quant"]] for q in pq], [q["quality_overall"] for q in pq],
+            color=[COLORS[q["quant"]] for q in pq])
     plt.ylim(0, 10); plt.ylabel("Judge quality (1-10)")
     plt.title("Answer quality by quant (Claude/Opus judge)")
-    for i, v in enumerate(vals):
-        plt.text(i, v, f"{v:.1f}", ha="center", va="bottom")
+    for i, q in enumerate(pq):
+        plt.text(i, q["quality_overall"], f"{q['quality_overall']:.1f}", ha="center", va="bottom")
     _save("07_quality.png")
     return True
 
@@ -296,12 +285,12 @@ def chart_quality_speed(summary):
     for q in pq:
         plt.scatter(q["best_tok_s"], q["quality_overall"], s=160,
                     color=COLORS[q["quant"]], zorder=3)
-        plt.annotate(f"{QUANT_LABEL[q['quant']]}\n(n={q['best_draft_n']})",
+        plt.annotate(f"{QUANT_LABEL[q['quant']]} (n={q['best_draft_n']})",
                      (q["best_tok_s"], q["quality_overall"]),
                      textcoords="offset points", xytext=(8, 6))
-    plt.xlabel("Best decode speed (tok/s, optimal MTP n)")
+    plt.xlabel("Best decode speed (tok/s at optimal MTP n)")
     plt.ylabel("Judge quality (1-10)")
-    plt.title("Quality vs speed trade-off (top-right is best)")
+    plt.title("Quality vs speed trade-off (top-right wins)")
     plt.grid(True, alpha=0.3)
     _save("08_quality_vs_speed.png")
     return True
@@ -316,72 +305,75 @@ def _save(name):
 # --------------------------------------------------------------------------- report
 def write_report(summary, has_quality):
     m = summary["meta"]
-    lines = []
-    lines.append("# Qwen3.6-27B MTP benchmark — Q5 / Q6 / Q8 on Apple M5 Pro (64 GB)\n")
-    lines.append(f"_{m['n_records']} successful runs · {len(m['passes'])} passes · "
-                 f"draft-n sweep {m['draft_ns']} · temp {m['temp']}, seed {m['seed']}, "
-                 f"cap {m['n_predict']} tok · ctx {m['ctx']}._\n")
+    L = []
+    L.append("# Qwen3.6-27B MTP benchmark — Q5 / Q6 / Q8 on Apple M5 Pro (64 GB)\n")
+    L.append(f"_Speed sweep: {m['n_speed']} runs (cap {m['speed_cap']} tok) · "
+             f"full-length: {m['n_full']} runs (cap {m['full_cap']} tok) · "
+             f"temp {m['temp']}, seed {m['seed']}, ctx {m['ctx']}._\n")
 
-    # Headline recommendation
-    pq = summary["per_quant"]
-    lines.append("## TL;DR\n")
-    for q in pq:
+    L.append("## TL;DR\n")
+    for q in summary["per_quant"]:
         spd = f"{q['speedup_vs_off']:.2f}x" if q.get("speedup_vs_off") else "n/a"
         qual = f"{q['quality_overall']:.1f}/10" if q.get("quality_overall") is not None else "ungraded"
-        lines.append(f"- **{q['label']}** — best at draft-n={q['best_draft_n']}: "
-                     f"**{(q['best_tok_s'] or 0):.1f} tok/s** ({spd} vs MTP-off), "
-                     f"acceptance {(q['best_acceptance'] or 0)*100:.0f}%, quality {qual}.")
-    lines.append("")
+        L.append(f"- **{q['label']}** — peak **{(q['best_tok_s'] or 0):.1f} tok/s** at "
+                 f"draft-n={q['best_draft_n']} ({spd} vs off, "
+                 f"{(q['best_acceptance'] or 0)*100:.0f}% accept); quality {qual}; "
+                 f"~{(q.get('total_tokens_mean') or 0):.0f} tok/answer.")
+    L.append("")
 
-    # Charts
-    lines.append("## Charts\n")
-    chart_files = ["01_decode_tok_s.png", "02_speedup.png", "03_acceptance.png",
-                   "04_prompt_speed.png", "05_ttft.png", "06_tokens.png"]
+    L.append("## Charts\n")
+    cfiles = ["01_decode_tok_s.png", "02_speedup.png", "03_acceptance.png",
+              "04_prompt_speed.png", "05_ttft.png", "06_tokens.png"]
     if has_quality:
-        chart_files += ["07_quality.png", "08_quality_vs_speed.png"]
-    for cf in chart_files:
-        lines.append(f"![{cf}](charts/{cf})\n")
+        cfiles += ["07_quality.png", "08_quality_vs_speed.png"]
+    for cf in cfiles:
+        L.append(f"![{cf}](results/charts/{cf})\n")
 
-    # Per-config table
-    lines.append("## Per-config detail (mean over 2 passes x 5 questions)\n")
-    lines.append("| quant | draft-n | tok/s | ±sd | accept % | prompt tok/s | TTFT ms | think tok | answer tok |")
-    lines.append("|---|---|---|---|---|---|---|---|---|")
+    L.append("## Speed sweep (mean over 5 questions)\n")
+    L.append("| quant | draft-n | tok/s | ±sd | accept % | prompt tok/s | TTFT ms |")
+    L.append("|---|---|---|---|---|---|---|")
     for c in summary["per_quant_config"]:
         acc = f"{c['acceptance_mean']*100:.0f}" if c["acceptance_mean"] is not None else "-"
-        lines.append(
-            f"| {QUANT_LABEL[c['quant']]} | {c['config']} | "
-            f"{(c['tok_s_mean'] or 0):.1f} | {(c['tok_s_std'] or 0):.1f} | {acc} | "
-            f"{(c['prompt_tok_s_mean'] or 0):.0f} | {(c['ttft_ms_mean'] or 0):.0f} | "
-            f"{(c['thinking_tokens_mean'] or 0):.0f} | {(c['answer_tokens_mean'] or 0):.0f} |")
-    lines.append("")
+        L.append(f"| {QUANT_LABEL[c['quant']]} | {c['config']} | {(c['tok_s_mean'] or 0):.1f} | "
+                 f"{(c['tok_s_std'] or 0):.1f} | {acc} | {(c['prompt_tok_s_mean'] or 0):.0f} | "
+                 f"{(c['ttft_ms_mean'] or 0):.0f} |")
+    L.append("")
 
-    # Determinism
+    L.append("## Full-length output (8192 cap, off config)\n")
+    L.append("| quant | total tok | thinking tok | answer tok | answers completed |")
+    L.append("|---|---|---|---|---|")
+    for q in summary["per_quant"]:
+        L.append(f"| {q['label']} | {(q.get('total_tokens_mean') or 0):.0f} | "
+                 f"{(q.get('thinking_tokens_mean') or 0):.0f} | "
+                 f"{(q.get('answer_tokens_mean') or 0):.0f} | "
+                 f"{q.get('answered', 0)}/{q.get('n', 0)} |")
+    L.append("")
+
     d = summary["determinism"]
-    lines.append("## Output determinism\n")
-    lines.append(f"- Cross-pass (fixed seed): {d['cross_pass_diverged']}/{d['cross_pass_compared']} "
-                 f"cells differed between pass 1 and pass 2.")
-    lines.append(f"- MTP vs off baseline (#23302 probe): {d['mtp_vs_off_diverged']}/{d['mtp_vs_off_compared']} "
-                 f"MTP runs produced a different output than their MTP-off baseline.\n")
+    L.append("## Output determinism (MTP correctness probe, #23302)\n")
+    L.append(f"- {d['mtp_vs_off_diverged']}/{d['mtp_vs_off_compared']} MTP runs produced a "
+             f"different output than their MTP-off baseline (fixed seed). 0 = MTP is "
+             f"output-preserving on this build; >0 flags the known determinism bug.\n")
 
-    # Hosting recommendation
     best = _pick_overall(summary)
     if best:
-        lines.append("## Hosting recommendation\n")
-        lines.append(f"For this machine, **{best['label']}** at "
-                     f"`--spec-draft-n-max {best['best_draft_n']}` is the recommended "
-                     f"serving config (best measured quality/speed balance). Launch line:\n")
-        lines.append("```bash")
-        lines.append(f"llama-server -m {C.MODELS[best['quant']]} \\")
-        lines.append(f"  --spec-type draft-mtp --spec-draft-n-max {best['best_draft_n']} \\")
-        lines.append("  -c 16384 -ngl 99 -fa on -np 1 --jinja --reasoning-format deepseek \\")
-        lines.append("  --temp 0.6 --top-p 0.95 --top-k 20 --host 127.0.0.1 --port 8080")
-        lines.append("```\n")
-        lines.append("Wire it into the research engine as an `openai_compat` provider profile "
-                     "(`config/providers.ts`) pointing at `http://127.0.0.1:8080/v1`; the engine's "
-                     "existing `lib/analyst/` OpenAI-compatible adapter then drives it as the brain.\n")
+        L.append("## Hosting recommendation\n")
+        L.append(f"On this machine, serve **{best['label']}** with "
+                 f"`--spec-draft-n-max {best['best_draft_n']}` "
+                 f"(~{(best['best_tok_s'] or 0):.0f} tok/s, "
+                 f"{(best.get('quality_overall') or 0):.1f}/10 quality). Launch line:\n")
+        L.append("```bash")
+        L.append(f"llama-server -m {C.MODELS[best['quant']]} \\")
+        L.append(f"  --spec-type draft-mtp --spec-draft-n-max {best['best_draft_n']} \\")
+        L.append("  -c 16384 -ngl 99 -fa on -np 1 --jinja --reasoning-format deepseek \\")
+        L.append("  --temp 0.6 --top-p 0.95 --top-k 20 --host 127.0.0.1 --port 8080")
+        L.append("```\n")
+        L.append("Wire it into the research engine as an `openai_compat` provider profile "
+                 "(`config/providers.ts`) pointing at `http://127.0.0.1:8080/v1`; the existing "
+                 "`lib/analyst/` adapter then drives it as the brain.\n")
 
     with open(os.path.join(C.REPO, "REPORT.md"), "w") as f:
-        f.write("\n".join(lines))
+        f.write("\n".join(L))
     print("wrote REPORT.md")
 
 
@@ -391,7 +383,6 @@ def _pick_overall(summary):
         return None
     graded = [q for q in pq if q.get("quality_overall") is not None]
     if graded:
-        # maximize quality, tie-break on speed
         return max(graded, key=lambda q: (round(q["quality_overall"], 1), q["best_tok_s"]))
     return max(pq, key=lambda q: q["best_tok_s"])
 
@@ -399,18 +390,22 @@ def _pick_overall(summary):
 # ------------------------------------------------------------------------------ main
 def main():
     os.makedirs(C.CHARTS, exist_ok=True)
-    recs = load_records()
-    if not recs:
-        print("no successful records yet")
+    recs = load_all()
+    speed = [r for r in recs if r.get("phase") == "speed" and "predicted_per_second" in r]
+    full = [r for r in recs if r.get("phase") == "full" and r.get("thinking_tokens") is not None]
+    if not speed:
+        print("no speed records yet")
         return
     scores = load_scores()
-    summary = build_summary(recs, scores)
+    summary = build_summary(speed, full, scores)
     chart_tok_s(summary); chart_speedup(summary); chart_acceptance(summary)
-    chart_prompt_speed(summary); chart_ttft(summary); chart_tokens(summary)
+    chart_prompt_speed(summary); chart_ttft(summary)
+    if full:
+        chart_tokens(summary)
     has_quality = chart_quality(summary)
     chart_quality_speed(summary)
     write_report(summary, has_quality)
-    print(f"done: {len(recs)} records, charts in {C.CHARTS}")
+    print(f"done: {len(speed)} speed + {len(full)} full records; charts in {C.CHARTS}")
 
 
 if __name__ == "__main__":

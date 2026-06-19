@@ -1,0 +1,123 @@
+[01:31:00] START run: 270 generations (passes=[1, 2] quants=['q5', 'q6', 'q8'] draft_ns=[0, 1, 2, 3, 4, 5, 6, 7, 8] n_predict=8192)
+[01:31:00] launch q5 off pass1 ...
+[01:40:46]   ok q5 off p1 q1_model_selection: 7402 tok @ 12.7 tok/s, ttft 788ms
+[01:40:46]   progress 1/270 (10 min elapsed, ETA 2627 min)
+[01:51:40]   ok q5 off p1 q2_coding: 8192 tok @ 12.5 tok/s, ttft 945ms
+[01:51:40]   progress 2/270 (21 min elapsed, ETA 2770 min)
+[01:59:49]   ok q5 off p1 q3_architecture: 6060 tok @ 12.4 tok/s, ttft 952ms
+[01:59:49]   progress 3/270 (29 min elapsed, ETA 2565 min)
+[02:06:34]   ok q5 off p1 q4_finance_reasoning: 5123 tok @ 12.7 tok/s, ttft 924ms
+[02:06:34]   progress 4/270 (36 min elapsed, ETA 2366 min)
+[02:15:56]   ok q5 off p1 q5_debugging: 7095 tok @ 12.6 tok/s, ttft 869ms
+[02:15:57]   progress 5/270 (45 min elapsed, ETA 2382 min)
+[02:15:57] launch q5 mtp1 pass1 ...
+[02:24:10]   ok q5 mtp1 p1 q1_model_selection: 7189 tok @ 14.7 tok/s, acc 81%, ttft 808ms
+[02:24:10]   progress 6/270 (53 min elapsed, ETA 2339 min)
+[02:33:15]   ok q5 mtp1 p1 q2_coding: 8192 tok @ 15.0 tok/s, acc 87%, ttft 874ms
+[02:33:15]   progress 7/270 (62 min elapsed, ETA 2339 min)
+[02:40:02]   ok q5 mtp1 p1 q3_architecture: 5900 tok @ 14.6 tok/s, acc 79%, ttft 902ms
+[02:40:02]   progress 8/270 (69 min elapsed, ETA 2261 min)
+[02:45:57]   ok q5 mtp1 p1 q4_finance_reasoning: 5123 tok @ 14.4 tok/s, acc 77%, ttft 900ms
+[02:45:57]   progress 9/270 (75 min elapsed, ETA 2174 min)
+[02:53:53]   ok q5 mtp1 p1 q5_debugging: 7095 tok @ 15.0 tok/s, acc 85%, ttft 893ms
+[02:53:53]   progress 10/270 (83 min elapsed, ETA 2155 min)
+[02:53:53] launch q5 mtp2 pass1 ...
+[03:02:58]   ok q5 mtp2 p1 q1_model_selection: 7189 tok @ 13.3 tok/s, acc 69%, ttft 829ms
+[03:02:58]   progress 11/270 (92 min elapsed, ETA 2165 min)
+[03:12:31]   ok q5 mtp2 p1 q2_coding: 8192 tok @ 14.3 tok/s, acc 79%, ttft 866ms
+[03:12:31]   progress 12/270 (102 min elapsed, ETA 2183 min)
+[03:20:01]   ok q5 mtp2 p1 q3_architecture: 5900 tok @ 13.1 tok/s, acc 67%, ttft 898ms
+[03:20:01]   progress 13/270 (109 min elapsed, ETA 2155 min)
+[03:26:40]   ok q5 mtp2 p1 q4_finance_reasoning: 5123 tok @ 12.9 tok/s, acc 65%, ttft 897ms
+[03:26:40]   progress 14/270 (116 min elapsed, ETA 2115 min)
+[03:35:09]   ok q5 mtp2 p1 q5_debugging: 7095 tok @ 14.0 tok/s, acc 75%, ttft 882ms
+[03:35:09]   progress 15/270 (124 min elapsed, ETA 2110 min)
+[03:35:09] launch q5 mtp3 pass1 ...
+[03:42:05]   ok q5 mtp3 p1 q1_model_selection: 7048 tok @ 17.1 tok/s, acc 56%, ttft 835ms
+[03:42:05]   progress 16/270 (131 min elapsed, ETA 2081 min)
+[03:49:04]   ok q5 mtp3 p1 q2_coding: 8192 tok @ 19.6 tok/s, acc 70%, ttft 890ms
+[03:49:04]   progress 17/270 (138 min elapsed, ETA 2055 min)
+[03:54:41]   ok q5 mtp3 p1 q3_architecture: 5698 tok @ 16.9 tok/s, acc 55%, ttft 915ms
+[03:54:41]   progress 18/270 (144 min elapsed, ETA 2012 min)
+[04:00:12]   ok q5 mtp3 p1 q4_finance_reasoning: 5551 tok @ 16.8 tok/s, acc 55%, ttft 930ms
+[04:00:12]   progress 19/270 (149 min elapsed, ETA 1971 min)
+[04:07:17]   ok q5 mtp3 p1 q5_debugging: 8003 tok @ 18.9 tok/s, acc 66%, ttft 896ms
+[04:07:17]   progress 20/270 (156 min elapsed, ETA 1953 min)
+[04:07:17] launch q5 mtp4 pass1 ...
+[04:14:31]   ok q5 mtp4 p1 q1_model_selection: 7072 tok @ 16.4 tok/s, acc 48%, ttft 840ms
+[04:14:31]   progress 21/270 (164 min elapsed, ETA 1939 min)
+[04:21:31]   ok q5 mtp4 p1 q2_coding: 8192 tok @ 19.5 tok/s, acc 62%, ttft 895ms
+[04:21:31]   progress 22/270 (171 min elapsed, ETA 1922 min)
+[04:27:28]   ok q5 mtp4 p1 q3_architecture: 5698 tok @ 16.0 tok/s, acc 46%, ttft 921ms
+[04:27:28]   progress 23/270 (176 min elapsed, ETA 1895 min)
+[04:33:13]   ok q5 mtp4 p1 q4_finance_reasoning: 5551 tok @ 16.1 tok/s, acc 47%, ttft 936ms
+[04:33:13]   progress 24/270 (182 min elapsed, ETA 1868 min)
+[04:40:28]   ok q5 mtp4 p1 q5_debugging: 8003 tok @ 18.4 tok/s, acc 58%, ttft 921ms
+[04:40:28]   progress 25/270 (189 min elapsed, ETA 1857 min)
+[04:40:28] launch q5 mtp5 pass1 ...
+[04:49:39]   ok q5 mtp5 p1 q1_model_selection: 7072 tok @ 12.9 tok/s, acc 41%, ttft 845ms
+[04:49:39]   progress 26/270 (199 min elapsed, ETA 1864 min)
+[04:58:12]   ok q5 mtp5 p1 q2_coding: 8192 tok @ 16.0 tok/s, acc 56%, ttft 901ms
+[04:58:12]   progress 27/270 (207 min elapsed, ETA 1865 min)
+[05:05:54]   ok q5 mtp5 p1 q3_architecture: 5993 tok @ 13.0 tok/s, acc 41%, ttft 914ms
+[05:05:54]   progress 28/270 (215 min elapsed, ETA 1857 min)
+[05:13:13]   ok q5 mtp5 p1 q4_finance_reasoning: 5551 tok @ 12.7 tok/s, acc 40%, ttft 935ms
+[05:13:13]   progress 29/270 (222 min elapsed, ETA 1847 min)
+[05:21:59]   ok q5 mtp5 p1 q5_debugging: 8003 tok @ 15.2 tok/s, acc 52%, ttft 910ms
+[05:21:59]   progress 30/270 (231 min elapsed, ETA 1848 min)
+[05:21:59] launch q5 mtp6 pass1 ...
+[05:32:33]   ok q5 mtp6 p1 q1_model_selection: 7048 tok @ 11.2 tok/s, acc 35%, ttft 838ms
+[05:32:33]   progress 31/270 (242 min elapsed, ETA 1862 min)
+[05:42:09]   ok q5 mtp6 p1 q2_coding: 8192 tok @ 14.2 tok/s, acc 50%, ttft 893ms
+[05:42:09]   progress 32/270 (251 min elapsed, ETA 1868 min)
+[05:51:03]   ok q5 mtp6 p1 q3_architecture: 5993 tok @ 11.3 tok/s, acc 36%, ttft 915ms
+[05:51:03]   progress 33/270 (260 min elapsed, ETA 1868 min)
+[05:59:18]   ok q5 mtp6 p1 q4_finance_reasoning: 5471 tok @ 11.1 tok/s, acc 35%, ttft 932ms
+[05:59:18]   progress 34/270 (268 min elapsed, ETA 1862 min)
+[06:09:14]   ok q5 mtp6 p1 q5_debugging: 8003 tok @ 13.4 tok/s, acc 46%, ttft 906ms
+[06:09:14]   progress 35/270 (278 min elapsed, ETA 1868 min)
+[06:09:15] launch q5 mtp7 pass1 ...
+[06:20:09]   ok q5 mtp7 p1 q1_model_selection: 7072 tok @ 10.9 tok/s, acc 31%, ttft 851ms
+[06:20:09]   progress 36/270 (289 min elapsed, ETA 1879 min)
+[06:29:44]   ok q5 mtp7 p1 q2_coding: 8192 tok @ 14.3 tok/s, acc 46%, ttft 900ms
+[06:29:44]   progress 37/270 (299 min elapsed, ETA 1881 min)
+[06:38:42]   ok q5 mtp7 p1 q3_architecture: 5698 tok @ 10.6 tok/s, acc 30%, ttft 923ms
+[06:38:42]   progress 38/270 (308 min elapsed, ETA 1879 min)
+[06:47:09]   ok q5 mtp7 p1 q4_finance_reasoning: 5471 tok @ 10.8 tok/s, acc 31%, ttft 940ms
+[06:47:09]   progress 39/270 (316 min elapsed, ETA 1873 min)
+[06:56:51]   ok q5 mtp7 p1 q5_debugging: 7608 tok @ 13.1 tok/s, acc 41%, ttft 909ms
+[06:56:51]   progress 40/270 (326 min elapsed, ETA 1874 min)
+[06:56:51] launch q5 mtp8 pass1 ...
+[07:08:15]   ok q5 mtp8 p1 q1_model_selection: 6202 tok @ 9.1 tok/s, acc 29%, ttft 875ms
+[07:08:15]   progress 41/270 (337 min elapsed, ETA 1884 min)
+[07:19:53]   ok q5 mtp8 p1 q2_coding: 8192 tok @ 11.8 tok/s, acc 42%, ttft 866ms
+[07:19:53]   progress 42/270 (349 min elapsed, ETA 1894 min)
+[07:31:17]   ok q5 mtp8 p1 q3_architecture: 6111 tok @ 8.9 tok/s, acc 28%, ttft 896ms
+[07:31:17]   progress 43/270 (360 min elapsed, ETA 1902 min)
+[07:41:05]   ok q5 mtp8 p1 q4_finance_reasoning: 5094 tok @ 8.7 tok/s, acc 27%, ttft 906ms
+[07:41:05]   progress 44/270 (370 min elapsed, ETA 1901 min)
+[07:52:54]   ok q5 mtp8 p1 q5_debugging: 7461 tok @ 10.5 tok/s, acc 36%, ttft 875ms
+[07:52:54]   progress 45/270 (382 min elapsed, ETA 1910 min)
+[07:52:55] launch q6 off pass1 ...
+[08:04:17]   ok q6 off p1 q1_model_selection: 7248 tok @ 10.7 tok/s, ttft 851ms
+[08:04:17]   progress 46/270 (393 min elapsed, ETA 1915 min)
+[08:17:04]   ok q6 off p1 q2_coding: 8192 tok @ 10.7 tok/s, ttft 786ms
+[08:17:04]   progress 47/270 (406 min elapsed, ETA 1927 min)
+[08:26:10]   ok q6 off p1 q3_architecture: 5850 tok @ 10.7 tok/s, ttft 822ms
+[08:26:10]   progress 48/270 (415 min elapsed, ETA 1920 min)
+[08:33:58]   ok q6 off p1 q4_finance_reasoning: 5020 tok @ 10.8 tok/s, ttft 808ms
+[08:33:58]   progress 49/270 (423 min elapsed, ETA 1908 min)
+[08:43:42]   ok q6 off p1 q5_debugging: 6260 tok @ 10.7 tok/s, ttft 791ms
+[08:43:42]   progress 50/270 (433 min elapsed, ETA 1904 min)
+[08:43:42] launch q6 mtp1 pass1 ...
+[08:52:04]   ok q6 mtp1 p1 q1_model_selection: 7254 tok @ 14.5 tok/s, acc 80%, ttft 800ms
+[08:52:04]   progress 51/270 (441 min elapsed, ETA 1894 min)
+[09:01:10]   ok q6 mtp1 p1 q2_coding: 8192 tok @ 15.0 tok/s, acc 89%, ttft 852ms
+[09:01:10]   progress 52/270 (450 min elapsed, ETA 1887 min)
+[09:08:03]   ok q6 mtp1 p1 q3_architecture: 5850 tok @ 14.2 tok/s, acc 78%, ttft 864ms
+[09:08:03]   progress 53/270 (457 min elapsed, ETA 1871 min)
+[09:13:58]   ok q6 mtp1 p1 q4_finance_reasoning: 5020 tok @ 14.2 tok/s, acc 77%, ttft 886ms
+[09:13:58]   progress 54/270 (463 min elapsed, ETA 1852 min)
+[09:21:07]   ok q6 mtp1 p1 q5_debugging: 6251 tok @ 14.6 tok/s, acc 84%, ttft 868ms
+[09:21:07]   progress 55/270 (470 min elapsed, ETA 1838 min)
+[09:21:07] launch q6 mtp2 pass1 ...
