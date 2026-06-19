@@ -302,3 +302,35 @@
 [12:28:02] launch [full] q5 off pass1 ...
 [12:37:46]   ok q5 off p1 q1_model_selection: 7402 tok @ 12.8 tok/s, ttft 805ms
 [12:37:46]   progress 1/15 (10 min elapsed, ETA 136 min)
+[12:48:33]   ok q5 off p1 q2_coding: 8294 tok @ 12.8 tok/s, ttft 818ms
+[12:48:33]   progress 2/15 (21 min elapsed, ETA 133 min)
+[12:56:19]   ok q5 off p1 q3_architecture: 6060 tok @ 13.0 tok/s, ttft 808ms
+[12:56:19]   progress 3/15 (28 min elapsed, ETA 113 min)
+[13:02:53]   ok q5 off p1 q4_finance_reasoning: 5123 tok @ 13.0 tok/s, ttft 856ms
+[13:02:53]   progress 4/15 (35 min elapsed, ETA 96 min)
+[13:12:00]   ok q5 off p1 q5_debugging: 7095 tok @ 13.0 tok/s, ttft 818ms
+[13:12:00]   progress 5/15 (44 min elapsed, ETA 88 min)
+[13:12:00] launch [full] q6 off pass1 ...
+[13:23:28]   ok q6 off p1 q1_model_selection: 7248 tok @ 10.7 tok/s, ttft 784ms
+[13:23:28]   progress 6/15 (55 min elapsed, ETA 83 min)
+[13:38:26]   ok q6 off p1 q2_coding: 9526 tok @ 10.6 tok/s, ttft 793ms
+[13:38:26]   progress 7/15 (70 min elapsed, ETA 80 min)
+[13:47:33]   ok q6 off p1 q3_architecture: 5850 tok @ 10.7 tok/s, ttft 820ms
+[13:47:33]   progress 8/15 (80 min elapsed, ETA 70 min)
+[13:55:22]   ok q6 off p1 q4_finance_reasoning: 5020 tok @ 10.7 tok/s, ttft 826ms
+[13:55:22]   progress 9/15 (87 min elapsed, ETA 58 min)
+[14:05:08]   ok q6 off p1 q5_debugging: 6260 tok @ 10.7 tok/s, ttft 804ms
+[14:05:08]   progress 10/15 (97 min elapsed, ETA 49 min)
+[14:05:08] launch [full] q8 off pass1 ...
+[14:17:21]   ok q8 off p1 q1_model_selection: 7053 tok @ 9.7 tok/s, ttft 763ms
+[14:17:21]   progress 11/15 (109 min elapsed, ETA 40 min)
+[14:34:36]   ok q8 off p1 q2_coding: 9998 tok @ 9.7 tok/s, ttft 795ms
+[14:34:36]   progress 12/15 (127 min elapsed, ETA 32 min)
+[14:43:59]   ok q8 off p1 q3_architecture: 5475 tok @ 9.7 tok/s, ttft 804ms
+[14:43:59]   progress 13/15 (136 min elapsed, ETA 21 min)
+[14:51:38]   ok q8 off p1 q4_finance_reasoning: 4395 tok @ 9.6 tok/s, ttft 790ms
+[14:51:38]   progress 14/15 (144 min elapsed, ETA 10 min)
+[15:02:59]   ok q8 off p1 q5_debugging: 6594 tok @ 9.7 tok/s, ttft 773ms
+[15:02:59]   progress 15/15 (155 min elapsed, ETA 0 min)
+[15:03:00] DONE run in 155.0 min
+[15:03:00] consolidated 150 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json

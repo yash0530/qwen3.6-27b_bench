@@ -1,0 +1,157 @@
+{
+  "judge": "claude-opus-4-8",
+  "rubric_version": 1,
+  "notes": "Graded by Claude/Opus reading all 15 full-length answers. Weights: correctness 0.35, depth 0.25, instruction_following 0.20, practicality 0.20. All three quants are excellent and near-equivalent; differences are small and consistent (Q8 >= Q6 >= Q5). q1 (market research) is uniformly capped on correctness because the local model's training cutoff predates the real mid-2026 models (it recommends speculative 'Qwen3-32B', and several answers wrongly claim 'MTP not supported, skip').",
+  "scores": [
+    {
+      "quant": "q5",
+      "question_id": "q1_model_selection",
+      "correctness": 6,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 7.5,
+      "rationale": "Sound reasoning and a coincidentally-near-correct pick (Qwen ~30B at Q5), but cutoff-limited: speculative model names and the wrong claim that MTP isn't supported. Covers all parts (research, comparison, pick, hosting, wiring)."
+    },
+    {
+      "quant": "q5",
+      "question_id": "q2_coding",
+      "correctness": 8,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.2,
+      "rationale": "Correct token-bucket + worker-pool + retry/jitter + abort + failure isolation. Minor: no max-backoff cap, and an items[index-1] edge bug in the fallback catch."
+    },
+    {
+      "quant": "q5",
+      "question_id": "q3_architecture",
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.8,
+      "rationale": "Excellent, audit-first design: provenance map, hash-chained audit log, replay(), strict compute-then-narrate boundary with a verifier gate. Independently mirrors the real engine's principles."
+    },
+    {
+      "quant": "q5",
+      "question_id": "q4_finance_reasoning",
+      "correctness": 8,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.45,
+      "rationale": "Sophisticated second-order reasoning (CoWoS/packaging bottleneck, inference commoditization, grid resilience), clean signal-vs-noise table and sector matrix, actionable weekly plan."
+    },
+    {
+      "quant": "q5",
+      "question_id": "q5_debugging",
+      "correctness": 9,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.55,
+      "rationale": "Sharp: correctly notes the original code doesn't actually cache rejections and the poisoning emerges from the naive fix. Correct dedup-before-await + .catch eviction + TTL/LRU."
+    },
+    {
+      "quant": "q6",
+      "question_id": "q1_model_selection",
+      "correctness": 6.5,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 9,
+      "overall": 7.9,
+      "rationale": "More decisive than q5 with explicit memory math and a 'don't trust native function-calling, route via JSON' caveat that matches reality. Still cutoff-limited/speculative on model names."
+    },
+    {
+      "quant": "q6",
+      "question_id": "q2_coding",
+      "correctness": 8.5,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.4,
+      "rationale": "Cleanest structure: modular retryWithBackoff + abortable delay helpers, worker pool, collects results. Correct and idiomatic; abort not counted as failure."
+    },
+    {
+      "quant": "q6",
+      "question_id": "q3_architecture",
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 9,
+      "overall": 9.0,
+      "rationale": "Most concrete architecture: SQL DDL for the job registry, advisory-lock overlap prevention, idempotency keys, Merkle-root lineage, verifier gate. Production-grade."
+    },
+    {
+      "quant": "q6",
+      "question_id": "q4_finance_reasoning",
+      "correctness": 8,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 8.5,
+      "overall": 8.55,
+      "rationale": "Strong 'scissors effect' framing (rising input costs vs falling inference prices), explicit hedges and trigger levels for the week. Crisp prioritized summary."
+    },
+    {
+      "quant": "q6",
+      "question_id": "q5_debugging",
+      "correctness": 9,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8.5,
+      "overall": 8.65,
+      "rationale": "Correct analysis and a clean minimal fix plus a generic AsyncCache (TTL + LRU). Slightly more concise than q5; notes cross-worker/distributed caveats."
+    },
+    {
+      "quant": "q8",
+      "question_id": "q1_model_selection",
+      "correctness": 6.5,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 9,
+      "overall": 8.1,
+      "rationale": "The most complete q1: capability matrix, RAG strategy, full engine wiring with code, operational checklist, fallback plan. Still cutoff-limited; minor slip ('Q6_K pushes past 45GB')."
+    },
+    {
+      "quant": "q8",
+      "question_id": "q2_coding",
+      "correctness": 8.5,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8.5,
+      "overall": 8.5,
+      "rationale": "Most complete coding answer: adds a maxDelayMs backoff cap and tracks retries in errors. Correct throughout; tiny unused destructure of {retries}."
+    },
+    {
+      "quant": "q8",
+      "question_id": "q3_architecture",
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 9,
+      "overall": 9.0,
+      "rationale": "Comprehensive: provenance ids, hash-chained audit, DLQ, idempotency keys, advisory locks, network-isolated narration container. Every digest line resolves to a number or dated source."
+    },
+    {
+      "quant": "q8",
+      "question_id": "q4_finance_reasoning",
+      "correctness": 8.5,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 8.5,
+      "overall": 8.7,
+      "rationale": "Adds explicit cross-sector feedback loops and resolves the apparent HBM-up/inference-down paradox via software efficiency + workload tiering. Tightest reasoning of the three."
+    },
+    {
+      "quant": "q8",
+      "question_id": "q5_debugging",
+      "correctness": 9.5,
+      "depth": 8.5,
+      "instruction_following": 9,
+      "practicality": 9,
+      "overall": 9.05,
+      "rationale": "Cleanest fix: a createLoader factory that also wraps Promise.resolve(fetchFn()) to catch SYNCHRONOUS throws (a subtlety the others missed), plus TTL + FIFO eviction and stampede note."
+    }
+  ]
+}
