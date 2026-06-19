@@ -47,7 +47,10 @@ CTX = 16384               # safely holds prompt (~1-2k) + up to 8192 generated
 #     -- complete answers for judging + true thinking/answer token totals. Draft-n does
 #     not change the output, so one config suffices.
 SPEED_N_PREDICT = 1024
-FULL_N_PREDICT = 8192
+# Total-token cap (thinking + answer share one budget). 12288 lets the answer complete
+# even on the long coding prompt (thinking self-terminates ~5-7k for these prompts, so
+# this leaves ample room for the answer) while fitting in CTX=16384 with the prompt.
+FULL_N_PREDICT = 12288
 
 # Smoke test overrides (fast end-to-end pipeline validation)
 SMOKE_QUANTS = ["q5"]
