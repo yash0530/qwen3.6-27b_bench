@@ -152,15 +152,17 @@ THINK_OPEN = re.compile(r"^\s*<think>", re.IGNORECASE)
 
 
 def split_think(raw: str):
-    """Return (thinking_text, answer_text). Qwen3.6 emits reasoning then </think>."""
+    """Return (thinking_text, answer_text).
+
+    The Qwen3.6 chat template opens `<think>` at the end of the prompt, so generation
+    always begins *inside* the reasoning block. It emits reasoning, then `</think>`,
+    then the final answer. If `</think>` is absent the reasoning was truncated by the
+    token cap, so the entire output is thinking (not answer).
+    """
     idx = raw.lower().find("</think>")
     if idx == -1:
-        # No closing tag: either a non-thinking answer or truncated reasoning.
-        if THINK_OPEN.search(raw):
-            return THINK_OPEN.sub("", raw, count=1).strip(), ""
-        return "", raw.strip()
-    thinking = raw[:idx]
-    thinking = THINK_OPEN.sub("", thinking, count=1).strip()
+        return THINK_OPEN.sub("", raw, count=1).strip(), ""
+    thinking = THINK_OPEN.sub("", raw[:idx], count=1).strip()
     answer = raw[idx + len("</think>"):].strip()
     return thinking, answer
 
