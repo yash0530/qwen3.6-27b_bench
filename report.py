@@ -391,7 +391,10 @@ def _pick_overall(summary):
 def main():
     os.makedirs(C.CHARTS, exist_ok=True)
     recs = load_all()
-    speed = [r for r in recs if r.get("phase") == "speed" and "predicted_per_second" in r]
+    # Respect the DRAFT_NS cap (n<=4): n=5-8 records stay in the raw JSONL but are
+    # excluded from charts, tables, and the best-n recommendation.
+    speed = [r for r in recs if r.get("phase") == "speed" and "predicted_per_second" in r
+             and r.get("draft_n") in C.DRAFT_NS]
     full = [r for r in recs if r.get("phase") == "full" and r.get("thinking_tokens") is not None]
     if not speed:
         print("no speed records yet")

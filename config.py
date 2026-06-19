@@ -26,7 +26,9 @@ QUANT_ORDER = ["q5", "q6", "q8"]
 
 # --- MTP sweep -----------------------------------------------------------------
 # draft_n == 0 is the special "MTP off" baseline (--spec-type none).
-DRAFT_NS = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+# Capped at 4: the sweep showed acceptance and tok/s both fall off past n=4, so n=5-8
+# are excluded from analysis/recommendation (raw records remain in results.jsonl).
+DRAFT_NS = [0, 1, 2, 3, 4]
 
 # Single pass. (Outputs are deterministic across draft-n with a fixed seed, so the
 # speed sweep needs only one measurement per cell.)
