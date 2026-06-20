@@ -22,19 +22,22 @@ in the 45 GB envelope that beats it (see `RESEARCH_models.md`).
 | Q5_K_XL (19 GB) | 8.30 | 17.7 | 3 | 1.37× | 57% | 864 ms | 6,795 |
 | Q6_K_XL (24 GB) | 8.50 | 17.5 | 3 | 1.61× | 57% | 856 ms | 6,781 |
 | **Q8_0 (27 GB)** | **8.67** | **17.7** | **2** | **1.80×** | **68%** | **761 ms** | 6,703 |
+| MLX-8bit (29 GB)* | - | 8.0 | off | - | - | 1076 ms | 6,468 |
+
+*\*MLX run was concluded early on the final debugging prompt; tok/answer based on the 4 completed prompts.*
 
 ---
 
-## Results & analysis (GGUF)
+## Results & analysis (GGUF & MLX)
 
-**Decode tok/s by MTP draft-n** (mean over 5 questions; n capped at 4 — beyond that acceptance
-and throughput fall off):
+**Decode tok/s by MTP draft-n / Runtime** (mean over questions; n capped at 4 — beyond that acceptance and throughput fall off):
 
 | quant | off | n1 | n2 | n3 | n4 |
 |---|---|---|---|---|---|
 | Q5 | 12.9 | 14.9 | 13.4 | **17.7** | 17.2 |
 | Q6 | 10.8 | 15.3 | 14.1 | **17.5** | 16.8 |
 | Q8 | 9.9 | 15.4 | **17.7** | 17.7 | 16.9 |
+| MLX-8bit | 8.0 | - | - | - | - |
 
 **Draft acceptance vs draft-n** (near-identical across quants): n1≈80% · n2≈68% · n3≈57% ·
 n4≈49% (decays to ~28% by n8, which is why n≥5 wastes compute).
