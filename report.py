@@ -18,8 +18,9 @@ import matplotlib.pyplot as plt
 import config as C
 
 QUANTS = C.QUANT_ORDER
-QUANT_LABEL = {"q5": "Q5_K_XL", "q6": "Q6_K_XL", "q8": "Q8_0"}
-COLORS = {"q5": "#2563eb", "q6": "#16a34a", "q8": "#dc2626"}
+QUANT_LABEL = {"q5": "Q5_K_XL", "q6": "Q6_K_XL", "q8": "Q8_0", "mlx8": "MLX-8bit"}
+COLORS = {"q5": "#2563eb", "q6": "#16a34a", "q8": "#dc2626", "mlx8": "#9333ea"}
+MLX_QUANTS = ["mlx8"]  # MLX runtime models (no MTP sweep; single config)
 
 
 # ------------------------------------------------------------------- load/group
@@ -60,7 +61,7 @@ def load_scores():
 
 
 # ----------------------------------------------------------------------- aggregate
-def build_summary(speed, full, scores):
+def build_summary(speed, full, scores, mlx_speed=None, mlx_full=None):
     def sgroup(quant, dn):
         return [r for r in speed if r["quant"] == quant and r["draft_n"] == dn
                 and "predicted_per_second" in r]
@@ -114,6 +115,27 @@ def build_summary(speed, full, scores):
             "best_acceptance": best["acceptance_mean"] if best else None,
             "quality_overall": overall,
             **(tokens.get(quant, {})),
+        })
+
+    # MLX models: single config (no MTP). tok/s from speed phase; tokens from full phase.
+    for mq in (MLX_QUANTS if mlx_speed else []):
+        sg = [r for r in mlx_speed if r["quant"] == mq]
+        if not sg:
+            continue
+        fg = [r for r in (mlx_full or []) if r["quant"] == mq]
+        tok_s = fmean([r.get("predicted_per_second") for r in sg])
+        q_scores = scores.get(mq, {})
+        overall = fmean([s.get("overall") for s in q_scores.values()]) if q_scores else None
+        per_quant.append({
+            "quant": mq, "label": QUANT_LABEL.get(mq, mq), "runtime": "mlx",
+            "off_tok_s": tok_s, "best_draft_n": None, "best_tok_s": tok_s,
+            "speedup_vs_off": None, "best_acceptance": None, "quality_overall": overall,
+            "thinking_tokens_mean": fmean([r.get("thinking_tokens") for r in fg]),
+            "answer_tokens_mean": fmean([r.get("answer_tokens") for r in fg]),
+            "total_tokens_mean": fmean([r.get("predicted_n") for r in fg]),
+            "ttft_ms_mean": fmean([r.get("ttft_ms") for r in sg]),
+            "prompt_tok_s_mean": fmean([r.get("prompt_per_second") for r in sg]),
+            "n": len(fg), "answered": sum(1 for r in fg if (r.get("answer_tokens") or 0) > 0),
         })
 
     summary = {
@@ -284,16 +306,37 @@ def chart_quality_speed(summary):
     plt.figure(figsize=(7.5, 5.5))
     for q in pq:
         plt.scatter(q["best_tok_s"], q["quality_overall"], s=160,
-                    color=COLORS[q["quant"]], zorder=3)
-        plt.annotate(f"{QUANT_LABEL[q['quant']]} (n={q['best_draft_n']})",
+                    color=COLORS.get(q["quant"], "#666"), zorder=3)
+        ntag = f"n={q['best_draft_n']}" if q.get("best_draft_n") is not None else "no MTP"
+        plt.annotate(f"{q['label']} ({ntag})",
                      (q["best_tok_s"], q["quality_overall"]),
                      textcoords="offset points", xytext=(8, 6))
-    plt.xlabel("Best decode speed (tok/s at optimal MTP n)")
+    plt.xlabel("Best decode speed (tok/s)")
     plt.ylabel("Judge quality (1-10)")
     plt.title("Quality vs speed trade-off (top-right wins)")
     plt.grid(True, alpha=0.3)
     _save("08_quality_vs_speed.png")
     return True
+
+
+def chart_runtime_compare(summary):
+    """Best decode tok/s across all models: GGUF (best-MTP) vs MLX (no MTP)."""
+    pq = [q for q in summary["per_quant"] if q.get("best_tok_s")]
+    if not pq:
+        return
+    plt.figure(figsize=(8, 5))
+    labels, vals, cols = [], [], []
+    for q in pq:
+        tag = f"\n(n={q['best_draft_n']})" if q.get("best_draft_n") is not None else "\n(no MTP)"
+        labels.append(q["label"] + tag)
+        vals.append(q["best_tok_s"])
+        cols.append(COLORS.get(q["quant"], "#666"))
+    plt.bar(labels, vals, color=cols)
+    plt.ylabel("Best decode speed (tokens/sec)")
+    plt.title("Runtime comparison: GGUF+MTP vs MLX (no MTP)")
+    for i, v in enumerate(vals):
+        plt.text(i, v, f"{v:.1f}", ha="center", va="bottom")
+    _save("09_runtime_tok_s.png")
 
 
 def _save(name):
@@ -303,7 +346,7 @@ def _save(name):
 
 
 # --------------------------------------------------------------------------- report
-def write_report(summary, has_quality):
+def write_report(summary, has_quality, has_mlx=False):
     m = summary["meta"]
     L = []
     L.append("# Qwen3.6-27B MTP benchmark — Q5 / Q6 / Q8 on Apple M5 Pro (64 GB)\n")
@@ -313,12 +356,16 @@ def write_report(summary, has_quality):
 
     L.append("## TL;DR\n")
     for q in summary["per_quant"]:
-        spd = f"{q['speedup_vs_off']:.2f}x" if q.get("speedup_vs_off") else "n/a"
         qual = f"{q['quality_overall']:.1f}/10" if q.get("quality_overall") is not None else "ungraded"
-        L.append(f"- **{q['label']}** — peak **{(q['best_tok_s'] or 0):.1f} tok/s** at "
-                 f"draft-n={q['best_draft_n']} ({spd} vs off, "
-                 f"{(q['best_acceptance'] or 0)*100:.0f}% accept); quality {qual}; "
-                 f"~{(q.get('total_tokens_mean') or 0):.0f} tok/answer.")
+        if q.get("runtime") == "mlx":
+            L.append(f"- **{q['label']}** (MLX, no MTP) — **{(q['best_tok_s'] or 0):.1f} tok/s**, "
+                     f"quality {qual}, ~{(q.get('total_tokens_mean') or 0):.0f} tok/answer.")
+        else:
+            spd = f"{q['speedup_vs_off']:.2f}x" if q.get("speedup_vs_off") else "n/a"
+            L.append(f"- **{q['label']}** — peak **{(q['best_tok_s'] or 0):.1f} tok/s** at "
+                     f"draft-n={q['best_draft_n']} ({spd} vs off, "
+                     f"{(q['best_acceptance'] or 0)*100:.0f}% accept); quality {qual}; "
+                     f"~{(q.get('total_tokens_mean') or 0):.0f} tok/answer.")
     L.append("")
 
     L.append("## Charts\n")
@@ -326,6 +373,8 @@ def write_report(summary, has_quality):
               "04_prompt_speed.png", "05_ttft.png", "06_tokens.png"]
     if has_quality:
         cfiles += ["07_quality.png", "08_quality_vs_speed.png"]
+    if has_mlx:
+        cfiles += ["09_runtime_tok_s.png"]
     for cf in cfiles:
         L.append(f"![{cf}](results/charts/{cf})\n")
 
@@ -391,24 +440,31 @@ def _pick_overall(summary):
 def main():
     os.makedirs(C.CHARTS, exist_ok=True)
     recs = load_all()
-    # Respect the DRAFT_NS cap (n<=4): n=5-8 records stay in the raw JSONL but are
-    # excluded from charts, tables, and the best-n recommendation.
+    # GGUF (llama.cpp) records: respect the DRAFT_NS cap (n<=4) and exclude MLX.
     speed = [r for r in recs if r.get("phase") == "speed" and "predicted_per_second" in r
-             and r.get("draft_n") in C.DRAFT_NS]
-    full = [r for r in recs if r.get("phase") == "full" and r.get("thinking_tokens") is not None]
+             and r.get("draft_n") in C.DRAFT_NS and r.get("runtime") != "mlx"]
+    full = [r for r in recs if r.get("phase") == "full" and r.get("thinking_tokens") is not None
+            and r.get("runtime") != "mlx"]
+    # MLX records (separate runtime, no MTP).
+    mlx_speed = [r for r in recs if r.get("runtime") == "mlx" and r.get("phase") == "speed"
+                 and r.get("predicted_per_second")]
+    mlx_full = [r for r in recs if r.get("runtime") == "mlx" and r.get("phase") == "full"
+                and r.get("thinking_tokens") is not None]
     if not speed:
         print("no speed records yet")
         return
     scores = load_scores()
-    summary = build_summary(speed, full, scores)
+    summary = build_summary(speed, full, scores, mlx_speed, mlx_full)
     chart_tok_s(summary); chart_speedup(summary); chart_acceptance(summary)
     chart_prompt_speed(summary); chart_ttft(summary)
     if full:
         chart_tokens(summary)
     has_quality = chart_quality(summary)
     chart_quality_speed(summary)
-    write_report(summary, has_quality)
-    print(f"done: {len(speed)} speed + {len(full)} full records; charts in {C.CHARTS}")
+    if mlx_speed:
+        chart_runtime_compare(summary)
+    write_report(summary, has_quality, bool(mlx_speed))
+    print(f"done: {len(speed)} speed + {len(full)} full + {len(mlx_speed)} mlx records")
 
 
 if __name__ == "__main__":
