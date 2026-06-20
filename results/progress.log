@@ -334,3 +334,18 @@
 [15:02:59]   progress 15/15 (155 min elapsed, ETA 0 min)
 [15:03:00] DONE run in 155.0 min
 [15:03:00] consolidated 150 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:30:07] launch [mlx/speed] mlx8 (mlx_lm) ...
+[18:30:15]   ERR [mlx] mlx8 speed q2_coding: HTTPError: HTTP Error 404: Not Found
+[18:30:16] consolidated 151 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:31:18] launch [mlx/speed] mlx8 (mlx_lm) ...
+[18:32:33]   ok [mlx] mlx8 q2_coding
+[18:32:33] consolidated 151 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:35:05] launch [mlx/speed] mlx8 (mlx_lm) ...
+[18:36:17]   ok [mlx] mlx8 speed q2_coding: 512 tok @ 8.0 tok/s, ttft 5729ms
+[18:36:18] consolidated 151 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:37:18] launch [mlx/speed] mlx8 (mlx_lm) ...
+[18:37:27]   warmed up mlx8
+[18:38:35]   ok [mlx] mlx8 speed q2_coding: 512 tok @ 7.7 tok/s, ttft 1076ms
+[18:38:35] consolidated 151 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:39:07] launch [mlx/speed] mlx8 (mlx_lm) ...
+[18:39:18]   warmed up mlx8
