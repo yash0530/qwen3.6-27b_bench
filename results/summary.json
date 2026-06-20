@@ -234,6 +234,24 @@
       "total_tokens_mean": 6703,
       "answered": 5,
       "n": 5
+    },
+    {
+      "quant": "mlx8",
+      "label": "MLX-8bit",
+      "runtime": "mlx",
+      "off_tok_s": 7.981000478667665,
+      "best_draft_n": null,
+      "best_tok_s": 7.981000478667665,
+      "speedup_vs_off": null,
+      "best_acceptance": null,
+      "quality_overall": null,
+      "thinking_tokens_mean": 4024.5,
+      "answer_tokens_mean": 2443.25,
+      "total_tokens_mean": 6467.75,
+      "ttft_ms_mean": 1026.5288352966309,
+      "prompt_tok_s_mean": 199.72169743059507,
+      "n": 4,
+      "answered": 4
     }
   ],
   "determinism": {

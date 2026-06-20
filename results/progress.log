@@ -349,3 +349,16 @@
 [18:38:35] consolidated 151 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
 [18:39:07] launch [mlx/speed] mlx8 (mlx_lm) ...
 [18:39:18]   warmed up mlx8
+[18:41:31]   ok [mlx] mlx8 speed q1_model_selection: 1023 tok @ 7.8 tok/s, ttft 1287ms
+[18:43:41]   ok [mlx] mlx8 speed q2_coding: 1024 tok @ 7.9 tok/s, ttft 944ms
+[18:45:50]   ok [mlx] mlx8 speed q3_architecture: 1023 tok @ 8.0 tok/s, ttft 964ms
+[18:47:58]   ok [mlx] mlx8 speed q4_finance_reasoning: 1024 tok @ 8.1 tok/s, ttft 988ms
+[18:50:05]   ok [mlx] mlx8 speed q5_debugging: 1024 tok @ 8.1 tok/s, ttft 950ms
+[18:50:05] consolidated 155 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[18:50:05] launch [mlx/full] mlx8 (mlx_lm) ...
+[18:50:15]   warmed up mlx8
+[19:04:33]   ok [mlx] mlx8 full q1_model_selection: 6689 tok @ 7.8 tok/s, ttft 1223ms
+[19:24:36]   ok [mlx] mlx8 full q2_coding: 9345 tok @ 7.8 tok/s, ttft 1477ms
+[19:36:58]   ok [mlx] mlx8 full q3_architecture: 5724 tok @ 7.7 tok/s, ttft 985ms
+[19:45:33]   ok [mlx] mlx8 full q4_finance_reasoning: 4113 tok @ 8.0 tok/s, ttft 991ms
+[19:59:18] consolidated 159 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json

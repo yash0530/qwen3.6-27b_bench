@@ -7,6 +7,7 @@ _Speed sweep: 75 runs (cap 1024 tok) · full-length: 15 runs (cap 12288 tok) · 
 - **Q5_K_XL** — peak **17.7 tok/s** at draft-n=3 (1.37x vs off, 57% accept); quality 8.3/10; ~6795 tok/answer.
 - **Q6_K_XL** — peak **17.5 tok/s** at draft-n=3 (1.61x vs off, 57% accept); quality 8.5/10; ~6781 tok/answer.
 - **Q8_0** — peak **17.7 tok/s** at draft-n=2 (1.80x vs off, 68% accept); quality 8.7/10; ~6703 tok/answer.
+- **MLX-8bit** (MLX, no MTP) — **8.0 tok/s**, quality ungraded, ~6468 tok/answer.
 
 ## Charts
 
@@ -25,6 +26,8 @@ _Speed sweep: 75 runs (cap 1024 tok) · full-length: 15 runs (cap 12288 tok) · 
 ![07_quality.png](results/charts/07_quality.png)
 
 ![08_quality_vs_speed.png](results/charts/08_quality_vs_speed.png)
+
+![09_runtime_tok_s.png](results/charts/09_runtime_tok_s.png)
 
 ## Speed sweep (mean over 5 questions)
 
@@ -53,6 +56,7 @@ _Speed sweep: 75 runs (cap 1024 tok) · full-length: 15 runs (cap 12288 tok) · 
 | Q5_K_XL | 6795 | 4413 | 2378 | 5/5 |
 | Q6_K_XL | 6781 | 4397 | 2379 | 5/5 |
 | Q8_0 | 6703 | 4349 | 2350 | 5/5 |
+| MLX-8bit | 6468 | 4024 | 2443 | 4/4 |
 
 ## Output determinism (MTP correctness probe, #23302)
 

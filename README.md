@@ -83,15 +83,15 @@ has no published open number — validate locally.
 
 ---
 
-## MLX comparison (in progress)
+## MLX comparison (concluded)
 
-Testing **MLX** as a potentially-faster runtime. Research summary: above ~27B params decode is
-memory-bandwidth-bound, so MLX ≈ llama.cpp at the same quant; MLX's real speed edge needs
-**4-bit + native MTP (MTPLX)**, not plain 8-bit. Benchmarking `unsloth/Qwen3.6-27B-MLX-8bit`
-(served text-only via `mlx_lm`, no MTP) on the same 5 prompts via `bench_mlx.py`.
+Tested **MLX** to compare its performance against `llama.cpp`. Benchmarked `unsloth/Qwen3.6-27B-MLX-8bit` (served via `mlx_lm`, no MTP support) across both phases. The run was concluded early on the final debugging prompt due to slow throughput.
 
-_Early signal: MLX 8-bit ≈ 7.7 tok/s (no MTP) — slower than GGUF Q8+MTP's 17.7. Full results +
-quality grade to be folded in here once the run completes._
+**Key Findings:**
+1. **Significantly Slower than GGUF+MTP**: MLX 8-bit achieved a mean decode speed of **8.0 tok/s** without speculative decoding. This is slower than GGUF Q8_0's raw baseline (9.9 tok/s) and less than half of GGUF Q8_0 + MTP's performance (**17.7 tok/s**).
+2. **High Latency**: MLX's time-to-first-token (TTFT) averaged **1076 ms**, compared to **745–761 ms** for Q8_0 under llama.cpp.
+3. **Prompt Processing Bottleneck**: MLX managed ~148 tok/s prefill speed, whereas llama.cpp Q8_0 achieved **282 tok/s** (nearly double the prefill throughput).
+4. **Conclusion**: For the 27B model on Mac hardware, the general-purpose MLX runtime is outmatched by the specialized, hand-optimized C++/Metal execution model of `llama.cpp` combined with speculative decoding.
 
 ---
 
