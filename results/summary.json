@@ -1,17 +1,5 @@
 {
   "meta": {
-    "quants": [
-      "q5",
-      "q6",
-      "q8"
-    ],
-    "draft_ns": [
-      0,
-      1,
-      2,
-      3,
-      4
-    ],
     "seed": 42,
     "temp": 0.6,
     "top_p": 0.95,
@@ -24,6 +12,7 @@
   },
   "per_quant_config": [
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
       "draft_n": 0,
       "config": "off",
@@ -35,6 +24,7 @@
       "acceptance_mean": null
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
       "draft_n": 1,
       "config": "mtp1",
@@ -46,6 +36,7 @@
       "acceptance_mean": 0.7971905718587473
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
       "draft_n": 2,
       "config": "mtp2",
@@ -57,6 +48,7 @@
       "acceptance_mean": 0.6704864447264097
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
       "draft_n": 3,
       "config": "mtp3",
@@ -68,6 +60,7 @@
       "acceptance_mean": 0.5673381443110143
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
       "draft_n": 4,
       "config": "mtp4",
@@ -79,6 +72,7 @@
       "acceptance_mean": 0.4859392228370242
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
       "draft_n": 0,
       "config": "off",
@@ -90,6 +84,7 @@
       "acceptance_mean": null
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
       "draft_n": 1,
       "config": "mtp1",
@@ -101,6 +96,7 @@
       "acceptance_mean": 0.7884458712913556
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
       "draft_n": 2,
       "config": "mtp2",
@@ -112,6 +108,7 @@
       "acceptance_mean": 0.6783956068932189
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
       "draft_n": 3,
       "config": "mtp3",
@@ -123,6 +120,7 @@
       "acceptance_mean": 0.5697545608771487
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
       "draft_n": 4,
       "config": "mtp4",
@@ -134,6 +132,7 @@
       "acceptance_mean": 0.4845760959357571
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "draft_n": 0,
       "config": "off",
@@ -145,6 +144,7 @@
       "acceptance_mean": null
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "draft_n": 1,
       "config": "mtp1",
@@ -156,6 +156,7 @@
       "acceptance_mean": 0.7890199980424464
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "draft_n": 2,
       "config": "mtp2",
@@ -167,6 +168,7 @@
       "acceptance_mean": 0.675183835622366
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "draft_n": 3,
       "config": "mtp3",
@@ -178,6 +180,7 @@
       "acceptance_mean": 0.5708799529515916
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "draft_n": 4,
       "config": "mtp4",
@@ -191,8 +194,9 @@
   ],
   "per_quant": [
     {
+      "model": "qwen3.6-27b",
       "quant": "q5",
-      "label": "Q5_K_XL",
+      "label": "Qwen 3.6 27B (Q5)",
       "off_tok_s": 12.90821069243026,
       "best_draft_n": 3,
       "best_tok_s": 17.673361182088016,
@@ -206,8 +210,9 @@
       "n": 5
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q6",
-      "label": "Q6_K_XL",
+      "label": "Qwen 3.6 27B (Q6)",
       "off_tok_s": 10.849277477830043,
       "best_draft_n": 3,
       "best_tok_s": 17.49890555024897,
@@ -221,8 +226,9 @@
       "n": 5
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
-      "label": "Q8_0",
+      "label": "Qwen 3.6 27B (Q8)",
       "off_tok_s": 9.853567960027982,
       "best_draft_n": 2,
       "best_tok_s": 17.739116565387206,
@@ -236,8 +242,9 @@
       "n": 5
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "mlx8",
-      "label": "MLX-8bit",
+      "label": "Qwen 3.6 27B (MLX-8bit)",
       "runtime": "mlx",
       "off_tok_s": 7.981000478667665,
       "best_draft_n": null,

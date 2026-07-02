@@ -25,18 +25,12 @@ from questions import QUESTIONS, QUESTION_BY_ID
 from bench import log, append_record, split_think, ensure_dirs, consolidate
 from transformers import AutoTokenizer
 
-MLX_MODELS = {
-    "mlx8": os.path.expanduser("~/Models/qwen3.6-27b-mlx-8bit"),
-    "mlx6": os.path.expanduser("~/Models/qwen3.6-27b-mlx-6bit"),
-}
-MLX_ORDER = ["mlx8", "mlx6"]
 MLX_PORT = 8090
 MLX_BASE = f"http://127.0.0.1:{MLX_PORT}"
 HEALTH_TIMEOUT_S = 600     # 29 GB MLX model can take a while to load
 REQ_TIMEOUT_S = 1800
 STREAM_GAP_TIMEOUT_S = 240
 
-SMOKE_QUESTION_IDS = ["q2_coding"]
 SMOKE_N_PREDICT = 512
 
 
@@ -48,11 +42,12 @@ def server_argv(backend, model_path, port):
 
 
 class MlxServer:
-    def __init__(self, quant, backend):
+    def __init__(self, model_id, quant, backend, model_path):
+        self.model_id = model_id
         self.quant = quant
         self.backend = backend
-        self.model = MLX_MODELS[quant]
-        self.log_path = os.path.join(C.LOGS, f"mlxserver_{quant}.log")
+        self.model = model_path
+        self.log_path = os.path.join(C.LOGS, f"mlxserver_{model_id}_{quant}.log")
         self.proc = None
 
     def start(self):
@@ -106,7 +101,6 @@ def stream_chat(messages, n_predict, model_id):
     req = urllib.request.Request(MLX_BASE + "/v1/chat/completions",
                                  data=json.dumps(payload).encode(),
                                  headers={"Content-Type": "application/json"})
-    # mlx_lm.server streams thinking in delta.reasoning and the answer in delta.content.
     t0 = time.time(); t_first = None; reasoning = []; content = []
     with urllib.request.urlopen(req, timeout=STREAM_GAP_TIMEOUT_S) as resp:
         for raw in resp:
@@ -135,39 +129,43 @@ def stream_chat(messages, n_predict, model_id):
             "t0": t0, "t_first": t_first, "t_end": t_end}
 
 
-def run(quants, question_ids, n_predict, phase, backend, tokenizers):
+def run(model_id, model_cfg, quants, question_ids, n_predict, phase, backend, tokenizers):
     ensure_dirs()
     qs = [QUESTION_BY_ID[q] for q in question_ids]
     for quant in quants:
-        if not os.path.isdir(MLX_MODELS[quant]):
-            log(f"skip {quant}: model not present at {MLX_MODELS[quant]}")
+        model_path = model_cfg["quants"][quant]
+        if not os.path.isdir(model_path):
+            log(f"skip {model_id}/{quant}: model not present at {model_path}")
             continue
         tok = tokenizers[quant]
-        srv = MlxServer(quant, backend)
-        log(f"launch [mlx/{phase}] {quant} ({backend}) ...")
+        srv = MlxServer(model_id, quant, backend, model_path)
+        log(f"launch [mlx/{phase}] {model_id} {quant} ({backend}) ...")
         if not srv.start():
             srv.stop(); continue
-        # Warmup: first request compiles Metal kernels + lazy-loads weights; discard it so
-        # the measured runs are representative (llama-server warms up automatically).
         try:
-            stream_chat([{"role": "user", "content": "hi"}], 16, MLX_MODELS[quant])
-            log(f"  warmed up {quant}")
+            stream_chat([{"role": "user", "content": "hi"}], 16, model_path)
+            log(f"  warmed up {model_id}/{quant}")
         except Exception as e:
             log(f"  warmup failed (continuing): {e}")
         for q in qs:
             messages = [{"role": "system", "content": q["system"]},
                         {"role": "user", "content": q["user"]}]
-            rec = {"phase": phase, "pass": 1, "quant": quant, "draft_n": 0,
+            rec = {"phase": phase, "pass": 1, "model": model_id, "quant": quant, "draft_n": 0,
                    "config": "mlx", "runtime": "mlx", "backend": backend,
                    "question_id": q["id"], "category": q["category"],
                    "seed": C.SEED, "n_predict_cap": n_predict,
-                   "model_path": MLX_MODELS[quant],
+                   "model_path": model_path,
                    "ts": datetime.now(timezone.utc).isoformat(), "error": None}
             try:
-                gen = stream_chat(messages, n_predict, MLX_MODELS[quant])
+                gen = stream_chat(messages, n_predict, model_path)
                 thinking = gen["reasoning"].strip()
                 answer = gen["content"].strip()
                 raw = thinking + (("\n</think>\n\n" + answer) if answer else "")
+                
+                # Use split_think helper if needed, but since MLX streams them split,
+                # we just format it as raw first, then run split_think to be sure
+                thinking, answer = split_think(raw, model_cfg["reasoning"])
+                
                 think_tok = len(tok.encode(thinking)) if thinking else 0
                 ans_tok = len(tok.encode(answer)) if answer else 0
                 comp_tok = think_tok + ans_tok
@@ -192,11 +190,11 @@ def run(quants, question_ids, n_predict, phase, backend, tokenizers):
                     "output_len_chars": len(raw),
                 })
                 ts = f"{tok_s:.1f}" if tok_s else "?"
-                log(f"  ok [mlx] {quant} {phase} {q['id']}: {comp_tok} tok @ {ts} tok/s"
+                log(f"  ok [mlx] {model_id} {quant} {phase} {q['id']}: {comp_tok} tok @ {ts} tok/s"
                     + (f", ttft {ttft_ms:.0f}ms" if ttft_ms else ""))
             except Exception as e:
                 rec["error"] = f"{type(e).__name__}: {e}"
-                log(f"  ERR [mlx] {quant} {phase} {q['id']}: {rec['error']}")
+                log(f"  ERR [mlx] {model_id} {quant} {phase} {q['id']}: {rec['error']}")
             append_record(rec)
         srv.stop()
     consolidate()
@@ -204,26 +202,31 @@ def run(quants, question_ids, n_predict, phase, backend, tokenizers):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MLX_MODELS_CONFIG.keys()),
+                    help="Model to benchmark (default: qwen3.6-27b)")
     ap.add_argument("--smoke", action="store_true")
-    ap.add_argument("--quant", choices=list(MLX_MODELS), default=None)
+    ap.add_argument("--quant", default=None)
     ap.add_argument("--backend", choices=["mlx_lm", "mlx_vlm"], default="mlx_lm")
     ap.add_argument("--phase", choices=["speed", "full"], default=None)
     args = ap.parse_args()
 
-    quants = [args.quant] if args.quant else MLX_ORDER
-    quants = [q for q in quants if os.path.isdir(MLX_MODELS[q])]
+    model_id = args.model
+    model_cfg = C.MLX_MODELS_CONFIG[model_id]
+
+    quants = [args.quant] if args.quant else model_cfg["quant_order"]
+    quants = [q for q in quants if os.path.isdir(model_cfg["quants"][q])]
     if not quants:
-        log("no MLX models present yet"); return
-    tokenizers = {q: AutoTokenizer.from_pretrained(MLX_MODELS[q]) for q in quants}
+        log(f"no MLX models present for {model_id} yet"); return
+    tokenizers = {q: AutoTokenizer.from_pretrained(model_cfg["quants"][q]) for q in quants}
 
     if args.smoke:
-        run(quants, SMOKE_QUESTION_IDS, SMOKE_N_PREDICT, "speed", args.backend, tokenizers)
+        run(model_id, model_cfg, quants[:1], ["q2_coding"], SMOKE_N_PREDICT, "speed", args.backend, tokenizers)
         return
     allq = [q["id"] for q in QUESTIONS]
     if args.phase in (None, "speed"):
-        run(quants, allq, C.SPEED_N_PREDICT, "speed", args.backend, tokenizers)
+        run(model_id, model_cfg, quants, allq, C.SPEED_N_PREDICT, "speed", args.backend, tokenizers)
     if args.phase in (None, "full"):
-        run(quants, allq, C.FULL_N_PREDICT, "full", args.backend, tokenizers)
+        run(model_id, model_cfg, quants, allq, C.FULL_N_PREDICT, "full", args.backend, tokenizers)
 
 
 if __name__ == "__main__":

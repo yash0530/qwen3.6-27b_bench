@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Benchmark orchestrator for Qwen3.6-27B MTP quants.
+"""Benchmark orchestrator for local LLMs (Qwen, Gemma, etc.).
 
 For every (pass, quant, draft_n) it launches a dedicated llama-server, runs the 5
 questions, and records rich per-run metrics to results/results.jsonl (crash-safe,
 resumable). Pure stdlib — no third-party deps.
 
 Usage:
-  python3 bench.py             # full run: all passes x quants x draft_n x questions
+  python3 bench.py             # full run for default model (Qwen 3.6 27B)
+  python3 bench.py --model gemma4-31b
   python3 bench.py --smoke     # tiny end-to-end validation (~3-5 min)
-  python3 bench.py --pass 1    # only pass 1
-  python3 bench.py --quant q6  # restrict to one quant
+  python3 bench.py --quant q8  # restrict to one quant
 """
 import argparse
 import hashlib
@@ -89,15 +89,17 @@ def parse_metrics(text: str) -> dict:
 
 # ------------------------------------------------------------------- server ctl
 class Server:
-    def __init__(self, quant: str, draft_n: int):
+    def __init__(self, model_id: str, quant: str, draft_n: int, model_path: str, reasoning_format: str):
+        self.model_id = model_id
         self.quant = quant
         self.draft_n = draft_n
-        self.model = C.MODELS[quant]
-        self.log_path = os.path.join(C.LOGS, f"server_{quant}_n{draft_n}.log")
+        self.model = model_path
+        self.reasoning_format = reasoning_format
+        self.log_path = os.path.join(C.LOGS, f"server_{model_id}_{quant}_n{draft_n}.log")
         self.proc = None
 
     def start(self):
-        cmd = C.server_cmd(self.model, self.draft_n, self.log_path)
+        cmd = C.server_cmd(self.model, self.draft_n, self.log_path, self.reasoning_format)
         self.logf = open(self.log_path, "ab")
         self.logf.write(f"\n===== launch {datetime.now().isoformat()} =====\n".encode())
         self.logf.write((" ".join(cmd) + "\n").encode())
@@ -151,16 +153,26 @@ class Server:
 THINK_OPEN = re.compile(r"^\s*<think>", re.IGNORECASE)
 
 
-def split_think(raw: str):
+def split_think(raw: str, is_reasoning: bool):
     """Return (thinking_text, answer_text).
 
-    The Qwen3.6 chat template opens `<think>` at the end of the prompt, so generation
+    For reasoning models:
+    The chat template opens `<think>` at the end of the prompt, so generation
     always begins *inside* the reasoning block. It emits reasoning, then `</think>`,
     then the final answer. If `</think>` is absent the reasoning was truncated by the
     token cap, so the entire output is thinking (not answer).
+
+    For non-reasoning models:
+    If is_reasoning is False, there is no thinking block, so the entire raw text
+    is the answer.
     """
+    if not is_reasoning:
+        return "", raw.strip()
+
     idx = raw.lower().find("</think>")
     if idx == -1:
+        if not THINK_OPEN.match(raw) and "<think>" not in raw.lower():
+            return "", raw.strip()
         return THINK_OPEN.sub("", raw, count=1).strip(), ""
     thinking = THINK_OPEN.sub("", raw[:idx], count=1).strip()
     answer = raw[idx + len("</think>"):].strip()
@@ -248,7 +260,8 @@ def done_keys(path: str) -> set:
             except Exception:
                 continue
             if r.get("error") is None:
-                seen.add((r.get("phase"), r["pass"], r["quant"], r["draft_n"], r["question_id"]))
+                # Include model_id in the keys to track resume status properly
+                seen.add((r.get("phase"), r["pass"], r.get("model", "qwen3.6-27b"), r["quant"], r["draft_n"], r["question_id"]))
     return seen
 
 
@@ -262,7 +275,7 @@ def config_label(draft_n: int) -> str:
 
 
 # ------------------------------------------------------------------------- main
-def run(passes, quants, draft_ns, question_ids, n_predict, phase):
+def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, phase):
     ensure_dirs()
     seen = done_keys(C.RESULTS_JSONL)
     qs = [QUESTION_BY_ID[qid] for qid in question_ids]
@@ -270,24 +283,25 @@ def run(passes, quants, draft_ns, question_ids, n_predict, phase):
     total = len(passes) * len(quants) * len(draft_ns) * len(qs)
     done = 0
     t_start = time.time()
-    log(f"START phase={phase}: {total} generations "
+    log(f"START model={model_id} phase={phase}: {total} generations "
         f"(passes={passes} quants={quants} draft_ns={draft_ns} cap={n_predict})")
 
     for p in passes:
         for quant in quants:
             for dn in draft_ns:
-                pending = [q for q in qs if (phase, p, quant, dn, q["id"]) not in seen]
+                pending = [q for q in qs if (phase, p, model_id, quant, dn, q["id"]) not in seen]
                 if not pending:
                     done += len(qs)
-                    log(f"skip [{phase}] {quant} {config_label(dn)} pass{p} (already done)")
+                    log(f"skip [{phase}] {model_id} {quant} {config_label(dn)} pass{p} (already done)")
                     continue
 
-                srv = Server(quant, dn)
-                log(f"launch [{phase}] {quant} {config_label(dn)} pass{p} ...")
+                model_path = model_cfg["quants"][quant]
+                srv = Server(model_id, quant, dn, model_path, model_cfg["reasoning_format"])
+                log(f"launch [{phase}] {model_id} {quant} {config_label(dn)} pass{p} ...")
                 if not srv.start():
                     for q in pending:
                         append_record({
-                            "phase": phase, "pass": p, "quant": quant, "draft_n": dn,
+                            "phase": phase, "pass": p, "model": model_id, "quant": quant, "draft_n": dn,
                             "config": config_label(dn), "question_id": q["id"],
                             "category": q["category"], "error": "server_start_failed",
                             "ts": datetime.now(timezone.utc).isoformat(),
@@ -302,10 +316,10 @@ def run(passes, quants, draft_ns, question_ids, n_predict, phase):
                         {"role": "user", "content": q["user"]},
                     ]
                     rec = {
-                        "phase": phase, "pass": p, "quant": quant, "draft_n": dn,
+                        "phase": phase, "pass": p, "model": model_id, "quant": quant, "draft_n": dn,
                         "config": config_label(dn), "question_id": q["id"],
                         "category": q["category"], "seed": C.SEED,
-                        "n_predict_cap": n_predict, "model_path": C.MODELS[quant],
+                        "n_predict_cap": n_predict, "model_path": model_path,
                         "ts": datetime.now(timezone.utc).isoformat(),
                         "error": None,
                     }
@@ -313,7 +327,7 @@ def run(passes, quants, draft_ns, question_ids, n_predict, phase):
                         prompt = apply_template(messages)
                         gen = run_generation(prompt, n_predict)
                         tim = extract_timings(gen["final"])
-                        thinking, answer = split_think(gen["raw_text"])
+                        thinking, answer = split_think(gen["raw_text"], model_cfg["reasoning"])
                         rec.update(tim)
                         rec.update({
                             "ttft_ms": gen["ttft_ms"],
@@ -332,11 +346,11 @@ def run(passes, quants, draft_ns, question_ids, n_predict, phase):
                         acc_s = f", acc {acc*100:.0f}%" if isinstance(acc, (int, float)) else ""
                         ttft = gen["ttft_ms"]
                         ttft_s = f", ttft {ttft:.0f}ms" if isinstance(ttft, (int, float)) else ""
-                        log(f"  ok {quant} {config_label(dn)} p{p} {q['id']}: "
+                        log(f"  ok {model_id} {quant} {config_label(dn)} p{p} {q['id']}: "
                             f"{rec.get('predicted_n')} tok @ {toks_s} tok/s{acc_s}{ttft_s}")
                     except Exception as e:
                         rec["error"] = f"{type(e).__name__}: {e}"
-                        log(f"  ERR {quant} {config_label(dn)} p{p} {q['id']}: {rec['error']}")
+                        log(f"  ERR {model_id} {quant} {config_label(dn)} p{p} {q['id']}: {rec['error']}")
                     append_record(rec)
                     done += 1
                     elapsed = time.time() - t_start
@@ -368,10 +382,12 @@ def consolidate():
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MODELS_CONFIG.keys()),
+                    help="Model to benchmark (default: qwen3.6-27b)")
     ap.add_argument("--smoke", action="store_true", help="tiny end-to-end validation run")
     ap.add_argument("--phase", choices=["speed", "full"], default=None,
                     help="run only one phase (default: both, speed then full)")
-    ap.add_argument("--quant", choices=list(C.MODELS), default=None)
+    ap.add_argument("--quant", default=None, help="restrict to one quant (must exist in model config)")
     ap.add_argument("--consolidate-only", action="store_true")
     args = ap.parse_args()
 
@@ -380,19 +396,37 @@ def main():
         consolidate()
         return
 
+    model_id = args.model
+    model_cfg = C.MODELS_CONFIG[model_id]
+
+    # Validate/gather quants to run
+    quants = [args.quant] if args.quant else model_cfg["quant_order"]
+    for q in quants:
+        if q not in model_cfg["quants"]:
+            print(f"Error: Quant '{q}' is not configured for model '{model_id}'")
+            sys.exit(1)
+        path = model_cfg["quants"][q]
+        if not os.path.exists(path):
+            print(f"Warning: Model file for {model_id} ({q}) not found at: {path}")
+
     if args.smoke:
-        run([1], C.SMOKE_QUANTS, C.SMOKE_DRAFT_NS,
-            C.SMOKE_QUESTION_IDS, C.SMOKE_N_PREDICT, phase="speed")
+        smoke_quant = quants[0]
+        smoke_draft_ns = [model_cfg["draft_ns"][0]]
+        if len(model_cfg["draft_ns"]) > 1:
+            smoke_draft_ns.append(model_cfg["draft_ns"][-1])
+        run(model_id, model_cfg, [1], [smoke_quant], smoke_draft_ns,
+            ["q2_coding"], C.SMOKE_N_PREDICT, phase="speed")
         return
 
-    quants = [args.quant] if args.quant else C.QUANT_ORDER
     allq = [q["id"] for q in QUESTIONS]
+    draft_ns = model_cfg["draft_ns"]
+    
     # Phase 1: speed sweep over the full grid at a short cap.
     if args.phase in (None, "speed"):
-        run([1], quants, C.DRAFT_NS, allq, C.SPEED_N_PREDICT, phase="speed")
+        run(model_id, model_cfg, [1], quants, draft_ns, allq, C.SPEED_N_PREDICT, phase="speed")
     # Phase 2: full-length generations (off config only) for token totals + judging.
     if args.phase in (None, "full"):
-        run([1], quants, [0], allq, C.FULL_N_PREDICT, phase="full")
+        run(model_id, model_cfg, [1], quants, [0], allq, C.FULL_N_PREDICT, phase="full")
 
 
 if __name__ == "__main__":

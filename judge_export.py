@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Export the canonical answers that need grading into results/judging/to_grade.json.
 
-Quality is a function of (quant x question), not of MTP draft depth (which only changes
-speed). So we grade ONE canonical answer per quant x question — the pass-1, MTP-off
-(draft_n=0) run — giving 3 x 5 = 15 items. With --all, every distinct output is exported.
+Quality is a function of (model x quant x question), not of MTP draft depth (which only changes
+speed). So we grade ONE canonical answer per model x quant x question — the pass-1, MTP-off
+(draft_n=0) run.
 
-A judge (Claude/Opus in this session, a future session, or any external grader) reads this
-file and writes results/judging/scores.json following RUBRIC.md.
+A judge (Claude/Opus or any external grader) reads this file and writes results/judging/scores.json
+following RUBRIC.md.
 """
 import argparse
 import json
@@ -25,7 +25,7 @@ def load_recs():
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--all", action="store_true",
-                    help="export every distinct output, not just the canonical 15")
+                    help="export every distinct output, not just the canonical ones")
     args = ap.parse_args()
 
     os.makedirs(C.JUDGING, exist_ok=True)
@@ -35,7 +35,8 @@ def main():
 
     items, seen = [], set()
     for r in recs:
-        key = (r["quant"], r["question_id"])
+        model = r.get("model", "qwen3.6-27b")
+        key = (model, r["quant"], r["question_id"])
         if key in seen:
             continue
         seen.add(key)
@@ -43,6 +44,7 @@ def main():
         q = QUESTION_BY_ID[r["question_id"]]
         think = r.get("thinking_text", "") or ""
         items.append({
+            "model": model,
             "quant": r["quant"],
             "question_id": r["question_id"],
             "category": r["category"],
@@ -58,13 +60,13 @@ def main():
         "instructions": (
             "Score each item per RUBRIC.md on correctness, depth, instruction_following, "
             "and practicality (1-10 each), compute overall, add a one-line rationale, and "
-            "write results/judging/scores.json with the same quant+question_id keys."
+            "write results/judging/scores.json with the same model+quant+question_id keys."
         ),
         "rubric_file": rubric_path,
         "schema_example": {
             "judge": "claude-opus-4-8", "rubric_version": 1,
             "scores": [{
-                "quant": "q6", "question_id": "q2_coding",
+                "model": "qwen3.6-27b", "quant": "q6", "question_id": "q2_coding",
                 "correctness": 8, "depth": 7, "instruction_following": 8,
                 "practicality": 8, "overall": 7.8, "rationale": "..."
             }],

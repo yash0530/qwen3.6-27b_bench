@@ -362,3 +362,8 @@
 [19:36:58]   ok [mlx] mlx8 full q3_architecture: 5724 tok @ 7.7 tok/s, ttft 985ms
 [19:45:33]   ok [mlx] mlx8 full q4_finance_reasoning: 4113 tok @ 8.0 tok/s, ttft 991ms
 [19:59:18] consolidated 159 records -> /Users/yash/Desktop/Programming/qwen3.6-27b_bench/results/results.json
+[00:55:10] START model=qwen3.6-27b phase=speed: 2 generations (passes=[1] quants=['q8'] draft_ns=[0, 4] cap=512)
+[00:55:10] skip [speed] qwen3.6-27b q8 off pass1 (already done)
+[00:55:10] skip [speed] qwen3.6-27b q8 mtp4 pass1 (already done)
+[00:55:10] DONE run in 0.0 min
+[00:55:10] consolidated 159 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json

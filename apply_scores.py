@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Merge results/judging/scores.json into results/results.json.
 
-Attaches a `judge` block to every run sharing the scored (quant, question_id), so the
+Attaches a `judge` block to every run sharing the scored (model, quant, question_id), so the
 JSON dump carries quality alongside the speed metrics. Idempotent. After running this,
 re-run report.py to regenerate the quality charts.
 """
@@ -30,14 +30,16 @@ def main():
     index = {}
     for item in scores.get("scores", []):
         item["overall"] = compute_overall(item)
-        index[(item["quant"], item["question_id"])] = item
+        model = item.get("model", "qwen3.6-27b")
+        index[(model, item["quant"], item["question_id"])] = item
 
     with open(C.RESULTS_JSON) as f:
         recs = json.load(f)
 
     merged = 0
     for r in recs:
-        key = (r.get("quant"), r.get("question_id"))
+        model = r.get("model", "qwen3.6-27b")
+        key = (model, r.get("quant"), r.get("question_id"))
         if key in index:
             it = index[key]
             r["judge"] = {
