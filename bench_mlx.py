@@ -1,232 +1,360 @@
 #!/usr/bin/env python3
-"""MLX benchmark harness — mirrors bench.py but drives an MLX OpenAI-compatible server.
+"""MLX benchmark harness — in-process mlx_vlm with MTP speculative decoding.
 
-Records into the SAME results/results.jsonl (with runtime="mlx") so the MLX quants land
-on the same charts as the GGUF quants. MLX (plain mlx_lm/mlx_vlm) has no MTP, so each model
-is a single config (draft_n=0). Run under the venv: .mlxenv/bin/python bench_mlx.py ...
+Records into the SAME results/results.jsonl (runtime="mlx_vlm") so the MLX configs land
+on the same charts as the GGUF ones.
 
-Token counts come from the model's own tokenizer (transformers AutoTokenizer); speed/TTFT
-are timed from the streamed SSE so the numbers are comparable to the llama.cpp timings.
+Why this drives mlx_vlm in-process instead of mlx_lm.server over HTTP — each bullet is a
+defect in the previous version of this file that the rewrite removes:
+
+  * **Engine-reported numbers.** GenerationResult carries prompt_tokens / prompt_tps /
+    generation_tokens / generation_tps / peak_memory. The old harness re-encoded stripped
+    output text to count tokens (systematic undercount) and derived prompt speed as
+    prompt_n / TTFT, which folds scheduling and first-token decode into a "prefill" number
+    and is not comparable to llama.cpp's prompt_per_second.
+  * **One reasoning split, not two.** stream_generate yields raw text containing real
+    <think>/</think> markers, exactly like llama.cpp's /completion. So split_think applies
+    once, to genuine markers. The old harness re-assembled the server's pre-split
+    reasoning/content fields into a fake raw string and re-parsed it, which filed all
+    reasoning as *answer* whenever generation was truncated mid-thought.
+  * **Cache isolation.** A fresh prompt cache per generation, asserted via
+    cached_tokens == 0. The GGUF control runs cache_prompt: False; the old MLX runs let
+    mlx_lm.server accumulate a 2.67 GB cross-request cache.
+  * **Seeded.** The seed is passed through, so MLX runs are reproducible like GGUF ones.
+  * **Acceptance is recorded.** Read off the drafter's accept_lens / draft_lens instead of
+    being written as None.
+
+MTP comes from mlx_vlm.speculative (--draft-kind mtp), using the separately-published bf16
+drafter checkpoints. bf16 matters: quantized MTP heads are reported to collapse acceptance
+on MoE models.
+
+Run under the venv:
+  .mlxenv/bin/python bench_mlx.py --model qwen3.6-27b
+  .mlxenv/bin/python bench_mlx.py --model qwen3.6-27b --smoke
 """
 import argparse
 import hashlib
 import json
 import os
-import signal
-import socket
-import subprocess
 import sys
 import time
-import urllib.request
 from datetime import datetime, timezone
 
 import config as C
+import tiers as T
 from questions import QUESTIONS, QUESTION_BY_ID
 from bench import log, append_record, split_think, ensure_dirs, consolidate
-from transformers import AutoTokenizer
-
-MLX_PORT = 8090
-MLX_BASE = f"http://127.0.0.1:{MLX_PORT}"
-HEALTH_TIMEOUT_S = 600     # 29 GB MLX model can take a while to load
-REQ_TIMEOUT_S = 1800
-STREAM_GAP_TIMEOUT_S = 240
-
-SMOKE_N_PREDICT = 512
 
 
-def server_argv(backend, model_path, port):
-    if backend == "mlx_vlm":
-        return [sys.executable, "-m", "mlx_vlm", "server", "--model", model_path, "--port", str(port)]
-    return [sys.executable, "-m", "mlx_lm", "server", "--model", model_path, "--port", str(port),
-            "--host", "127.0.0.1"]
+def mlx_done_keys(path):
+    """Completed-run keys, tier- and kv-aware.
 
-
-class MlxServer:
-    def __init__(self, model_id, quant, backend, model_path):
-        self.model_id = model_id
-        self.quant = quant
-        self.backend = backend
-        self.model = model_path
-        self.log_path = os.path.join(C.LOGS, f"mlxserver_{model_id}_{quant}.log")
-        self.proc = None
-
-    def start(self):
-        argv = server_argv(self.backend, self.model, MLX_PORT)
-        self.logf = open(self.log_path, "ab")
-        self.logf.write(f"\n== launch {datetime.now().isoformat()} ==\n{' '.join(argv)}\n".encode())
-        self.logf.flush()
-        self.proc = subprocess.Popen(argv, stdout=self.logf, stderr=self.logf)
-        deadline = time.time() + HEALTH_TIMEOUT_S
-        while time.time() < deadline:
-            if self.proc.poll() is not None:
-                log(f"  !! mlx server exited early (code {self.proc.returncode}); see {self.log_path}")
-                return False
+    bench.done_keys predates the tier/kv sweep and keys only on
+    (phase, pass, model, quant, draft_n, question). That would treat the same question at
+    shallow/agent/deep as one cell, so a restarted sweep would either skip work it never
+    did or append duplicates that then get averaged into the summary.
+    """
+    seen = set()
+    if not os.path.exists(path):
+        return seen
+    with open(path) as f:
+        for ln in f:
             try:
-                with urllib.request.urlopen(MLX_BASE + "/v1/models", timeout=4) as r:
-                    if r.status == 200:
-                        return True
+                r = json.loads(ln)
             except Exception:
-                pass
-            time.sleep(2.0)
-        log("  !! mlx server health timeout")
-        return False
-
-    def stop(self):
-        if self.proc and self.proc.poll() is None:
-            self.proc.send_signal(signal.SIGTERM)
-            try:
-                self.proc.wait(timeout=25)
-            except subprocess.TimeoutExpired:
-                self.proc.kill(); self.proc.wait(timeout=10)
-        try:
-            self.logf.close()
-        except Exception:
-            pass
-        deadline = time.time() + 60
-        while time.time() < deadline:
-            s = socket.socket(); s.settimeout(0.5)
-            free = s.connect_ex(("127.0.0.1", MLX_PORT)) != 0
-            s.close()
-            if free:
-                return
-            time.sleep(0.5)
+                continue
+            if r.get("error") is not None or r.get("runtime") != "mlx_vlm":
+                continue
+            seen.add((r.get("phase"), r.get("model"), r.get("quant"),
+                      r.get("draft_block_size"), r.get("kv_bits"),
+                      r.get("prompt_tier"), r.get("question_id")))
+    return seen
 
 
-def stream_chat(messages, n_predict, model_id):
-    payload = {
-        "messages": messages, "max_tokens": n_predict,
-        "temperature": C.TEMP, "top_p": C.TOP_P, "top_k": C.TOP_K,
-        "stream": True, "model": model_id,
+def _lazy_imports():
+    """Imported late so `--help` and arg errors don't pay the MLX import cost."""
+    from mlx_vlm import load, stream_generate, apply_chat_template
+    from mlx_vlm.speculative.drafters import load_drafter, validate_drafter_compatibility
+    return load, stream_generate, apply_chat_template, load_drafter, validate_drafter_compatibility
+
+
+# ------------------------------------------------------------------ spec counters
+def reset_spec_counters(draft_model):
+    """Zero the drafter's per-round accounting so each question is measured alone."""
+    if draft_model is None:
+        return
+    for attr in ("accept_lens", "draft_lens"):
+        if hasattr(draft_model, attr):
+            setattr(draft_model, attr, [])
+
+
+def read_spec_counters(draft_model):
+    """Return (drafted_total, accepted_total, acceptance_rate) or (None, None, None).
+
+    Mirrors mlx_vlm.speculative.common._format_speculative_stats: acceptance is
+    accepted drafts / drafted tokens, which is the same quantity llama.cpp reports as
+    draft_n_accepted / draft_n — so the two runtimes are directly comparable on chart 03.
+    """
+    if draft_model is None:
+        return None, None, None
+    accept_lens = getattr(draft_model, "accept_lens", None) or []
+    draft_lens = getattr(draft_model, "draft_lens", None) or []
+    if not accept_lens:
+        return None, None, None
+    accepted = sum(accept_lens)
+    drafted = sum(draft_lens) if draft_lens else None
+    if not drafted:
+        return None, int(accepted), None
+    return int(drafted), int(accepted), accepted / drafted
+
+
+# ------------------------------------------------------------------- one generation
+def generate_once(stream_generate, model, processor, prompt, n_predict, draft_model,
+                  draft_kind, draft_block_size, kv_bits, reasoning, tier="shallow"):
+    """Run one generation, returning engine-reported stats plus the raw text."""
+    kwargs = dict(
+        max_tokens=n_predict,
+        temperature=C.TEMP,
+        top_p=C.TOP_P,
+        top_k=C.TOP_K,
+        seed=C.SEED,
+        enable_thinking=bool(reasoning),
+        prefill_step_size=C.PREFILL_STEP_SIZE,
+    )
+    if kv_bits:
+        kwargs.update(kv_bits=kv_bits, kv_group_size=C.KV_GROUP_SIZE,
+                      kv_quant_scheme=C.KV_QUANT_SCHEME,
+                      quantized_kv_start=C.quantized_kv_start_for(tier))
+    if draft_model is not None and draft_block_size:
+        kwargs.update(draft_model=draft_model, draft_kind=draft_kind,
+                      draft_block_size=draft_block_size)
+
+    reset_spec_counters(draft_model)
+
+    # Seed MLX's global RNG explicitly. Passing `seed=` to stream_generate is NOT enough:
+    # ar.py only builds its seeded sampler when top_k == DEFAULT_TOP_K (0), and we pass
+    # top_k=20 for parity with llama.cpp, so it silently falls through to make_sampler(),
+    # which takes no seed. Seeding globally keeps sampling parity (top_k=20 on both arms)
+    # while still making runs reproducible — which the MTP determinism probe requires.
+    import mlx.core as mx
+    mx.random.seed(C.SEED)
+
+    pieces = []
+    t0 = time.time()
+    ttft_ms = None
+    last = None
+    for resp in stream_generate(model, processor, prompt, **kwargs):
+        if resp.text:
+            if ttft_ms is None:
+                ttft_ms = (time.time() - t0) * 1000.0
+            pieces.append(resp.text)
+        last = resp
+    wall_ms = (time.time() - t0) * 1000.0
+
+    drafted, accepted, acc_rate = read_spec_counters(draft_model)
+    return {
+        "raw_text": "".join(pieces),
+        "ttft_ms": ttft_ms,
+        "wall_ms": wall_ms,
+        "prompt_n": getattr(last, "prompt_tokens", None),
+        "prompt_per_second": getattr(last, "prompt_tps", None),
+        "predicted_n": getattr(last, "generation_tokens", None),
+        "predicted_per_second": getattr(last, "generation_tps", None),
+        "peak_memory_gb": getattr(last, "peak_memory", None),
+        "cached_tokens": getattr(last, "cached_tokens", None),
+        "finish_reason": getattr(last, "finish_reason", None),
+        "draft_tokens_total": drafted,
+        "draft_tokens_accepted": accepted,
+        "acceptance_rate": acc_rate,
     }
-    req = urllib.request.Request(MLX_BASE + "/v1/chat/completions",
-                                 data=json.dumps(payload).encode(),
-                                 headers={"Content-Type": "application/json"})
-    t0 = time.time(); t_first = None; reasoning = []; content = []
-    with urllib.request.urlopen(req, timeout=STREAM_GAP_TIMEOUT_S) as resp:
-        for raw in resp:
-            line = raw.decode("utf-8", "replace").strip()
-            if not line.startswith("data:"):
-                continue
-            body = line[5:].strip()
-            if body == "[DONE]":
-                break
-            try:
-                chunk = json.loads(body)
-            except Exception:
-                continue
-            delta = (chunk.get("choices") or [{}])[0].get("delta", {})
-            r = delta.get("reasoning") or delta.get("reasoning_content") or ""
-            c = delta.get("content") or ""
-            if r or c:
-                if t_first is None:
-                    t_first = time.time()
-                if r:
-                    reasoning.append(r)
-                if c:
-                    content.append(c)
-    t_end = time.time()
-    return {"reasoning": "".join(reasoning), "content": "".join(content),
-            "t0": t0, "t_first": t_first, "t_end": t_end}
 
 
-def run(model_id, model_cfg, quants, question_ids, n_predict, phase, backend, tokenizers):
+def config_label(block_size):
+    return "off" if not block_size else f"mtp{block_size}"
+
+
+# --------------------------------------------------------------------------- runner
+def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
+        question_ids, n_predict, phase, resume=True):
     ensure_dirs()
+    load, stream_generate, apply_chat_template, load_drafter, validate_compat = _lazy_imports()
+
+    model_path = model_cfg["quants"][quant]
+    if not os.path.isdir(model_path):
+        log(f"skip {model_id}/{quant}: not present at {model_path}")
+        return
+
+    log(f"loading target {model_id}/{quant} from {model_path} ...")
+    model, processor = load(model_path)
+
+    tokenizer = getattr(processor, "tokenizer", processor)
+
+    def count_tokens(text):
+        return len(tokenizer.encode(text))
+
+    built = T.build(QUESTIONS, count_tokens)
+
+    draft_model, draft_kind = None, None
+    draft_path = model_cfg.get("draft_model")
+    if draft_path and os.path.isdir(draft_path):
+        log(f"loading drafter from {draft_path} ...")
+        draft_model, draft_kind = load_drafter(draft_path, kind=model_cfg.get("draft_kind"))
+        log(f"  drafter kind resolved to {draft_kind!r}")
+        validate_compat(model, draft_model, draft_kind)
+        log("  drafter is compatible with the target")
+    elif draft_path:
+        log(f"  !! drafter not present at {draft_path}; MTP configs will be skipped")
+
+    seen = mlx_done_keys(C.RESULTS_JSONL) if resume else set()
     qs = [QUESTION_BY_ID[q] for q in question_ids]
-    for quant in quants:
-        model_path = model_cfg["quants"][quant]
-        if not os.path.isdir(model_path):
-            log(f"skip {model_id}/{quant}: model not present at {model_path}")
-            continue
-        tok = tokenizers[quant]
-        srv = MlxServer(model_id, quant, backend, model_path)
-        log(f"launch [mlx/{phase}] {model_id} {quant} ({backend}) ...")
-        if not srv.start():
-            srv.stop(); continue
-        try:
-            stream_chat([{"role": "user", "content": "hi"}], 16, model_path)
-            log(f"  warmed up {model_id}/{quant}")
-        except Exception as e:
-            log(f"  warmup failed (continuing): {e}")
-        for q in qs:
-            messages = [{"role": "system", "content": q["system"]},
-                        {"role": "user", "content": q["user"]}]
-            rec = {"phase": phase, "pass": 1, "model": model_id, "quant": quant, "draft_n": 0,
-                   "config": "mlx", "runtime": "mlx", "backend": backend,
-                   "question_id": q["id"], "category": q["category"],
-                   "seed": C.SEED, "n_predict_cap": n_predict,
-                   "model_path": model_path,
-                   "ts": datetime.now(timezone.utc).isoformat(), "error": None}
-            try:
-                gen = stream_chat(messages, n_predict, model_path)
-                thinking = gen["reasoning"].strip()
-                answer = gen["content"].strip()
-                raw = thinking + (("\n</think>\n\n" + answer) if answer else "")
-                
-                # Use split_think helper if needed, but since MLX streams them split,
-                # we just format it as raw first, then run split_think to be sure
-                thinking, answer = split_think(raw, model_cfg["reasoning"])
-                
-                think_tok = len(tok.encode(thinking)) if thinking else 0
-                ans_tok = len(tok.encode(answer)) if answer else 0
-                comp_tok = think_tok + ans_tok
-                ttft_ms = (gen["t_first"] - gen["t0"]) * 1000 if gen["t_first"] else None
-                dec_s = (gen["t_end"] - gen["t_first"]) if gen["t_first"] else None
-                tok_s = comp_tok / dec_s if dec_s and dec_s > 0.05 else None
-                try:
-                    rendered = tok.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
-                    prompt_n = len(tok.encode(rendered))
-                except Exception:
-                    prompt_n = None
-                prompt_s = (prompt_n / (ttft_ms / 1000)) if (prompt_n and ttft_ms) else None
-                rec.update({
-                    "predicted_n": comp_tok, "predicted_per_second": tok_s,
-                    "prompt_n": prompt_n, "prompt_per_second": prompt_s,
-                    "draft_tokens_total": None, "draft_tokens_accepted": None,
-                    "acceptance_rate": None, "ttft_ms": ttft_ms,
-                    "wall_ms": (gen["t_end"] - gen["t0"]) * 1000,
-                    "thinking_tokens": think_tok, "answer_tokens": ans_tok,
-                    "thinking_text": thinking, "answer_text": answer, "raw_text": raw,
-                    "output_sha256": hashlib.sha256(raw.encode()).hexdigest(),
-                    "output_len_chars": len(raw),
-                })
-                ts = f"{tok_s:.1f}" if tok_s else "?"
-                log(f"  ok [mlx] {model_id} {quant} {phase} {q['id']}: {comp_tok} tok @ {ts} tok/s"
-                    + (f", ttft {ttft_ms:.0f}ms" if ttft_ms else ""))
-            except Exception as e:
-                rec["error"] = f"{type(e).__name__}: {e}"
-                log(f"  ERR [mlx] {model_id} {quant} {phase} {q['id']}: {rec['error']}")
-            append_record(rec)
-        srv.stop()
+
+    total = len(tier_names) * len(block_sizes) * len(kv_bits_opts) * len(qs)
+    done = 0
+    t_start = time.time()
+    log(f"START [mlx_vlm/{phase}] {model_id}/{quant}: {total} generations "
+        f"(tiers={tier_names} blocks={block_sizes} kv_bits={kv_bits_opts} cap={n_predict})")
+
+    for tier in tier_names:
+        for kv_bits in kv_bits_opts:
+            for bs in block_sizes:
+                if bs and draft_model is None:
+                    log(f"skip mtp{bs}: no drafter loaded")
+                    done += len(qs)
+                    continue
+                for q in qs:
+                    key = (phase, model_id, quant, bs, kv_bits, tier, q["id"])
+                    if resume and key in seen:
+                        done += 1
+                        log(f"  skip (done) {tier} {config_label(bs)} kv{kv_bits or 'fp16'} {q['id']}")
+                        continue
+
+                    user_text = T.user_text(built, q["id"], tier)
+                    messages = [{"role": "system", "content": q["system"]},
+                                {"role": "user", "content": user_text}]
+                    # enable_thinking MUST be passed to the *template*, not only to
+                    # stream_generate. Without it the Qwen3.6 template emits a
+                    # pre-closed "<think>\n\n</think>\n\n" block and the model answers
+                    # with no reasoning at all — while llama.cpp (--jinja) reasons by
+                    # default. That silently made the two arms do different work.
+                    prompt = apply_chat_template(
+                        processor, model.config, messages, add_generation_prompt=True,
+                        **({"enable_thinking": True} if model_cfg.get("reasoning", True) else {}))
+
+                    rec = {
+                        "phase": phase, "pass": 1, "model": model_id, "quant": quant,
+                        "draft_n": bs, "config": config_label(bs),
+                        "runtime": "mlx_vlm", "backend": "mlx_vlm",
+                        "draft_kind": draft_kind if bs else None,
+                        "draft_block_size": bs, "kv_bits": kv_bits,
+                        "quantized_kv_start": C.quantized_kv_start_for(tier) if kv_bits else None,
+                        "kv_arm": ("fp16" if not kv_bits else
+                                   ("q8-decode-only" if C.QUANTIZED_KV_DEFER else "q8-full")),
+                        "prompt_tier": tier,
+                        "question_id": q["id"], "category": q["category"],
+                        "seed": C.SEED, "n_predict_cap": n_predict,
+                        "model_path": model_path,
+                        "ts": datetime.now(timezone.utc).isoformat(), "error": None,
+                    }
+                    try:
+                        gen = generate_once(stream_generate, model, processor, prompt,
+                                            n_predict, draft_model, draft_kind, bs,
+                                            kv_bits, model_cfg.get("reasoning", True),
+                                            tier=tier)
+
+                        # Cache isolation is a claim this harness makes; verify it rather
+                        # than trust it. A non-zero hit means a previous question's KV
+                        # leaked in and the timing is not a cold-prefill measurement.
+                        cached = gen.get("cached_tokens")
+                        if cached:
+                            rec["cache_leak_tokens"] = cached
+                            log(f"  !! cache leak: {cached} cached tokens on {q['id']}")
+
+                        thinking, answer = split_think(gen["raw_text"],
+                                                       model_cfg.get("reasoning", True))
+                        rec.update({k: gen[k] for k in (
+                            "prompt_n", "prompt_per_second", "predicted_n",
+                            "predicted_per_second", "draft_tokens_total",
+                            "draft_tokens_accepted", "acceptance_rate", "ttft_ms",
+                            "wall_ms", "peak_memory_gb", "cached_tokens", "finish_reason")})
+                        rec.update({
+                            "thinking_tokens": count_tokens(thinking) if thinking else 0,
+                            "answer_tokens": count_tokens(answer) if answer else 0,
+                            "thinking_text": thinking,
+                            "answer_text": answer,
+                            "raw_text": gen["raw_text"],
+                            "output_sha256": hashlib.sha256(gen["raw_text"].encode()).hexdigest(),
+                            "output_len_chars": len(gen["raw_text"]),
+                        })
+                        ts = gen["predicted_per_second"]
+                        acc = gen["acceptance_rate"]
+                        log(f"  ok [mlx_vlm] {model_id} {quant} {tier} {config_label(bs)} "
+                            f"kv{kv_bits or 'fp16'} {q['id']}: {gen['predicted_n']} tok @ "
+                            f"{ts:.1f} tok/s"
+                            + (f", acc {acc*100:.0f}%" if acc is not None else "")
+                            + (f", prefill {gen['prompt_n']}@{gen['prompt_per_second']:.0f} tok/s"
+                               if gen["prompt_per_second"] else ""))
+                    except Exception as e:
+                        rec["error"] = f"{type(e).__name__}: {e}"
+                        log(f"  ERR [mlx_vlm] {model_id} {quant} {tier} {config_label(bs)} "
+                            f"{q['id']}: {rec['error']}")
+                    append_record(rec)
+                    done += 1
+                    elapsed = time.time() - t_start
+                    rate = done / elapsed if elapsed else 0
+                    eta = (total - done) / rate if rate else 0
+                    log(f"  progress {done}/{total} ({elapsed/60:.0f} min elapsed, "
+                        f"ETA {eta/60:.0f} min)")
+
+    log(f"DONE [mlx_vlm] {model_id}/{quant} in {(time.time()-t_start)/60:.1f} min")
     consolidate()
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MLX_MODELS_CONFIG.keys()),
-                    help="Model to benchmark (default: qwen3.6-27b)")
-    ap.add_argument("--smoke", action="store_true")
-    ap.add_argument("--quant", default=None)
-    ap.add_argument("--backend", choices=["mlx_lm", "mlx_vlm"], default="mlx_lm")
+    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MLX_MODELS_CONFIG.keys()))
+    ap.add_argument("--quant", default=None, help="restrict to one quant (default: all present)")
+    ap.add_argument("--smoke", action="store_true", help="one question, shallow, off vs mtp")
     ap.add_argument("--phase", choices=["speed", "full"], default=None)
+    ap.add_argument("--tiers", default=None,
+                    help=f"comma-separated subset of {T.TIER_ORDER}")
+    ap.add_argument("--blocks", default=None,
+                    help="comma-separated draft block sizes, e.g. 0,1,2,3,4")
+    ap.add_argument("--kv-bits", default=None,
+                    help="comma-separated; 0 means unquantized. e.g. 0,8")
+    ap.add_argument("--no-resume", action="store_true")
     args = ap.parse_args()
 
-    model_id = args.model
-    model_cfg = C.MLX_MODELS_CONFIG[model_id]
-
+    model_cfg = C.MLX_MODELS_CONFIG[args.model]
     quants = [args.quant] if args.quant else model_cfg["quant_order"]
     quants = [q for q in quants if os.path.isdir(model_cfg["quants"][q])]
     if not quants:
-        log(f"no MLX models present for {model_id} yet"); return
-    tokenizers = {q: AutoTokenizer.from_pretrained(model_cfg["quants"][q]) for q in quants}
+        log(f"no MLX models present for {args.model}")
+        return
+
+    tier_names = args.tiers.split(",") if args.tiers else list(model_cfg.get("tiers", ["shallow"]))
+    blocks = ([int(x) for x in args.blocks.split(",")] if args.blocks
+              else model_cfg.get("draft_block_ns", [0]))
+    kv_opts = ([int(x) or None for x in args.kv_bits.split(",")] if args.kv_bits
+               else model_cfg.get("kv_bits_opts", [None]))
 
     if args.smoke:
-        run(model_id, model_cfg, quants[:1], ["q2_coding"], SMOKE_N_PREDICT, "speed", args.backend, tokenizers)
+        for q in quants[:1]:
+            run(args.model, model_cfg, q, [0, model_cfg.get("draft_block_ns", [0, 2])[-1]],
+                [None], ["shallow"], ["q2_coding"], C.SMOKE_N_PREDICT, "speed", resume=False)
         return
+
     allq = [q["id"] for q in QUESTIONS]
-    if args.phase in (None, "speed"):
-        run(model_id, model_cfg, quants, allq, C.SPEED_N_PREDICT, "speed", args.backend, tokenizers)
-    if args.phase in (None, "full"):
-        run(model_id, model_cfg, quants, allq, C.FULL_N_PREDICT, "full", args.backend, tokenizers)
+    for q in quants:
+        if args.phase in (None, "speed"):
+            run(args.model, model_cfg, q, blocks, kv_opts, tier_names, allq,
+                C.SPEED_N_PREDICT, "speed", resume=not args.no_resume)
+        if args.phase in (None, "full"):
+            # Canonical answers for judging: MTP OFF, unquantized KV, shallow prompt —
+            # matching the GGUF canonical (draft_n=0) so the judge compares like with
+            # like. Whether MTP alters output is a separate question, answered by the
+            # determinism probe rather than folded into the quality score.
+            run(args.model, model_cfg, q, [0], [None], ["shallow"], allq,
+                C.FULL_N_PREDICT, "full", resume=not args.no_resume)
 
 
 if __name__ == "__main__":

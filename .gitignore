@@ -4,3 +4,11 @@ results/logs/
 .DS_Store
 .mlxenv/
 results/mlx_run.log
+
+# Working backups taken while iterating on the harness (24MB+, not reproducible artifacts)
+results/*.bak-*
+results/*.jsonl.bak-*
+
+# Per-stage run logs. results/logs/ is already ignored; these are the chain/driver logs.
+results/*.log
+results/*_stdout.log

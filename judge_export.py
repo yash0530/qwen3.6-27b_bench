@@ -32,6 +32,11 @@ def main():
     recs = [r for r in load_recs() if r.get("error") is None]
     # Canonical answers come from the full-length phase (8192 cap, off config).
     recs = [r for r in recs if r.get("phase") == "full" and (r.get("answer_text") or r.get("thinking_text"))]
+    # Exclude the legacy mlx_lm.server runs. They share quant="mlx8" with the current
+    # mlx_vlm runs, so without this the grader would score stale outputs produced by a
+    # harness with a corrupted thinking/answer split — and would silently win the dedupe
+    # below by appearing earlier in the file.
+    recs = [r for r in recs if r.get("runtime") != "mlx"]
 
     items, seen = [], set()
     for r in recs:

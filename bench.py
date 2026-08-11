@@ -26,6 +26,7 @@ import urllib.request
 from datetime import datetime, timezone
 
 import config as C
+import tiers as T
 from questions import QUESTIONS, QUESTION_BY_ID
 
 
@@ -89,17 +90,23 @@ def parse_metrics(text: str) -> dict:
 
 # ------------------------------------------------------------------- server ctl
 class Server:
-    def __init__(self, model_id: str, quant: str, draft_n: int, model_path: str, reasoning_format: str):
+    def __init__(self, model_id: str, quant: str, draft_n: int, model_path: str, reasoning_format: str,
+                 ctx: int = None, kv_quant: str = None, tier: str = "shallow"):
         self.model_id = model_id
         self.quant = quant
         self.draft_n = draft_n
         self.model = model_path
         self.reasoning_format = reasoning_format
-        self.log_path = os.path.join(C.LOGS, f"server_{model_id}_{quant}_n{draft_n}.log")
+        self.ctx = ctx
+        self.kv_quant = kv_quant
+        self.tier = tier
+        suffix = f"_{tier}" + (f"_kv{kv_quant}" if kv_quant else "")
+        self.log_path = os.path.join(C.LOGS, f"server_{model_id}_{quant}_n{draft_n}{suffix}.log")
         self.proc = None
 
     def start(self):
-        cmd = C.server_cmd(self.model, self.draft_n, self.log_path, self.reasoning_format)
+        cmd = C.server_cmd(self.model, self.draft_n, self.log_path, self.reasoning_format,
+                           ctx=self.ctx, kv_quant=self.kv_quant)
         self.logf = open(self.log_path, "ab")
         self.logf.write(f"\n===== launch {datetime.now().isoformat()} =====\n".encode())
         self.logf.write((" ".join(cmd) + "\n").encode())
@@ -171,8 +178,15 @@ def split_think(raw: str, is_reasoning: bool):
 
     idx = raw.lower().find("</think>")
     if idx == -1:
-        if not THINK_OPEN.match(raw) and "<think>" not in raw.lower():
-            return "", raw.strip()
+        # No closing tag. Because the chat template opens <think> at the end of the
+        # prompt, generation begins *inside* the reasoning block and the opening tag
+        # never appears in the output — so its absence says nothing. What the missing
+        # </think> does say is that the token cap truncated the model mid-reasoning:
+        # everything generated is thinking, and there is no answer yet.
+        #
+        # The previous version returned ("", raw) whenever no literal <think> appeared,
+        # which filed an entire truncated reasoning block as the *answer*. That silently
+        # corrupted 75 of 210 GGUF speed rows and every MLX speed row.
         return THINK_OPEN.sub("", raw, count=1).strip(), ""
     thinking = THINK_OPEN.sub("", raw[:idx], count=1).strip()
     answer = raw[idx + len("</think>"):].strip()
@@ -250,6 +264,13 @@ def extract_timings(final: dict) -> dict:
 
 # ------------------------------------------------------------------- run record
 def done_keys(path: str) -> set:
+    """Completed-run keys for the GGUF arm.
+
+    Keyed on tier and KV type as well as the sweep axes: the same question at
+    shallow/agent/deep, or at fp16 vs q8_0 KV, are different measurements. Without
+    those in the key a restarted sweep would append duplicates that then get averaged
+    into the summary.
+    """
     seen = set()
     if not os.path.exists(path):
         return seen
@@ -259,9 +280,10 @@ def done_keys(path: str) -> set:
                 r = json.loads(ln)
             except Exception:
                 continue
-            if r.get("error") is None:
-                # Include model_id in the keys to track resume status properly
-                seen.add((r.get("phase"), r["pass"], r.get("model", "qwen3.6-27b"), r["quant"], r["draft_n"], r["question_id"]))
+            if r.get("error") is None and r.get("runtime") in (None, "gguf"):
+                seen.add((r.get("phase"), r.get("pass"), r.get("model", "qwen3.6-27b"),
+                          r.get("quant"), r.get("draft_n"), r.get("question_id"),
+                          r.get("prompt_tier", "shallow"), r.get("kv_quant")))
     return seen
 
 
@@ -275,29 +297,34 @@ def config_label(draft_n: int) -> str:
 
 
 # ------------------------------------------------------------------------- main
-def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, phase):
+def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, phase,
+        tier="shallow", kv_quant=None, built=None):
     ensure_dirs()
     seen = done_keys(C.RESULTS_JSONL)
     qs = [QUESTION_BY_ID[qid] for qid in question_ids]
+    ctx = C.ctx_for_tier(tier, n_predict)
 
     total = len(passes) * len(quants) * len(draft_ns) * len(qs)
     done = 0
     t_start = time.time()
-    log(f"START model={model_id} phase={phase}: {total} generations "
-        f"(passes={passes} quants={quants} draft_ns={draft_ns} cap={n_predict})")
+    log(f"START model={model_id} phase={phase} tier={tier} kv={kv_quant or 'fp16'} ctx={ctx}: "
+        f"{total} generations (passes={passes} quants={quants} draft_ns={draft_ns} cap={n_predict})")
 
     for p in passes:
         for quant in quants:
             for dn in draft_ns:
-                pending = [q for q in qs if (phase, p, model_id, quant, dn, q["id"]) not in seen]
+                pending = [q for q in qs
+                           if (phase, p, model_id, quant, dn, q["id"], tier, kv_quant) not in seen]
                 if not pending:
                     done += len(qs)
                     log(f"skip [{phase}] {model_id} {quant} {config_label(dn)} pass{p} (already done)")
                     continue
 
                 model_path = model_cfg["quants"][quant]
-                srv = Server(model_id, quant, dn, model_path, model_cfg["reasoning_format"])
-                log(f"launch [{phase}] {model_id} {quant} {config_label(dn)} pass{p} ...")
+                srv = Server(model_id, quant, dn, model_path, model_cfg["reasoning_format"],
+                             ctx=ctx, kv_quant=kv_quant, tier=tier)
+                log(f"launch [{phase}] {model_id} {quant} {config_label(dn)} pass{p} "
+                    f"tier={tier} kv={kv_quant or 'fp16'} ...")
                 if not srv.start():
                     for q in pending:
                         append_record({
@@ -311,15 +338,18 @@ def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, 
                     continue
 
                 for q in pending:
+                    user_text = built[q["id"]][tier] if built else q["user"]
                     messages = [
                         {"role": "system", "content": q["system"]},
-                        {"role": "user", "content": q["user"]},
+                        {"role": "user", "content": user_text},
                     ]
                     rec = {
                         "phase": phase, "pass": p, "model": model_id, "quant": quant, "draft_n": dn,
                         "config": config_label(dn), "question_id": q["id"],
                         "category": q["category"], "seed": C.SEED,
                         "n_predict_cap": n_predict, "model_path": model_path,
+                        "runtime": "gguf", "prompt_tier": tier,
+                        "kv_quant": kv_quant, "ctx": ctx,
                         "ts": datetime.now(timezone.utc).isoformat(),
                         "error": None,
                     }
@@ -388,6 +418,10 @@ def main():
     ap.add_argument("--phase", choices=["speed", "full"], default=None,
                     help="run only one phase (default: both, speed then full)")
     ap.add_argument("--quant", default=None, help="restrict to one quant (must exist in model config)")
+    ap.add_argument("--tiers", default=None,
+                    help="comma-separated prompt-depth tiers, e.g. shallow,agent,deep")
+    ap.add_argument("--kv-quant", dest="kv_quant", default=None,
+                    help="comma-separated KV cache types, e.g. none,q8_0 (matches MLX --kv-bits)")
     ap.add_argument("--consolidate-only", action="store_true")
     args = ap.parse_args()
 
@@ -420,13 +454,23 @@ def main():
 
     allq = [q["id"] for q in QUESTIONS]
     draft_ns = model_cfg["draft_ns"]
-    
+
+    # Prompts come from the shared cache so both runtimes send identical bytes.
+    built = T.load_cached() if args.tiers or args.kv_quant else None
+    tier_names = args.tiers.split(",") if args.tiers else ["shallow"]
+    kv_opts = args.kv_quant.split(",") if args.kv_quant else [None]
+    kv_opts = [None if k in ("", "none", "fp16") else k for k in kv_opts]
+
     # Phase 1: speed sweep over the full grid at a short cap.
     if args.phase in (None, "speed"):
-        run(model_id, model_cfg, [1], quants, draft_ns, allq, C.SPEED_N_PREDICT, phase="speed")
+        for tier in tier_names:
+            for kvq in kv_opts:
+                run(model_id, model_cfg, [1], quants, draft_ns, allq, C.SPEED_N_PREDICT,
+                    phase="speed", tier=tier, kv_quant=kvq, built=built)
     # Phase 2: full-length generations (off config only) for token totals + judging.
     if args.phase in (None, "full"):
-        run(model_id, model_cfg, [1], quants, [0], allq, C.FULL_N_PREDICT, phase="full")
+        run(model_id, model_cfg, [1], quants, [0], allq, C.FULL_N_PREDICT, phase="full",
+            tier="shallow", kv_quant=kv_opts[-1], built=built)
 
 
 if __name__ == "__main__":

@@ -30,6 +30,18 @@ MODELS_CONFIG = {
         "quant_order": ["q5", "q6", "q8"],
         "draft_ns": [0, 1, 2, 3, 4],
     },
+    "qwen3.6-35b-a3b": {
+        "name": "Qwen 3.6 35B A3B",
+        "reasoning": True,
+        "reasoning_format": "deepseek",
+        "quants": {
+            "q5": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mtp-q5/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf"),
+            "q6": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mtp-q6/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf"),
+            "q8": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mtp-q8/Qwen3.6-35B-A3B-Q8_0.gguf"),
+        },
+        "quant_order": ["q5", "q6", "q8"],
+        "draft_ns": [0, 1, 2, 3, 4],
+    },
     "gemma4-31b": {
         "name": "Gemma 4 31B",
         "reasoning": False,
@@ -44,25 +56,87 @@ MODELS_CONFIG = {
 }
 
 # --- MLX Model Registry --------------------------------------------------------
+# Served in-process by bench_mlx.py via mlx_vlm, with MTP speculative decoding from the
+# separately-published drafter checkpoints.
+#
+# The drafters are bf16 *on purpose*: quantized MTP heads are reported to collapse
+# acceptance on MoE models (single-digit percentages vs ~80% at bf16), because
+# quantization error compounds through the expert-routing prediction. They are small
+# (~0.8 GB for the 27B head), so keeping them unquantized costs almost nothing.
+#
+# `draft_block_ns` is the MLX analogue of the GGUF `draft_ns` sweep: 0 means no
+# speculation, N overrides the drafter's configured block size (3 for these checkpoints).
 MLX_MODELS_CONFIG = {
     "qwen3.6-27b": {
         "name": "Qwen 3.6 27B",
         "reasoning": True,
         "quants": {
             "mlx8": os.path.expanduser("~/Models/qwen3.6-27b-mlx-8bit"),
-            "mlx6": os.path.expanduser("~/Models/qwen3.6-27b-mlx-6bit"),
-        },
-        "quant_order": ["mlx8", "mlx6"],
-    },
-    "gemma4-31b": {
-        "name": "Gemma 4 31B",
-        "reasoning": False,
-        "quants": {
-            "mlx8": os.path.expanduser("~/Models/gemma4-31b-mlx-8bit"),
         },
         "quant_order": ["mlx8"],
+        "draft_model": os.path.expanduser("~/Models/qwen3.6-27b-mtp-bf16"),
+        "draft_kind": None,           # auto-detected from the drafter's model_type
+        # Dense model: this is where MLX has a real shot, so sweep it fully.
+        # Block size is the *verify* block: the drafter proposes block_size - 1 tokens
+        # (speculative/dflash.py:140). So 1 proposes nothing and the decode loop
+        # degenerates to a single token — measured, and it emits 1 token then stops.
+        # Valid speculative depths therefore start at 2. 0 means speculation off.
+        "draft_block_ns": [0, 2, 3, 4, 5],
+        "kv_bits_opts": [None, 8],    # fp16 vs q8 KV, to match llama.cpp's -ctk/-ctv q8_0
+        "tiers": ["shallow", "agent", "deep"],
+    },
+    "qwen3.6-35b-a3b": {
+        "name": "Qwen 3.6 35B A3B",
+        "reasoning": True,
+        "quants": {
+            "mlx8": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mlx-8bit"),
+        },
+        "quant_order": ["mlx8"],
+        "draft_model": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mtp-bf16"),
+        "draft_kind": None,
+        # MoE: published acceptance is ~11% (one MTP layer cannot predict expert
+        # routing), so this arm confirms or refutes that rather than sweeping.
+        # See the 27B note above for why depths start at 2, not 1.
+        "draft_block_ns": [0, 2, 3],
+        "kv_bits_opts": [None, 8],
+        "tiers": ["shallow", "agent"],
     },
 }
+
+# --- MLX generation knobs -------------------------------------------------------
+KV_GROUP_SIZE = 64
+KV_QUANT_SCHEME = "uniform"   # "turboquant" also fails with MTP; see note below
+PREFILL_STEP_SIZE = 2048      # do NOT raise: prefilling 23k in one step OOMs Metal
+
+# Quantized KV + MTP is broken in mlx_vlm 0.6.3 at depth.
+#
+#   mlx_vlm/models/qwen3_5/language.py:1481
+#     prefix_len = keys.shape[-2] - L      # `keys` is a list when the cache is quantized
+#
+# A quantized MLX KV cache is a list of (values, scales, biases); the speculative-verify
+# branch of Qwen3.5 attention indexes it as a plain array. Measured matrix on this box:
+# shallow+q8+MTP passes, agent+fp16+MTP passes, agent+q8+no-MTP passes, agent+q8+MTP
+# fails for every block size. `turboquant` fails differently
+# ("'_QuantizedStateProxy' object is not subscriptable").
+#
+# Deferring quantization past the prompt avoids the crash, because the prompt's KV then
+# stays unquantized and only decode-time KV is quantized. That is NOT equivalent to
+# llama.cpp's -ctk q8_0 -ctv q8_0, which quantizes the whole cache — it forfeits exactly
+# the memory saving that makes q8 KV worth using at long context. It is measured here as
+# its own labelled arm ("q8 decode-only") rather than being passed off as q8 KV.
+QUANTIZED_KV_DEFER = True
+
+
+def quantized_kv_start_for(tier: str) -> int:
+    """Step at which to begin quantizing the KV cache, per prompt-depth tier.
+
+    Set just past the tier's prompt so prefill never hands a quantized cache to the
+    speculative verify path. Returns 0 when deferral is off (which will crash with MTP
+    at depth — kept switchable so the bug can be re-tested against future mlx_vlm).
+    """
+    if not QUANTIZED_KV_DEFER:
+        return 0
+    return {"shallow": 1024, "agent": 24000, "deep": 66000}.get(tier, 1024)
 
 
 # --- Decoding (fixed across every run) -----------------------------------------
@@ -92,12 +166,35 @@ STREAM_READ_TIMEOUT_S = 240  # max gap between streamed tokens before we bail
 PORT_FREE_TIMEOUT_S = 60  # max wait for the port to free after server stop
 
 
-def server_cmd(model_path: str, draft_n: int, log_path: str, reasoning_format: str = "none") -> list:
-    """Build the llama-server argv for one (quant, draft_n) configuration."""
+def ctx_for_tier(tier: str, n_predict: int) -> int:
+    """Context large enough to hold the tier's prompt plus the generation cap.
+
+    The old harness pinned -c 16384 for everything. That cannot hold the `agent`
+    (~23k) or `deep` (~64k) prompts at all, and it also means the GGUF control was
+    measured at a different context size than the MLX arm. Both runtimes now size
+    context from the same tier.
+    """
+    prompt_tokens = {"shallow": 512, "agent": 23000, "deep": 64000}.get(tier, 512)
+    need = prompt_tokens + n_predict + 2048   # headroom for template + slack
+    # Round up to the next power-of-two-ish boundary llama.cpp is happy with.
+    for size in (16384, 32768, 65536, 98304, 131072, 262144):
+        if need <= size:
+            return size
+    return 262144
+
+
+def server_cmd(model_path: str, draft_n: int, log_path: str, reasoning_format: str = "none",
+               ctx: int = None, kv_quant: str = None) -> list:
+    """Build the llama-server argv for one (quant, draft_n) configuration.
+
+    `kv_quant` (e.g. "q8_0") mirrors the MLX arm's --kv-bits so neither runtime gets a
+    free ride on KV cache precision — and it matches what llm-serve actually serves with
+    (LOCAL_LLM_HARNESS.md §4 uses -ctk q8_0 -ctv q8_0).
+    """
     cmd = [
         LLAMA_SERVER,
         "-m", model_path,
-        "-c", str(CTX),
+        "-c", str(ctx or CTX),
         "-ngl", "99",
         "-fa", "on",
         "-np", "1",                 # MTP requires a single slot
@@ -108,6 +205,8 @@ def server_cmd(model_path: str, draft_n: int, log_path: str, reasoning_format: s
         "--metrics",
         "--no-webui",
     ]
+    if kv_quant:
+        cmd += ["-ctk", kv_quant, "-ctv", kv_quant]
     if reasoning_format and reasoning_format != "none":
         cmd += ["--reasoning-format", reasoning_format]
 

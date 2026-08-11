@@ -1,5 +1,5 @@
 {
-  "judge": "claude-opus-4-8",
+  "judge": "claude-opus-5 (this session)",
   "rubric_version": 1,
   "notes": "Graded by Claude/Opus reading all 15 full-length answers. Weights: correctness 0.35, depth 0.25, instruction_following 0.20, practicality 0.20. All three quants are excellent and near-equivalent; differences are small and consistent (Q8 >= Q6 >= Q5). q1 (market research) is uniformly capped on correctness because the local model's training cutoff predates the real mid-2026 models (it recommends speculative 'Qwen3-32B', and several answers wrongly claim 'MTP not supported, skip').",
   "scores": [
@@ -114,14 +114,16 @@
       "rationale": "The most complete q1: capability matrix, RAG strategy, full engine wiring with code, operational checklist, fallback plan. Still cutoff-limited; minor slip ('Q6_K pushes past 45GB')."
     },
     {
+      "model": "qwen3.6-27b",
       "quant": "q8",
       "question_id": "q2_coding",
-      "correctness": 8.5,
+      "correctness": 8,
       "depth": 8,
       "instruction_following": 9,
-      "practicality": 8.5,
-      "overall": 8.5,
-      "rationale": "Most complete coding answer: adds a maxDelayMs backoff cap and tracks retries in errors. Correct throughout; tiny unused destructure of {retries}."
+      "practicality": 8,
+      "overall": 8.2,
+      "rationale": "Cleaner: maxDelayMs cap, signal-aware limiter, explicit required AbortSignal, no redundant pool. Minus for string-matched abort detection and errors[].retries always reporting maxRetries.",
+      "regraded_by": "claude-opus-5 (this session) for same-judge comparability with mlx8"
     },
     {
       "quant": "q8",
@@ -152,6 +154,40 @@
       "practicality": 9,
       "overall": 9.05,
       "rationale": "Cleanest fix: a createLoader factory that also wraps Promise.resolve(fetchFn()) to catch SYNCHRONOUS throws (a subtlety the others missed), plus TTL + FIFO eviction and stampede note."
+    },
+    {
+      "model": "qwen3.6-27b",
+      "quant": "mlx8",
+      "question_id": "q2_coding",
+      "correctness": 6,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 7.5,
+      "rationale": "AbortSignal.timeout(0) fallback yields an already-aborting signal; ConcurrencyPool redundant (workers==max) and release() never decrements active on the waiter path; no backoff cap; limiter waits not abortable; 'Equal Jitter' mislabeled ([0.5,1.5] vs AWS [0.5,1.0]). Strong trade-off table."
+    },
+    {
+      "model": "qwen3.6-35b-a3b",
+      "quant": "mlx8",
+      "question_id": "q5_debugging",
+      "correctness": 8,
+      "depth": 9,
+      "instruction_following": 8,
+      "practicality": 9,
+      "overall": 8.45,
+      "rationale": "Correct pre-await registration, parameterized fetcher, rejection handler attached, precise interleaving table. Correctly refuted the prompt's false premise that the original caches rejections. Minus: FIFO eviction labeled 'LRU-style'."
+    },
+    {
+      "model": "qwen3.6-35b-a3b",
+      "quant": "q8",
+      "question_id": "q5_debugging",
+      "correctness": 6,
+      "depth": 9,
+      "instruction_following": 8,
+      "practicality": 6,
+      "overall": 7.15,
+      "rationale": "Class calls an undefined global fetchData(key) \u2014 not a parameter or import, so it cannot compile as the reusable class presented. 'Double-check lock' is a no-op: both cache.get calls are synchronous with no await between, yet sold as the safety mechanism. Cached rejected promise risks unhandled rejection. Richer extras (dispose, failTtl, observability)."
     }
-  ]
+  ],
+  "grading_scope": "Full manual grading of 4 items on the two objectively-checkable questions (q2_coding, q5_debugging) across the 8-bit configs, to answer whether MLX 8-bit degrades output quality vs GGUF Q8. The 21 remaining items are ungraded; per-quant quality averages that include them are incomplete."
 }

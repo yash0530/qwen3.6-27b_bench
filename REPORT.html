@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Local LLM Benchmark Suite Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card-bg: rgba(22, 31, 56, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.15);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.15);
+      --accent: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.15);
+      --font-title: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    header {
+      margin-bottom: 40px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 24px;
+    }
+    h1 {
+      font-family: var(--font-title);
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .meta-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .grid-tldr {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    }
+    .card-title {
+      font-family: var(--font-title);
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0 0 15px 0;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+    .card-stat {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+      font-family: var(--font-title);
+    }
+    .card-detail {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-right: 8px;
+    }
+    .badge-primary {
+      background: var(--primary-glow);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .badge-success {
+      background: var(--success-glow);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-accent {
+      background: var(--accent-glow);
+      color: #c084fc;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+    }
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 1.75rem;
+      font-weight: 600;
+      margin: 40px 0 20px 0;
+      color: #fff;
+      border-left: 4px solid var(--primary);
+      padding-left: 12px;
+    }
+    .grid-charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    @media (max-width: 600px) {
+      .grid-charts {
+        grid-template-columns: 1fr;
+      }
+    }
+    .chart-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    .chart-box img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+    .chart-title {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card-bg);
+    }
+    th, td {
+      padding: 14px 20px;
+      text-align: left;
+    }
+    th {
+      background-color: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 1px solid var(--card-border);
+      font-family: var(--font-title);
+      font-size: 0.95rem;
+    }
+    td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.9rem;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    .recommendation-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 16px;
+      padding: 30px;
+      margin-top: 40px;
+      box-shadow: 0 4px 30px rgba(59, 130, 246, 0.05);
+    }
+    pre {
+      background: #04060a;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      color: #34d399;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      margin: 20px 0 0 0;
+    }
+    code {
+      font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Local LLM Benchmark Suite Dashboard</h1>
+      <p class="meta-subtitle">
+        Speed sweep: 400 runs · full-length: 30 runs · 
+        temp 0.6, seed 42, ctx 16384
+      </p>
+    </header>
+
+    <div class="section-title">Performance Summary</div>
+    <div class="grid-tldr">
+      
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 27B (Q5)</div>
+        <div class="card-stat">17.7 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=3</strong> (1.37x speedup vs off) (57% accept)<br>
+          Quality: <strong>8.3/10</strong><br>
+          Avg response size: <strong>6795 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 27B (Q6)</div>
+        <div class="card-stat">17.5 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=3</strong> (1.61x speedup vs off) (57% accept)<br>
+          Quality: <strong>8.5/10</strong><br>
+          Avg response size: <strong>6781 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 27B (Q8)</div>
+        <div class="card-stat">14.7 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=3</strong> (1.67x speedup vs off) (60% accept)<br>
+          Quality: <strong>8.6/10</strong><br>
+          Avg response size: <strong>6703 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 35B A3B (Q5)</div>
+        <div class="card-stat">76.2 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.27x speedup vs off) (67% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>7612 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 35B A3B (Q6)</div>
+        <div class="card-stat">70.5 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=1</strong> (1.24x speedup vs off) (78% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>6782 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.6 35B A3B (Q8)</div>
+        <div class="card-stat">51.6 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=1</strong> (1.16x speedup vs off) (79% accept)<br>
+          Quality: <strong>7.2/10</strong><br>
+          Avg response size: <strong>7780 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.6 27B (MLX-8bit)</div>
+        <div class="card-stat">15.8 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>7.5/10</strong><br>
+          Avg response size: <strong>7037 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.6 35B A3B (MLX-8bit)</div>
+        <div class="card-stat">70.7 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>8.4/10</strong><br>
+          Avg response size: <strong>7180 tokens</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Visual Analytics</div>
+    <div class="grid-charts">
+      
+      <div class="chart-box">
+        <img src="results/charts/01_decode_tok_s.png" alt="decode tok s">
+        <div class="chart-title">decode tok s</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/02_speedup.png" alt="speedup">
+        <div class="chart-title">speedup</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/03_acceptance.png" alt="acceptance">
+        <div class="chart-title">acceptance</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/04_prompt_speed.png" alt="prompt speed">
+        <div class="chart-title">prompt speed</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/05_ttft.png" alt="ttft">
+        <div class="chart-title">ttft</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/06_tokens.png" alt="tokens">
+        <div class="chart-title">tokens</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/07_quality.png" alt="quality">
+        <div class="chart-title">quality</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/08_quality_vs_speed.png" alt="quality vs speed">
+        <div class="chart-title">quality vs speed</div>
+      </div>
+
+      <div class="chart-box">
+        <img src="results/charts/09_runtime_tok_s.png" alt="runtime tok s">
+        <div class="chart-title">runtime tok s</div>
+      </div>
+    </div>
+
+    <div class="section-title">Speed Sweep Metrics</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Model & Quant</th>
+            <th>Config</th>
+            <th>Speed (tok/s)</th>
+            <th>Margin of Error</th>
+            <th>MTP Accept %</th>
+            <th>Prefill Speed</th>
+            <th>TTFT</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>12.9</strong></td>
+          <td>±0.2</td>
+          <td>-</td>
+          <td>257</td>
+          <td>814 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>14.9</strong></td>
+          <td>±0.3</td>
+          <td>80%</td>
+          <td>247</td>
+          <td>849 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>13.4</strong></td>
+          <td>±0.6</td>
+          <td>67%</td>
+          <td>246</td>
+          <td>853 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>17.7</strong></td>
+          <td>±1.0</td>
+          <td>57%</td>
+          <td>242</td>
+          <td>864 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>17.2</strong></td>
+          <td>±1.2</td>
+          <td>49%</td>
+          <td>241</td>
+          <td>868 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>10.8</strong></td>
+          <td>±0.0</td>
+          <td>-</td>
+          <td>275</td>
+          <td>760 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>15.3</strong></td>
+          <td>±0.1</td>
+          <td>79%</td>
+          <td>266</td>
+          <td>782 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>14.1</strong></td>
+          <td>±0.2</td>
+          <td>68%</td>
+          <td>251</td>
+          <td>829 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>17.5</strong></td>
+          <td>±0.6</td>
+          <td>57%</td>
+          <td>244</td>
+          <td>856 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>16.8</strong></td>
+          <td>±0.7</td>
+          <td>48%</td>
+          <td>246</td>
+          <td>850 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>8.8</strong></td>
+          <td>±0.9</td>
+          <td>-</td>
+          <td>248</td>
+          <td>151701 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>13.2</strong></td>
+          <td>±2.2</td>
+          <td>81%</td>
+          <td>241</td>
+          <td>156802 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>14.7</strong></td>
+          <td>±2.9</td>
+          <td>70%</td>
+          <td>236</td>
+          <td>158227 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>14.7</strong></td>
+          <td>±3.1</td>
+          <td>60%</td>
+          <td>231</td>
+          <td>157944 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>13.9</strong></td>
+          <td>±3.1</td>
+          <td>52%</td>
+          <td>230</td>
+          <td>158322 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>60.0</strong></td>
+          <td>±0.3</td>
+          <td>-</td>
+          <td>875</td>
+          <td>271 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>76.0</strong></td>
+          <td>±1.0</td>
+          <td>77%</td>
+          <td>906</td>
+          <td>236 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>76.2</strong></td>
+          <td>±3.7</td>
+          <td>67%</td>
+          <td>943</td>
+          <td>224 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>68.5</strong></td>
+          <td>±5.3</td>
+          <td>56%</td>
+          <td>904</td>
+          <td>233 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>63.6</strong></td>
+          <td>±5.3</td>
+          <td>49%</td>
+          <td>898</td>
+          <td>234 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>57.1</strong></td>
+          <td>±0.5</td>
+          <td>-</td>
+          <td>950</td>
+          <td>225 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>70.5</strong></td>
+          <td>±1.6</td>
+          <td>78%</td>
+          <td>935</td>
+          <td>226 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>69.2</strong></td>
+          <td>±2.1</td>
+          <td>65%</td>
+          <td>925</td>
+          <td>231 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>65.1</strong></td>
+          <td>±2.5</td>
+          <td>56%</td>
+          <td>914</td>
+          <td>233 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>59.4</strong></td>
+          <td>±2.7</td>
+          <td>47%</td>
+          <td>903</td>
+          <td>235 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>44.6</strong></td>
+          <td>±8.5</td>
+          <td>-</td>
+          <td>792</td>
+          <td>51591 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp1</span></td>
+          <td><strong>51.6</strong></td>
+          <td>±12.5</td>
+          <td>79%</td>
+          <td>752</td>
+          <td>55475 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>50.3</strong></td>
+          <td>±13.2</td>
+          <td>67%</td>
+          <td>753</td>
+          <td>55781 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp3</span></td>
+          <td><strong>47.1</strong></td>
+          <td>±13.0</td>
+          <td>58%</td>
+          <td>753</td>
+          <td>55861 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp4</span></td>
+          <td><strong>42.5</strong></td>
+          <td>±11.8</td>
+          <td>49%</td>
+          <td>745</td>
+          <td>55997 ms</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Full-length Generation Capacity</div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Model & Quant</th>
+            <th>Total Tokens</th>
+            <th>Thinking Tokens</th>
+            <th>Answer Tokens</th>
+            <th>Completions</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q5)</strong></td>
+          <td><strong>6795</strong></td>
+          <td>4413</td>
+          <td>2378</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q6)</strong></td>
+          <td><strong>6781</strong></td>
+          <td>4397</td>
+          <td>2379</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (Q8)</strong></td>
+          <td><strong>6703</strong></td>
+          <td>4349</td>
+          <td>2350</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q5)</strong></td>
+          <td><strong>7612</strong></td>
+          <td>5517</td>
+          <td>2091</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q6)</strong></td>
+          <td><strong>6782</strong></td>
+          <td>4267</td>
+          <td>2511</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (Q8)</strong></td>
+          <td><strong>7780</strong></td>
+          <td>5029</td>
+          <td>2747</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 27B (MLX-8bit)</strong></td>
+          <td><strong>7037</strong></td>
+          <td>4647</td>
+          <td>2386</td>
+          <td>5/5</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.6 35B A3B (MLX-8bit)</strong></td>
+          <td><strong>7180</strong></td>
+          <td>4546</td>
+          <td>2628</td>
+          <td>5/5</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title">MTP Output Determinism Probe</div>
+    <div class="card" style="margin-bottom: 40px;">
+      <div class="card-detail">
+        <p style="margin: 0; font-size: 1rem;">
+          🔍 Out of compared runs, <strong>316/500</strong> speculative decoding runs diverged from the MTP-off baseline under a fixed seed.
+        </p>
+      </div>
+    </div>
+
+    
+    <div class="recommendation-card">
+      <h3 style="margin-top: 0; font-family: var(--font-title); font-size: 1.5rem; color: #fff;">
+        🚀 Recommended Hosting Configuration
+      </h3>
+      <p>Based on comprehensive speed-to-quality optimizations, serve <strong>Qwen 3.6 27B (Q8)</strong> on this machine with the following launch command:</p>
+      <pre><code>llama-server -m /Users/yash/Models/qwen3.6-27b-mtp-q8/Qwen3.6-27B-Q8_0.gguf \
+  --spec-type draft-mtp --spec-draft-n-max 3 \
+  -c 16384 -ngl 99 -fa on -np 1 --jinja --reasoning-format deepseek \
+  --temp 0.6 --top-p 0.95 --top-k 20 --host 127.0.0.1 --port 8080</code></pre>
+    </div>
+  </div>
+</body>
+</html>
