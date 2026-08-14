@@ -68,7 +68,9 @@ def load_all():
     
     res = []
     for r in recs:
-        if r.get("error") is None:
+        # Smoke rows are gate checks at a short token cap on a single question. They
+        # would otherwise be averaged in as if they were sweep measurements.
+        if r.get("error") is None and not r.get("smoke"):
             # normalize model
             if "model" not in r:
                 r["model"] = "qwen3.6-27b"

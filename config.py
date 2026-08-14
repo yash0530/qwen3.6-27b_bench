@@ -42,6 +42,51 @@ MODELS_CONFIG = {
         "quant_order": ["q5", "q6", "q8"],
         "draft_ns": [0, 1, 2, 3, 4],
     },
+    # Qwen 3.8 27B (released 2026-08-14). Dense 64-layer hybrid, 48 GatedDeltaNet + 16
+    # full-attention layers — the same 3:1 family as 3.6, and it reports `model_type:
+    # qwen3_5`, so llama.cpp and mlx_vlm load it on their existing Qwen3.5 paths.
+    #
+    # Quant selection is the point of this arm. Qwen themselves publish no GGUF and no
+    # MLX (only FP8, which is CUDA-only), so on Apple Silicon there is no official-vs-
+    # community choice to make — the real question is which *community* quant is best,
+    # and nobody has measured it for 3.8. A KL study on the previous generation found
+    # unsloth's UD-Q8_K_XL off the quality/size Pareto frontier while a plain Q8_0 was
+    # both smaller and closer to BF16, so the ggml-org quants are carried as a
+    # cross-uploader control rather than assuming UD wins by construction.
+    #
+    # `draft_sidecar`: every unsloth quant carries the MTP head inline (verified by
+    # reading the GGUF tensor names: blk.64.nextn.*), so they need no extra file. The
+    # ggml-org quants carry none and must be pointed at an `mtp-*.gguf` sidecar.
+    "qwen3.8-27b": {
+        "name": "Qwen 3.8 27B",
+        "reasoning": True,
+        "reasoning_format": "deepseek",
+        "quants": {
+            "q4_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q4_K_XL.gguf"),
+            "q5": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q5_K_M.gguf"),
+            "q5_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf"),
+            "q6": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q6_K.gguf"),
+            "q6_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q6_K_XL.gguf"),
+            "q8": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q8_0.gguf"),
+            "q8_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q8_K_XL.gguf"),
+            # Cross-uploader control (no inline MTP; see draft_sidecars below).
+            "q4_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/Qwen3.8-27B-Q4_K_M.gguf"),
+            "q8_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/Qwen3.8-27B-Q8_0.gguf"),
+        },
+        # Screening order: the reference quant first, so an interrupted run still has
+        # the baseline every other quant is compared against.
+        "quant_order": ["q8", "q8_ud", "q8_ggml", "q6_ud", "q6",
+                        "q5_ud", "q5", "q4_ud", "q4_ggml"],
+        "draft_sidecars": {
+            "q4_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
+            "q8_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
+        },
+        "draft_ns": [0, 1, 2, 3, 4],
+        # Qwen's own thinking-mode recommendation for 3.8 is temp 1.0 (3.6 used 0.6).
+        # Applied to both runtimes so the arms stay comparable to each other, while
+        # still serving this model the way its authors intend.
+        "sampling": {"temp": 1.0, "top_p": 0.95, "top_k": 20},
+    },
     "gemma4-31b": {
         "name": "Gemma 4 31B",
         "reasoning": False,
@@ -101,7 +146,52 @@ MLX_MODELS_CONFIG = {
         "kv_bits_opts": [None, 8],
         "tiers": ["shallow", "agent"],
     },
+    # Qwen 3.8 27B MLX arm. Three targets from two uploaders, because MLX quant quality
+    # across sources is exactly as unmeasured as the GGUF side.
+    #
+    # The drafter is a caveat, not a footnote: mlx-community published no MTP head for
+    # 3.8 (they did for 3.6), so the only option is vvsotnikov's, and a drafter is only
+    # valid against the checkpoint it was distilled from. Acceptance is therefore
+    # expected to hold on the matching 8-bit target and may collapse on the other two.
+    # Phase 0 measures that rather than assuming it, and any target where acceptance
+    # collapses is benchmarked MTP-off and labelled, not quietly reported as slow.
+    "qwen3.8-27b": {
+        "name": "Qwen 3.8 27B",
+        "reasoning": True,
+        "quants": {
+            "mlx8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-8bit"),
+            "mlx6": os.path.expanduser("~/Models/qwen3.8-27b-mlx-6bit"),
+            "mxfp8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-mxfp8"),
+        },
+        "quant_order": ["mlx8", "mlx6", "mxfp8"],
+        "draft_model": os.path.expanduser("~/Models/qwen3.8-27b-mtp-mlx-8bit"),
+        # bf16 alternate, kept as the acceptance control: on 3.6 the quantized MTP heads
+        # were reported to collapse acceptance, and this drafter is only available
+        # quantized from a third party, so the two are compared directly in Phase C.
+        "draft_model_alt": os.path.expanduser("~/Models/qwen3.8-27b-mtp-mlx-bf16"),
+        "draft_kind": None,           # auto-detected from the drafter's model_type
+        "draft_block_ns": [0, 2, 3, 4, 5],
+        "kv_bits_opts": [None, 8],
+        "tiers": ["shallow", "agent", "deep"],
+        "sampling": {"temp": 1.0, "top_p": 0.95, "top_k": 20},
+        # Qwen 3.8's template adds a reasoning_effort knob (default "xhigh"). Pinned
+        # explicitly so the MLX prompt matches what llama-server's --jinja renders from
+        # the same template default; validate_parity.py checks the rendered prompts.
+        "reasoning_effort": "xhigh",
+    },
 }
+
+
+def sampling_for(model_cfg: dict) -> tuple:
+    """(temp, top_p, top_k) for a model — its own recommendation, else the global default.
+
+    Qwen 3.8 asks for temp 1.0 in thinking mode where 3.6 asked for 0.6. Hardcoding one
+    value across models would mean serving at least one of them wrong, so it is per-model
+    but shared across runtimes: the GGUF-vs-MLX comparison stays like-for-like, which is
+    the invariant that actually matters here.
+    """
+    s = (model_cfg or {}).get("sampling") or {}
+    return s.get("temp", TEMP), s.get("top_p", TOP_P), s.get("top_k", TOP_K)
 
 # --- MLX generation knobs -------------------------------------------------------
 KV_GROUP_SIZE = 64
@@ -184,12 +274,17 @@ def ctx_for_tier(tier: str, n_predict: int) -> int:
 
 
 def server_cmd(model_path: str, draft_n: int, log_path: str, reasoning_format: str = "none",
-               ctx: int = None, kv_quant: str = None) -> list:
+               ctx: int = None, kv_quant: str = None, draft_sidecar: str = None) -> list:
     """Build the llama-server argv for one (quant, draft_n) configuration.
 
     `kv_quant` (e.g. "q8_0") mirrors the MLX arm's --kv-bits so neither runtime gets a
     free ride on KV cache precision — and it matches what llm-serve actually serves with
     (LOCAL_LLM_HARNESS.md §4 uses -ctk q8_0 -ctv q8_0).
+
+    `draft_sidecar` is for quants that ship the MTP head as a separate file instead of
+    inline. The unsloth Qwen 3.8 quants embed it (blk.64.nextn.*) and need nothing; the
+    ggml-org ones do not and must be handed an `mtp-*.gguf` here, or they would silently
+    benchmark as if speculation were unavailable.
     """
     cmd = [
         LLAMA_SERVER,
@@ -214,4 +309,6 @@ def server_cmd(model_path: str, draft_n: int, log_path: str, reasoning_format: s
         cmd += ["--spec-type", "none"]
     else:
         cmd += ["--spec-type", "draft-mtp", "--spec-draft-n-max", str(draft_n)]
+        if draft_sidecar:
+            cmd += ["--model-draft", draft_sidecar]
     return cmd

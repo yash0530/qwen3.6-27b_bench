@@ -29,7 +29,7 @@ def main():
     args = ap.parse_args()
 
     os.makedirs(C.JUDGING, exist_ok=True)
-    recs = [r for r in load_recs() if r.get("error") is None]
+    recs = [r for r in load_recs() if r.get("error") is None and not r.get("smoke")]
     # Canonical answers come from the full-length phase (8192 cap, off config).
     recs = [r for r in recs if r.get("phase") == "full" and (r.get("answer_text") or r.get("thinking_text"))]
     # Exclude the legacy mlx_lm.server runs. They share quant="mlx8" with the current

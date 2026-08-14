@@ -93,11 +93,11 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp3 | 15.6 | 0.7 | 69 | 303 | 840 | 36.6 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp4 | 14.7 | 0.4 | 57 | 299 | 890 | 36.6 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp5 | 12.9 | 0.8 | 46 | 301 | 926 | 36.6 |
-| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | off | 10.0 | 0.0 | - | 289 | 1214 | 35.3 |
+| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | off | 9.9 | 0.1 | - | 252 | 1585 | 35.3 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp2 | 14.8 | 0.3 | 83 | 338 | 743 | 35.7 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp3 | 15.8 | 0.7 | 70 | 309 | 832 | 36.0 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp4 | 15.1 | 1.1 | 60 | 302 | 881 | 36.3 |
-| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp5 | 13.3 | 0.8 | 48 | 303 | 921 | 36.6 |
+| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp5 | 14.1 | 1.8 | 48 | 305 | 971 | 36.6 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | off | 56.0 | 0.0 | - | 1646 | 14030 | 43.9 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | mtp2 | 59.1 | 1.3 | 78 | 1635 | 14130 | 43.9 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | mtp3 | 55.1 | 2.3 | 63 | 1633 | 14156 | 43.9 |
@@ -138,9 +138,9 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 
 ## Output determinism (MTP correctness probe, #23302)
 
-- llama.cpp: 212/320 diverged · MLX: 104/180 diverged
+- llama.cpp: 212/320 diverged · MLX: 105/181 diverged
 
-- 316/500 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
+- 317/501 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
 
 ## Warm-cache TTFT (multi-turn session at agent depth)
 

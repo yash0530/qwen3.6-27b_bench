@@ -2594,3 +2594,14 @@
 [19:26:19] DRIFT decode -4.5%   prefill -5.7%
 [19:26:19]   (|drift| under ~3% => machine stable, cross-engine margins are real)
 [20:49:47] consolidated 829 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[10:03:08] loading target qwen3.6-27b/mlx8 from /Users/yash/Models/qwen3.6-27b-mlx-8bit ...
+[10:03:12] loading drafter from /Users/yash/Models/qwen3.6-27b-mtp-bf16 ...
+[10:03:12]   drafter kind resolved to 'mtp'
+[10:03:12]   drafter is compatible with the target
+[10:03:12] START [mlx_vlm/speed] qwen3.6-27b/mlx8: 2 generations (tiers=['shallow'] blocks=[0, 5] kv_bits=[None] cap=512)
+[10:04:07]   ok [mlx_vlm] qwen3.6-27b mlx8 shallow off kvfp16 q2_coding: 512 tok @ 9.8 tok/s, prefill 159@68 tok/s
+[10:04:07]   progress 1/2 (1 min elapsed, ETA 1 min)
+[10:04:37]   ok [mlx_vlm] qwen3.6-27b mlx8 shallow mtp5 kvfp16 q2_coding: 512 tok @ 17.9 tok/s, acc 47%, prefill 159@319 tok/s
+[10:04:37]   progress 2/2 (1 min elapsed, ETA 0 min)
+[10:04:37] DONE [mlx_vlm] qwen3.6-27b/mlx8 in 1.4 min
+[10:04:37] consolidated 831 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json

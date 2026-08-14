@@ -91,7 +91,8 @@ def parse_metrics(text: str) -> dict:
 # ------------------------------------------------------------------- server ctl
 class Server:
     def __init__(self, model_id: str, quant: str, draft_n: int, model_path: str, reasoning_format: str,
-                 ctx: int = None, kv_quant: str = None, tier: str = "shallow"):
+                 ctx: int = None, kv_quant: str = None, tier: str = "shallow",
+                 draft_sidecar: str = None):
         self.model_id = model_id
         self.quant = quant
         self.draft_n = draft_n
@@ -100,13 +101,15 @@ class Server:
         self.ctx = ctx
         self.kv_quant = kv_quant
         self.tier = tier
+        self.draft_sidecar = draft_sidecar
         suffix = f"_{tier}" + (f"_kv{kv_quant}" if kv_quant else "")
         self.log_path = os.path.join(C.LOGS, f"server_{model_id}_{quant}_n{draft_n}{suffix}.log")
         self.proc = None
 
     def start(self):
         cmd = C.server_cmd(self.model, self.draft_n, self.log_path, self.reasoning_format,
-                           ctx=self.ctx, kv_quant=self.kv_quant)
+                           ctx=self.ctx, kv_quant=self.kv_quant,
+                           draft_sidecar=self.draft_sidecar)
         self.logf = open(self.log_path, "ab")
         self.logf.write(f"\n===== launch {datetime.now().isoformat()} =====\n".encode())
         self.logf.write((" ".join(cmd) + "\n").encode())
@@ -194,14 +197,19 @@ def split_think(raw: str, is_reasoning: bool):
 
 
 # --------------------------------------------------------------- one generation
-def run_generation(prompt: str, n_predict: int) -> dict:
-    """Stream /completion, capture TTFT + full timings + text."""
+def run_generation(prompt: str, n_predict: int, sampling: tuple = None) -> dict:
+    """Stream /completion, capture TTFT + full timings + text.
+
+    `sampling` is (temp, top_p, top_k) from the model's own recommendation — Qwen 3.8
+    asks for temp 1.0 where 3.6 asks for 0.6. The MLX arm reads the same value.
+    """
+    temp, top_p, top_k = sampling or (C.TEMP, C.TOP_P, C.TOP_K)
     payload = {
         "prompt": prompt,
         "n_predict": n_predict,
-        "temperature": C.TEMP,
-        "top_p": C.TOP_P,
-        "top_k": C.TOP_K,
+        "temperature": temp,
+        "top_p": top_p,
+        "top_k": top_k,
         "seed": C.SEED,
         "cache_prompt": False,
         "stream": True,
@@ -280,7 +288,8 @@ def done_keys(path: str) -> set:
                 r = json.loads(ln)
             except Exception:
                 continue
-            if r.get("error") is None and r.get("runtime") in (None, "gguf"):
+            if (r.get("error") is None and r.get("runtime") in (None, "gguf")
+                    and not r.get("smoke")):
                 seen.add((r.get("phase"), r.get("pass"), r.get("model", "qwen3.6-27b"),
                           r.get("quant"), r.get("draft_n"), r.get("question_id"),
                           r.get("prompt_tier", "shallow"), r.get("kv_quant")))
@@ -298,11 +307,12 @@ def config_label(draft_n: int) -> str:
 
 # ------------------------------------------------------------------------- main
 def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, phase,
-        tier="shallow", kv_quant=None, built=None):
+        tier="shallow", kv_quant=None, built=None, smoke=False):
     ensure_dirs()
     seen = done_keys(C.RESULTS_JSONL)
     qs = [QUESTION_BY_ID[qid] for qid in question_ids]
     ctx = C.ctx_for_tier(tier, n_predict)
+    sampling = C.sampling_for(model_cfg)
 
     total = len(passes) * len(quants) * len(draft_ns) * len(qs)
     done = 0
@@ -321,8 +331,9 @@ def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, 
                     continue
 
                 model_path = model_cfg["quants"][quant]
+                sidecar = (model_cfg.get("draft_sidecars") or {}).get(quant)
                 srv = Server(model_id, quant, dn, model_path, model_cfg["reasoning_format"],
-                             ctx=ctx, kv_quant=kv_quant, tier=tier)
+                             ctx=ctx, kv_quant=kv_quant, tier=tier, draft_sidecar=sidecar)
                 log(f"launch [{phase}] {model_id} {quant} {config_label(dn)} pass{p} "
                     f"tier={tier} kv={kv_quant or 'fp16'} ...")
                 if not srv.start():
@@ -350,12 +361,23 @@ def run(model_id, model_cfg, passes, quants, draft_ns, question_ids, n_predict, 
                         "n_predict_cap": n_predict, "model_path": model_path,
                         "runtime": "gguf", "prompt_tier": tier,
                         "kv_quant": kv_quant, "ctx": ctx,
+                        "temp": sampling[0], "top_p": sampling[1], "top_k": sampling[2],
+                        "draft_sidecar": sidecar,
+                        # See bench_mlx.py: smoke rows use a short cap and one question,
+                        # so they are tagged and excluded from resume keys and reports.
+                        "smoke": True if smoke else None,
                         "ts": datetime.now(timezone.utc).isoformat(),
                         "error": None,
                     }
                     try:
                         prompt = apply_template(messages)
-                        gen = run_generation(prompt, n_predict)
+                        # Recorded so the MLX arm's locally-rendered prompt can be
+                        # compared byte-for-byte against what llama-server's --jinja
+                        # produced from the same template. Qwen 3.8 added a
+                        # reasoning_effort knob; a mismatch there changes how much the
+                        # model thinks without changing anything else visible.
+                        rec["prompt_sha256"] = hashlib.sha256(prompt.encode()).hexdigest()
+                        gen = run_generation(prompt, n_predict, sampling=sampling)
                         tim = extract_timings(gen["final"])
                         thinking, answer = split_think(gen["raw_text"], model_cfg["reasoning"])
                         rec.update(tim)
@@ -449,7 +471,7 @@ def main():
         if len(model_cfg["draft_ns"]) > 1:
             smoke_draft_ns.append(model_cfg["draft_ns"][-1])
         run(model_id, model_cfg, [1], [smoke_quant], smoke_draft_ns,
-            ["q2_coding"], C.SMOKE_N_PREDICT, phase="speed")
+            ["q2_coding"], C.SMOKE_N_PREDICT, phase="speed", smoke=True)
         return
 
     allq = [q["id"] for q in QUESTIONS]

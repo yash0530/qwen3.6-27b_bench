@@ -95,17 +95,21 @@ def main():
             warn(f"{phase}: only one arm present", str(rates))
 
     # 2. Identical prompt depth per tier — both arms must see the same bytes.
-    print("\n2. Prompt length parity per tier")
+    # Grouped per model, not just per tier: once more than one model family is in
+    # results.jsonl, averaging a tier across models compares a Qwen 3.6 prompt to a
+    # Qwen 3.8 one and the number stops meaning anything.
+    print("\n2. Prompt length parity per model and tier")
     by = collections.defaultdict(dict)
     for r in recs:
         if r.get("prompt_n"):
-            by[(r.get("prompt_tier") or "shallow")].setdefault(arm(r), []).append(r["prompt_n"])
-    for tier, d in sorted(by.items()):
+            key = (r.get("model") or "?", r.get("prompt_tier") or "shallow")
+            by[key].setdefault(arm(r), []).append(r["prompt_n"])
+    for (model, tier), d in sorted(by.items()):
         if len(d) < 2:
             continue
         g = sum(d["gguf"]) / len(d["gguf"]); m = sum(d["mlx"]) / len(d["mlx"])
         rel = abs(g - m) / max(g, m)
-        check(f"{tier}: gguf={g:.0f} tok, mlx={m:.0f} tok", rel <= 0.02,
+        check(f"{model} {tier}: gguf={g:.0f} tok, mlx={m:.0f} tok", rel <= 0.02,
               f"differ by {rel:.1%} (must be <=2%)")
 
     # 3. Answers must exist where generation completed.
@@ -138,6 +142,50 @@ def main():
     print("\n6. No degenerate speculative configs")
     deg = [r for r in recs if arm(r) == "mlx" and r.get("draft_block_size") == 1]
     check("no mlx draft_block_size=1 rows", not deg, f"{len(deg)} present")
+
+    # 7. Sampling parity — both arms must serve a model with the same knobs.
+    # Qwen 3.8 wants temp 1.0 in thinking mode where 3.6 wanted 0.6, so this is now a
+    # per-model value and therefore something that can drift between arms.
+    print("\n7. Sampling parity per model")
+    samp = collections.defaultdict(dict)
+    for r in recs:
+        if r.get("temp") is not None:
+            samp[r.get("model") or "?"].setdefault(arm(r), set()).add(
+                (r.get("temp"), r.get("top_p"), r.get("top_k")))
+    for model, d in sorted(samp.items()):
+        if len(d) < 2:
+            continue
+        check(f"{model}: gguf={sorted(d['gguf'])} mlx={sorted(d['mlx'])}",
+              d["gguf"] == d["mlx"], "arms sampled differently")
+
+    # 8. Rendered-prompt parity — the strongest available form of check 2.
+    # llama-server renders the chat template itself via /apply-template; the MLX arm
+    # renders locally. Comparing the resulting bytes catches template-kwarg drift
+    # (Qwen 3.8's reasoning_effort, enable_thinking) that a token count can miss.
+    # Warn rather than fail: the two renderers may legitimately differ on BOS handling,
+    # and check 2 remains the hard gate on prompt depth.
+    print("\n8. Rendered prompt parity (byte-level, advisory)")
+    shas = collections.defaultdict(dict)
+    for r in recs:
+        if r.get("prompt_sha256"):
+            key = (r.get("model") or "?", r.get("prompt_tier") or "shallow",
+                   r.get("question_id"))
+            shas[key].setdefault(arm(r), set()).add(r["prompt_sha256"])
+    compared = matched = 0
+    for key, d in shas.items():
+        if len(d) < 2:
+            continue
+        compared += 1
+        if d["gguf"] == d["mlx"]:
+            matched += 1
+    if compared:
+        if matched == compared:
+            check(f"{matched}/{compared} prompts byte-identical across arms", True)
+        else:
+            warn(f"{matched}/{compared} prompts byte-identical across arms",
+                 "differing renders — confirm reasoning_effort/enable_thinking match")
+    else:
+        print("   (no overlapping arms with recorded prompt hashes yet)")
 
     print()
     if FAILURES:

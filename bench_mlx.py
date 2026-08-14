@@ -63,7 +63,8 @@ def mlx_done_keys(path):
                 r = json.loads(ln)
             except Exception:
                 continue
-            if r.get("error") is not None or r.get("runtime") != "mlx_vlm":
+            if (r.get("error") is not None or r.get("runtime") != "mlx_vlm"
+                    or r.get("smoke")):
                 continue
             seen.add((r.get("phase"), r.get("model"), r.get("quant"),
                       r.get("draft_block_size"), r.get("kv_bits"),
@@ -110,13 +111,15 @@ def read_spec_counters(draft_model):
 
 # ------------------------------------------------------------------- one generation
 def generate_once(stream_generate, model, processor, prompt, n_predict, draft_model,
-                  draft_kind, draft_block_size, kv_bits, reasoning, tier="shallow"):
+                  draft_kind, draft_block_size, kv_bits, reasoning, tier="shallow",
+                  sampling=None):
     """Run one generation, returning engine-reported stats plus the raw text."""
+    temp, top_p, top_k = sampling or (C.TEMP, C.TOP_P, C.TOP_K)
     kwargs = dict(
         max_tokens=n_predict,
-        temperature=C.TEMP,
-        top_p=C.TOP_P,
-        top_k=C.TOP_K,
+        temperature=temp,
+        top_p=top_p,
+        top_k=top_k,
         seed=C.SEED,
         enable_thinking=bool(reasoning),
         prefill_step_size=C.PREFILL_STEP_SIZE,
@@ -175,7 +178,7 @@ def config_label(block_size):
 
 # --------------------------------------------------------------------------- runner
 def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
-        question_ids, n_predict, phase, resume=True):
+        question_ids, n_predict, phase, resume=True, smoke=False):
     ensure_dirs()
     load, stream_generate, apply_chat_template, load_drafter, validate_compat = _lazy_imports()
 
@@ -207,6 +210,7 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
 
     seen = mlx_done_keys(C.RESULTS_JSONL) if resume else set()
     qs = [QUESTION_BY_ID[q] for q in question_ids]
+    sampling = C.sampling_for(model_cfg)
 
     total = len(tier_names) * len(block_sizes) * len(kv_bits_opts) * len(qs)
     done = 0
@@ -236,9 +240,19 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
                     # pre-closed "<think>\n\n</think>\n\n" block and the model answers
                     # with no reasoning at all — while llama.cpp (--jinja) reasons by
                     # default. That silently made the two arms do different work.
+                    # Qwen 3.8's template adds reasoning_effort (default "xhigh"). Pass it
+                    # explicitly when configured: llama-server's --jinja takes the
+                    # template default, so leaving it unset here would only match by
+                    # coincidence, and a mismatch changes how much the model thinks —
+                    # exactly the class of silent divergence that cost a 10h rerun on 3.6.
+                    tmpl_kwargs = {}
+                    if model_cfg.get("reasoning", True):
+                        tmpl_kwargs["enable_thinking"] = True
+                    if model_cfg.get("reasoning_effort"):
+                        tmpl_kwargs["reasoning_effort"] = model_cfg["reasoning_effort"]
                     prompt = apply_chat_template(
                         processor, model.config, messages, add_generation_prompt=True,
-                        **({"enable_thinking": True} if model_cfg.get("reasoning", True) else {}))
+                        **tmpl_kwargs)
 
                     rec = {
                         "phase": phase, "pass": 1, "model": model_id, "quant": quant,
@@ -253,13 +267,22 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
                         "question_id": q["id"], "category": q["category"],
                         "seed": C.SEED, "n_predict_cap": n_predict,
                         "model_path": model_path,
+                        # Smoke runs use a shorter cap and a single question, so their
+                        # numbers are not comparable to a real sweep. Tagged rather than
+                        # kept out of the file so a failed gate stays inspectable — the
+                        # resume keys and the report both filter on this.
+                        "smoke": True if smoke else None,
+                        "temp": sampling[0], "top_p": sampling[1], "top_k": sampling[2],
+                        "reasoning_effort": model_cfg.get("reasoning_effort"),
+                        "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
+                        "draft_model_path": (model_cfg.get("draft_model") if bs else None),
                         "ts": datetime.now(timezone.utc).isoformat(), "error": None,
                     }
                     try:
                         gen = generate_once(stream_generate, model, processor, prompt,
                                             n_predict, draft_model, draft_kind, bs,
                                             kv_bits, model_cfg.get("reasoning", True),
-                                            tier=tier)
+                                            tier=tier, sampling=sampling)
 
                         # Cache isolation is a claim this harness makes; verify it rather
                         # than trust it. A non-zero hit means a previous question's KV
@@ -340,7 +363,8 @@ def main():
     if args.smoke:
         for q in quants[:1]:
             run(args.model, model_cfg, q, [0, model_cfg.get("draft_block_ns", [0, 2])[-1]],
-                [None], ["shallow"], ["q2_coding"], C.SMOKE_N_PREDICT, "speed", resume=False)
+                [None], ["shallow"], ["q2_coding"], C.SMOKE_N_PREDICT, "speed",
+                resume=False, smoke=True)
         return
 
     allq = [q["id"] for q in QUESTIONS]
