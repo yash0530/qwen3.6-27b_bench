@@ -45,7 +45,7 @@ FOLLOW_UP = "Name the single biggest risk in one sentence."
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MLX_MODELS_CONFIG))
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MLX_MODELS_CONFIG))
     ap.add_argument("--tier", default="agent", choices=T.TIER_ORDER)
     ap.add_argument("--max-tokens", type=int, default=40)
     args = ap.parse_args()

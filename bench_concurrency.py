@@ -29,9 +29,9 @@ KV precision note: the MLX arm runs fp16 KV. Quantized KV + MTP is broken in mlx
 0.6.3 (see config.py), so a q8 MLX arm cannot use speculation at all.
 
 Usage:
-  .mlxenv/bin/python bench_concurrency.py --arm mlx        --model qwen3.6-27b
-  python3            bench_concurrency.py --arm gguf-mtp   --model qwen3.6-27b
-  python3            bench_concurrency.py --arm gguf-batch --model qwen3.6-27b
+  .mlxenv/bin/python bench_concurrency.py --arm mlx        --model qwen3.8-27b
+  python3            bench_concurrency.py --arm gguf-mtp   --model qwen3.8-27b
+  python3            bench_concurrency.py --arm gguf-batch --model qwen3.8-27b
 """
 import argparse
 import json
@@ -258,7 +258,7 @@ def run_level(arm, model_id, n_clients, n_predict, tier, built, model_name, draf
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", required=True, choices=["mlx", "gguf-mtp", "gguf-batch"])
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MODELS_CONFIG.keys()))
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MODELS_CONFIG.keys()))
     ap.add_argument("--tier", default="shallow", choices=T.TIER_ORDER)
     ap.add_argument("--draft-n", type=int, default=None,
                     help="MTP depth; default = best from the main sweep, per arm")

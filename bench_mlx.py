@@ -29,8 +29,8 @@ drafter checkpoints. bf16 matters: quantized MTP heads are reported to collapse 
 on MoE models.
 
 Run under the venv:
-  .mlxenv/bin/python bench_mlx.py --model qwen3.6-27b
-  .mlxenv/bin/python bench_mlx.py --model qwen3.6-27b --smoke
+  .mlxenv/bin/python bench_mlx.py --model qwen3.8-27b
+  .mlxenv/bin/python bench_mlx.py --model qwen3.8-27b --smoke
 """
 import argparse
 import hashlib
@@ -343,7 +343,7 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MLX_MODELS_CONFIG.keys()))
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MLX_MODELS_CONFIG.keys()))
     ap.add_argument("--quant", default=None, help="restrict to one quant (default: all present)")
     ap.add_argument("--smoke", action="store_true", help="one question, shallow, off vs mtp")
     ap.add_argument("--phase", choices=["speed", "full"], default=None)

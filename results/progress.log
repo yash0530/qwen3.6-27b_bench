@@ -2625,3 +2625,5 @@
 [10:18:43]   progress 2/2 (2 min elapsed, ETA 0 min)
 [10:18:43] DONE run in 1.5 min
 [10:18:43] consolidated 833 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[11:17:18] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 25 generations (passes=[1] quants=['q8'] draft_ns=[0, 1, 2, 3, 4] cap=1024)
+[11:17:18] launch [speed] qwen3.8-27b q8 off pass1 tier=shallow kv=fp16 ...

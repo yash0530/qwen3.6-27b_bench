@@ -13,8 +13,8 @@ grows by one exchange per turn. Turn 1 is cold. Turns 2..N should hit the cached
 only prefill the delta. What matters is the TTFT curve across turns, per engine.
 
 Usage:
-  .mlxenv/bin/python bench_warmcache.py --arm mlx      --model qwen3.6-27b
-  python3            bench_warmcache.py --arm gguf     --model qwen3.6-27b
+  .mlxenv/bin/python bench_warmcache.py --arm mlx      --model qwen3.8-27b
+  python3            bench_warmcache.py --arm gguf     --model qwen3.8-27b
 """
 import argparse
 import json
@@ -69,7 +69,7 @@ def one_turn(messages, model_name, n_predict, cache_prompt):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", required=True, choices=["mlx", "gguf"])
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MODELS_CONFIG.keys()))
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MODELS_CONFIG.keys()))
     ap.add_argument("--tier", default="agent", choices=T.TIER_ORDER)
     ap.add_argument("--draft-n", type=int, default=None)
     args = ap.parse_args()

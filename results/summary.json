@@ -376,7 +376,7 @@
     {
       "model": "qwen3.6-27b",
       "quant": "q5",
-      "label": "Qwen 3.6 27B (Q5)",
+      "label": "qwen3.6-27b (Q5)",
       "off_tok_s": 12.90821069243026,
       "best_draft_n": 3,
       "best_tok_s": 17.673361182088016,
@@ -392,7 +392,7 @@
     {
       "model": "qwen3.6-27b",
       "quant": "q6",
-      "label": "Qwen 3.6 27B (Q6_K)",
+      "label": "qwen3.6-27b (Q6_K)",
       "off_tok_s": 10.849277477830043,
       "best_draft_n": 3,
       "best_tok_s": 17.49890555024897,
@@ -408,7 +408,7 @@
     {
       "model": "qwen3.6-27b",
       "quant": "q8",
-      "label": "Qwen 3.6 27B (Q8)",
+      "label": "qwen3.6-27b (Q8)",
       "off_tok_s": 8.83595425799534,
       "best_draft_n": 3,
       "best_tok_s": 14.734665804779441,
@@ -472,7 +472,7 @@
     {
       "model": "qwen3.6-27b",
       "quant": "mlx8",
-      "label": "Qwen 3.6 27B (MLX-8bit)",
+      "label": "qwen3.6-27b (MLX-8bit)",
       "runtime": "mlx",
       "off_tok_s": 9.974507447406118,
       "best_draft_n": 3,

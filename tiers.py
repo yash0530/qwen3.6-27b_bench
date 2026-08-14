@@ -135,7 +135,7 @@ def load_cached() -> dict:
             f"{CACHE_PATH} missing. Build it first with the MLX tokenizer:\n"
             f"  .mlxenv/bin/python -c 'import tiers,questions;"
             f"from transformers import AutoTokenizer;"
-            f"t=AutoTokenizer.from_pretrained(\"~/Models/qwen3.6-27b-mtp-bf16\");"
+            f"t=AutoTokenizer.from_pretrained(\"~/Models/qwen3.8-27b-mlx-8bit\");"
             f"tiers.build(questions.QUESTIONS, lambda s: len(t.encode(s)))'"
         )
     with open(CACHE_PATH) as f:

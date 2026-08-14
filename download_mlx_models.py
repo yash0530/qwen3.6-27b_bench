@@ -16,8 +16,8 @@ MODELS_DIR = os.path.expanduser("~/Models")
 
 # (repo_id, local_dir_name) in smoke-gate-first order.
 TARGETS = [
-    ("mlx-community/Qwen3.6-27B-MTP-bf16", "qwen3.6-27b-mtp-bf16"),
-    ("lmstudio-community/Qwen3.6-27B-MLX-8bit", "qwen3.6-27b-mlx-8bit"),
+    # The 27B pair was removed when Qwen 3.6 27B was retired for 3.8; see
+    # download_qwen38.py for the current 27B-class targets.
     ("mlx-community/Qwen3.6-35B-A3B-MTP-bf16", "qwen3.6-35b-a3b-mtp-bf16"),
     ("lmstudio-community/Qwen3.6-35B-A3B-MLX-8bit", "qwen3.6-35b-a3b-mlx-8bit"),
 ]

@@ -71,7 +71,7 @@ def main():
         "schema_example": {
             "judge": "claude-opus-4-8", "rubric_version": 1,
             "scores": [{
-                "model": "qwen3.6-27b", "quant": "q6", "question_id": "q2_coding",
+                "model": "qwen3.8-27b", "quant": "q8", "question_id": "q2_coding",
                 "correctness": 8, "depth": 7, "instruction_following": 8,
                 "practicality": 8, "overall": 7.8, "rationale": "..."
             }],

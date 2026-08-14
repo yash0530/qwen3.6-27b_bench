@@ -6,7 +6,7 @@ questions, and records rich per-run metrics to results/results.jsonl (crash-safe
 resumable). Pure stdlib — no third-party deps.
 
 Usage:
-  python3 bench.py             # full run for default model (Qwen 3.6 27B)
+  python3 bench.py             # full run for default model (Qwen 3.8 27B)
   python3 bench.py --model gemma4-31b
   python3 bench.py --smoke     # tiny end-to-end validation (~3-5 min)
   python3 bench.py --quant q8  # restrict to one quant
@@ -434,8 +434,8 @@ def consolidate():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--model", default="qwen3.6-27b", choices=list(C.MODELS_CONFIG.keys()),
-                    help="Model to benchmark (default: qwen3.6-27b)")
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MODELS_CONFIG.keys()),
+                    help="Model to benchmark (default: qwen3.8-27b)")
     ap.add_argument("--smoke", action="store_true", help="tiny end-to-end validation run")
     ap.add_argument("--phase", choices=["speed", "full"], default=None,
                     help="run only one phase (default: both, speed then full)")

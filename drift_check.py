@@ -29,7 +29,7 @@ from questions import QUESTIONS
 OUT = os.path.join(C.RESULTS, "drift.jsonl")
 
 
-def stored(tier, draft_n, kv):
+def stored(tier, draft_n, kv, model_id, quant):
     vals = {"tok": [], "pf": []}
     with open(C.RESULTS_JSONL) as f:
         for ln in f:
@@ -37,10 +37,10 @@ def stored(tier, draft_n, kv):
                 r = json.loads(ln)
             except Exception:
                 continue
-            if (r.get("error") or r.get("phase") != "speed"
+            if (r.get("error") or r.get("smoke") or r.get("phase") != "speed"
                     or r.get("runtime") not in (None, "gguf")
-                    or (r.get("model") or "qwen3.6-27b") != "qwen3.6-27b"
-                    or r.get("quant") != "q8" or r.get("draft_n") != draft_n
+                    or (r.get("model") or "qwen3.6-27b") != model_id
+                    or r.get("quant") != quant or r.get("draft_n") != draft_n
                     or (r.get("prompt_tier") or "shallow") != tier
                     or r.get("kv_quant") != kv):
                 continue
@@ -55,20 +55,26 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tier", default="agent")
     ap.add_argument("--draft-n", type=int, default=3)
+    # The drift control has to re-measure a cell that already exists, so the model is a
+    # parameter rather than a constant: it must follow whichever sweep is being
+    # controlled, and it must not point at weights that may not be installed.
+    ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MODELS_CONFIG))
+    ap.add_argument("--quant", default="q8")
     args = ap.parse_args()
 
     kv = None
-    old = stored(args.tier, args.draft_n, kv)
+    old = stored(args.tier, args.draft_n, kv, args.model, args.quant)
     if not old["tok"]:
-        log(f"no stored GGUF rows for tier={args.tier} draft_n={args.draft_n}; nothing to compare")
+        log(f"no stored GGUF rows for {args.model}/{args.quant} tier={args.tier} "
+            f"draft_n={args.draft_n}; nothing to compare")
         return
     log(f"stored: {len(old['tok'])} runs, decode {st.mean(old['tok']):.2f} tok/s, "
         f"prefill {st.mean(old['pf']):.0f} tok/s")
 
-    cfg = C.MODELS_CONFIG["qwen3.6-27b"]
+    cfg = C.MODELS_CONFIG[args.model]
     built = T.load_cached()
     ctx = C.ctx_for_tier(args.tier, C.SPEED_N_PREDICT)
-    srv = Server("qwen3.6-27b", "q8", args.draft_n, cfg["quants"]["q8"],
+    srv = Server(args.model, args.quant, args.draft_n, cfg["quants"][args.quant],
                  cfg["reasoning_format"], ctx=ctx, kv_quant=kv, tier=args.tier)
     log(f"relaunching llama-server (ctx={ctx}) ...")
     if not srv.start():
@@ -95,6 +101,7 @@ def main():
     d_pf = (st.mean(now["pf"]) - st.mean(old["pf"])) / st.mean(old["pf"]) * 100
     rec = {"ts": datetime.now(timezone.utc).isoformat(), "tier": args.tier,
            "draft_n": args.draft_n, "kv": kv,
+           "model": args.model, "quant": args.quant,
            "stored_tok": st.mean(old["tok"]), "now_tok": st.mean(now["tok"]),
            "stored_pf": st.mean(old["pf"]), "now_pf": st.mean(now["pf"]),
            "drift_tok_pct": d_tok, "drift_prefill_pct": d_pf}

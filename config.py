@@ -17,19 +17,16 @@ PROGRESS_LOG = os.path.join(RESULTS, "progress.log")
 
 # --- Model Registry -----------------------------------------------------------
 # Registered models, their characteristics, paths, and sweep parameters.
+#
+# Qwen 3.6 27B was retired on 2026-08-14, superseded by Qwen 3.8 27B, and its weights
+# were deleted. Its measurements stay in results.jsonl and in REPORT.md — that study is
+# what established the MLX-vs-llama.cpp and warm-cache findings the 3.8 work builds on —
+# but it is no longer a benchmark target, and leaving a registry entry pointing at
+# missing files would only produce confusing "model not found" runs.
+#
+# The 35B A3B stays: Qwen 3.8 shipped only 27B and 2.4T-A95B, and the latter does not fit
+# in 64 GB, so there is no 3.8 replacement for the fast MoE.
 MODELS_CONFIG = {
-    "qwen3.6-27b": {
-        "name": "Qwen 3.6 27B",
-        "reasoning": True,
-        "reasoning_format": "deepseek",  # llama-server option
-        "quants": {
-            "q5": os.path.expanduser("~/Models/qwen3.6-27b-mtp-q5/Qwen3.6-27B-UD-Q5_K_XL.gguf"),
-            "q6": os.path.expanduser("~/Models/qwen3.6-27b-mtp-q6/Qwen3.6-27B-UD-Q6_K_XL.gguf"),
-            "q8": os.path.expanduser("~/Models/qwen3.6-27b-mtp-q8/Qwen3.6-27B-Q8_0.gguf"),
-        },
-        "quant_order": ["q5", "q6", "q8"],
-        "draft_ns": [0, 1, 2, 3, 4],
-    },
     "qwen3.6-35b-a3b": {
         "name": "Qwen 3.6 35B A3B",
         "reasoning": True,
@@ -111,25 +108,12 @@ MODELS_CONFIG = {
 #
 # `draft_block_ns` is the MLX analogue of the GGUF `draft_ns` sweep: 0 means no
 # speculation, N overrides the drafter's configured block size (3 for these checkpoints).
+#
+# Qwen 3.6 27B was retired here on 2026-08-14 along with its GGUF entry; see the note on
+# MODELS_CONFIG. Block-size semantics documented there still apply to every drafter: the
+# drafter proposes block_size - 1 tokens (speculative/dflash.py:140), so a block size of
+# 1 proposes nothing, emits a single token and stops. Valid depths start at 2; 0 is off.
 MLX_MODELS_CONFIG = {
-    "qwen3.6-27b": {
-        "name": "Qwen 3.6 27B",
-        "reasoning": True,
-        "quants": {
-            "mlx8": os.path.expanduser("~/Models/qwen3.6-27b-mlx-8bit"),
-        },
-        "quant_order": ["mlx8"],
-        "draft_model": os.path.expanduser("~/Models/qwen3.6-27b-mtp-bf16"),
-        "draft_kind": None,           # auto-detected from the drafter's model_type
-        # Dense model: this is where MLX has a real shot, so sweep it fully.
-        # Block size is the *verify* block: the drafter proposes block_size - 1 tokens
-        # (speculative/dflash.py:140). So 1 proposes nothing and the decode loop
-        # degenerates to a single token — measured, and it emits 1 token then stops.
-        # Valid speculative depths therefore start at 2. 0 means speculation off.
-        "draft_block_ns": [0, 2, 3, 4, 5],
-        "kv_bits_opts": [None, 8],    # fp16 vs q8 KV, to match llama.cpp's -ctk/-ctv q8_0
-        "tiers": ["shallow", "agent", "deep"],
-    },
     "qwen3.6-35b-a3b": {
         "name": "Qwen 3.6 35B A3B",
         "reasoning": True,
