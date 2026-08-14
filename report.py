@@ -6,6 +6,7 @@ records (full grid, short cap). Token totals + answer text come from phase="full
 records (off config, 8192 cap). Judge scores (if present in results/judging/scores.json)
 add a quality axis. Safe to re-run any time.
 """
+import collections
 import json
 import os
 import statistics as stats
@@ -40,7 +41,14 @@ def get_label(model: str, quant: str) -> str:
     qname = quant
     q_map = {
         "q5": "Q5", "q6": "Q6", "q8": "Q8",
-        "mlx8": "MLX-8bit", "mlx6": "MLX-6bit", "mlx4": "MLX-4bit"
+        "mlx8": "MLX-8bit", "mlx6": "MLX-6bit", "mlx4": "MLX-4bit",
+        # Qwen 3.8 candidates. The uploader is part of the identity, not a detail: the
+        # whole point of carrying q8_ggml alongside q8 and q8_ud is that they are three
+        # different files from two projects and may not rank the way their bit-width says.
+        "q4_ud": "UD-Q4_K_XL", "q5_ud": "UD-Q5_K_XL", "q6_ud": "UD-Q6_K_XL",
+        "q8_ud": "UD-Q8_K_XL", "q6": "Q6_K",
+        "q4_ggml": "Q4_K_M (ggml-org)", "q8_ggml": "Q8_0 (ggml-org)",
+        "mxfp8": "MLX-mxfp8",
     }
     return f"{mname} ({q_map.get(quant, quant)})"
 
@@ -260,6 +268,92 @@ def _read_jsonl(name):
     return out
 
 
+def _quant_comparison_section(model_id="qwen3.8-27b"):
+    """Which quant should actually be served — size, speed, and drift from the reference.
+
+    Qwen publishes no GGUF and no MLX build of 3.8 (FP8 only, which is CUDA-only), so on
+    Apple Silicon every candidate is a community conversion and "which uploader" is an
+    open question rather than a matter of picking the official one. Prior-generation KL
+    work found unsloth's UD-Q8_K_XL off the quality/size Pareto frontier while a plain
+    Q8_0 was both smaller and closer to BF16, which is why the ggml-org builds are
+    carried here as a control rather than assumed to be redundant.
+
+    Agreement columns come from quant_agreement.py and are a proxy for capability
+    retention, not a substitute for the rubric score. They are shown next to it, not
+    folded into it.
+    """
+    recs = [r for r in load_all()
+            if r.get("model") == model_id and r.get("phase") == "speed"
+            and r.get("prompt_tier") == "agent" and r.get("predicted_per_second")]
+    if not recs:
+        return []
+
+    agree = {}
+    p = os.path.join(C.RESULTS, "quant_agreement.json")
+    if os.path.exists(p):
+        try:
+            with open(p) as f:
+                agree = (json.load(f) or {}).get("agreement", {})
+        except Exception:
+            agree = {}
+
+    def size_gb(r):
+        path = r.get("model_path") or ""
+        try:
+            if os.path.isfile(path):
+                return os.path.getsize(path) / 1e9
+            if os.path.isdir(path):
+                return sum(os.path.getsize(os.path.join(path, f))
+                           for f in os.listdir(path)
+                           if f.endswith(".safetensors")) / 1e9
+        except OSError:
+            pass
+        return None
+
+    cells = collections.defaultdict(list)
+    paths = {}
+    for r in recs:
+        cells[(r.get("runtime"), r.get("quant"))].append(r)
+        paths[(r.get("runtime"), r.get("quant"))] = r
+
+    rows = []
+    for key, rs in cells.items():
+        runtime, quant = key
+        best = max(rs, key=lambda r: r["predicted_per_second"])
+        a = agree.get(quant) or {}
+        rows.append({
+            "runtime": "MLX" if runtime == "mlx_vlm" else "llama.cpp",
+            "quant": quant,
+            "gb": size_gb(paths[key]),
+            "tok_s": fmean([r["predicted_per_second"] for r in rs]),
+            "best_tok_s": best["predicted_per_second"],
+            "acc": fmean([r["acceptance_rate"] for r in rs
+                          if r.get("acceptance_rate") is not None]),
+            "jaccard": a.get("jaccard"),
+            "prefix": a.get("prefix"),
+        })
+    if not rows:
+        return []
+
+    L = ["## Quant comparison — Qwen 3.8 27B (agent depth, ~23k tokens)\n"]
+    L.append("| Runtime | Quant | Size | Decode tok/s | Best | MTP accept | "
+             "Agreement (jaccard) | Prefix |")
+    L.append("|---|---|---:|---:|---:|---:|---:|---:|")
+    for r in sorted(rows, key=lambda r: -(r["tok_s"] or 0)):
+        gb = f"{r['gb']:.1f} GB" if r["gb"] else "—"
+        acc = f"{r['acc']:.0%}" if r["acc"] else "—"
+        jac = f"{r['jaccard']:.3f}" if r["jaccard"] is not None else "—"
+        pre = f"{r['prefix']:.3f}" if r["prefix"] is not None else "—"
+        L.append(f"| {r['runtime']} | `{r['quant']}` | {gb} | {r['tok_s']:.1f} | "
+                 f"{r['best_tok_s']:.1f} | {acc} | {jac} | {pre} |")
+    L.append("")
+    L.append("Agreement is measured against the reference quant on full-length answers: "
+             "vocabulary overlap and the length of the common leading run. It is a text "
+             "proxy for capability retention — the rigorous measurement is KL divergence "
+             "against BF16, which needs logits the serving APIs do not expose.\n")
+    return L
+
+
 def _aux_sections():
     """Warm-cache, concurrency and append-only tables.
 
@@ -328,6 +422,8 @@ def _aux_sections():
                                  f"{(r['ttft_ms_mean'] or 0) / 1000:.1f}s" if r else "—")
                 L.append(f"| {a} | " + " | ".join(cells) + " |")
             L.append("")
+
+    L += _quant_comparison_section()
 
     drift = _read_jsonl("drift.jsonl")
     if drift:

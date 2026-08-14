@@ -5,10 +5,10 @@ _Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
 ## TL;DR
 
 - **Qwen 3.6 27B (Q5)** — peak **17.7 tok/s** at draft-n=3 (1.37x vs off) (57% accept); quality 8.3/10; ~6795 tok/answer.
-- **Qwen 3.6 27B (Q6)** — peak **17.5 tok/s** at draft-n=3 (1.61x vs off) (57% accept); quality 8.5/10; ~6781 tok/answer.
+- **Qwen 3.6 27B (Q6_K)** — peak **17.5 tok/s** at draft-n=3 (1.61x vs off) (57% accept); quality 8.5/10; ~6781 tok/answer.
 - **Qwen 3.6 27B (Q8)** — peak **14.7 tok/s** at draft-n=3 (1.67x vs off) (60% accept); quality 8.6/10; ~6703 tok/answer.
 - **Qwen 3.6 35B A3B (Q5)** — peak **76.2 tok/s** at draft-n=2 (1.27x vs off) (67% accept); quality ungraded; ~7612 tok/answer.
-- **Qwen 3.6 35B A3B (Q6)** — peak **70.5 tok/s** at draft-n=1 (1.24x vs off) (78% accept); quality ungraded; ~6782 tok/answer.
+- **Qwen 3.6 35B A3B (Q6_K)** — peak **70.5 tok/s** at draft-n=1 (1.24x vs off) (78% accept); quality ungraded; ~6782 tok/answer.
 - **Qwen 3.6 35B A3B (Q8)** — peak **51.6 tok/s** at draft-n=1 (1.16x vs off) (79% accept); quality 7.2/10; ~7780 tok/answer.
 - **Qwen 3.6 27B (MLX-8bit)** (MLX) — **15.8 tok/s**, quality 7.5/10, ~7037 tok/answer.
 - **Qwen 3.6 35B A3B (MLX-8bit)** (MLX) — **70.7 tok/s**, quality 8.4/10, ~7180 tok/answer.
@@ -42,11 +42,11 @@ _Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
 | Qwen 3.6 27B (Q5) | mtp2 | 13.4 | 0.6 | 67 | 246 | 853 |
 | Qwen 3.6 27B (Q5) | mtp3 | 17.7 | 1.0 | 57 | 242 | 864 |
 | Qwen 3.6 27B (Q5) | mtp4 | 17.2 | 1.2 | 49 | 241 | 868 |
-| Qwen 3.6 27B (Q6) | off | 10.8 | 0.0 | - | 275 | 760 |
-| Qwen 3.6 27B (Q6) | mtp1 | 15.3 | 0.1 | 79 | 266 | 782 |
-| Qwen 3.6 27B (Q6) | mtp2 | 14.1 | 0.2 | 68 | 251 | 829 |
-| Qwen 3.6 27B (Q6) | mtp3 | 17.5 | 0.6 | 57 | 244 | 856 |
-| Qwen 3.6 27B (Q6) | mtp4 | 16.8 | 0.7 | 48 | 246 | 850 |
+| Qwen 3.6 27B (Q6_K) | off | 10.8 | 0.0 | - | 275 | 760 |
+| Qwen 3.6 27B (Q6_K) | mtp1 | 15.3 | 0.1 | 79 | 266 | 782 |
+| Qwen 3.6 27B (Q6_K) | mtp2 | 14.1 | 0.2 | 68 | 251 | 829 |
+| Qwen 3.6 27B (Q6_K) | mtp3 | 17.5 | 0.6 | 57 | 244 | 856 |
+| Qwen 3.6 27B (Q6_K) | mtp4 | 16.8 | 0.7 | 48 | 246 | 850 |
 | Qwen 3.6 27B (Q8) | off | 8.8 | 0.9 | - | 248 | 151701 |
 | Qwen 3.6 27B (Q8) | mtp1 | 13.2 | 2.2 | 81 | 241 | 156802 |
 | Qwen 3.6 27B (Q8) | mtp2 | 14.7 | 2.9 | 70 | 236 | 158227 |
@@ -57,11 +57,11 @@ _Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
 | Qwen 3.6 35B A3B (Q5) | mtp2 | 76.2 | 3.7 | 67 | 943 | 224 |
 | Qwen 3.6 35B A3B (Q5) | mtp3 | 68.5 | 5.3 | 56 | 904 | 233 |
 | Qwen 3.6 35B A3B (Q5) | mtp4 | 63.6 | 5.3 | 49 | 898 | 234 |
-| Qwen 3.6 35B A3B (Q6) | off | 57.1 | 0.5 | - | 950 | 225 |
-| Qwen 3.6 35B A3B (Q6) | mtp1 | 70.5 | 1.6 | 78 | 935 | 226 |
-| Qwen 3.6 35B A3B (Q6) | mtp2 | 69.2 | 2.1 | 65 | 925 | 231 |
-| Qwen 3.6 35B A3B (Q6) | mtp3 | 65.1 | 2.5 | 56 | 914 | 233 |
-| Qwen 3.6 35B A3B (Q6) | mtp4 | 59.4 | 2.7 | 47 | 903 | 235 |
+| Qwen 3.6 35B A3B (Q6_K) | off | 57.1 | 0.5 | - | 950 | 225 |
+| Qwen 3.6 35B A3B (Q6_K) | mtp1 | 70.5 | 1.6 | 78 | 935 | 226 |
+| Qwen 3.6 35B A3B (Q6_K) | mtp2 | 69.2 | 2.1 | 65 | 925 | 231 |
+| Qwen 3.6 35B A3B (Q6_K) | mtp3 | 65.1 | 2.5 | 56 | 914 | 233 |
+| Qwen 3.6 35B A3B (Q6_K) | mtp4 | 59.4 | 2.7 | 47 | 903 | 235 |
 | Qwen 3.6 35B A3B (Q8) | off | 44.6 | 8.5 | - | 792 | 51591 |
 | Qwen 3.6 35B A3B (Q8) | mtp1 | 51.6 | 12.5 | 79 | 752 | 55475 |
 | Qwen 3.6 35B A3B (Q8) | mtp2 | 50.3 | 13.2 | 67 | 753 | 55781 |
@@ -93,11 +93,11 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp3 | 15.6 | 0.7 | 69 | 303 | 840 | 36.6 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp4 | 14.7 | 0.4 | 57 | 299 | 890 | 36.6 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | 8 | mtp5 | 12.9 | 0.8 | 46 | 301 | 926 | 36.6 |
-| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | off | 9.9 | 0.1 | - | 252 | 1585 | 35.3 |
+| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | off | 10.0 | 0.0 | - | 289 | 1214 | 35.3 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp2 | 14.8 | 0.3 | 83 | 338 | 743 | 35.7 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp3 | 15.8 | 0.7 | 70 | 309 | 832 | 36.0 |
 | Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp4 | 15.1 | 1.1 | 60 | 302 | 881 | 36.3 |
-| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp5 | 14.1 | 1.8 | 48 | 305 | 971 | 36.6 |
+| Qwen 3.6 27B (MLX-8bit) | shallow | fp16 | mtp5 | 13.3 | 0.8 | 48 | 303 | 921 | 36.6 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | off | 56.0 | 0.0 | - | 1646 | 14030 | 43.9 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | mtp2 | 59.1 | 1.3 | 78 | 1635 | 14130 | 43.9 |
 | Qwen 3.6 35B A3B (MLX-8bit) | agent | 8 | mtp3 | 55.1 | 2.3 | 63 | 1633 | 14156 | 43.9 |
@@ -128,19 +128,19 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 | model/quant | total tok | thinking tok | answer tok | answers completed |
 |---|---|---|---|---|
 | Qwen 3.6 27B (Q5) | 6795 | 4413 | 2378 | 5/5 |
-| Qwen 3.6 27B (Q6) | 6781 | 4397 | 2379 | 5/5 |
+| Qwen 3.6 27B (Q6_K) | 6781 | 4397 | 2379 | 5/5 |
 | Qwen 3.6 27B (Q8) | 6703 | 4349 | 2350 | 5/5 |
 | Qwen 3.6 35B A3B (Q5) | 7612 | 5517 | 2091 | 5/5 |
-| Qwen 3.6 35B A3B (Q6) | 6782 | 4267 | 2511 | 5/5 |
+| Qwen 3.6 35B A3B (Q6_K) | 6782 | 4267 | 2511 | 5/5 |
 | Qwen 3.6 35B A3B (Q8) | 7780 | 5029 | 2747 | 5/5 |
 | Qwen 3.6 27B (MLX-8bit) | 7037 | 4647 | 2386 | 5/5 |
 | Qwen 3.6 35B A3B (MLX-8bit) | 7180 | 4546 | 2628 | 5/5 |
 
 ## Output determinism (MTP correctness probe, #23302)
 
-- llama.cpp: 212/320 diverged · MLX: 105/181 diverged
+- llama.cpp: 212/320 diverged · MLX: 104/180 diverged
 
-- 317/501 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
+- 316/500 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
 
 ## Warm-cache TTFT (multi-turn session at agent depth)
 
