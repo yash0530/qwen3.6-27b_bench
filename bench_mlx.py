@@ -68,7 +68,11 @@ def mlx_done_keys(path):
                 continue
             seen.add((r.get("phase"), r.get("model"), r.get("quant"),
                       r.get("draft_block_size"), r.get("kv_bits"),
-                      r.get("prompt_tier"), r.get("question_id")))
+                      r.get("prompt_tier"), r.get("question_id"),
+                      # Drafter precision is part of the cell: the 8-bit and bf16 heads
+                      # are different configurations, and without this the second one
+                      # would resume straight past every row the first already wrote.
+                      r.get("draft_precision")))
     return seen
 
 
@@ -199,6 +203,10 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
 
     draft_model, draft_kind = None, None
     draft_path = model_cfg.get("draft_model")
+    # Read off the checkpoint directory name ("...-mtp-mlx-8bit" -> "8bit"), which is how
+    # the two drafters are told apart in the records and in the resume key.
+    draft_precision = (os.path.basename(draft_path.rstrip("/")).split("-")[-1]
+                       if draft_path else None)
     if draft_path and os.path.isdir(draft_path):
         log(f"loading drafter from {draft_path} ...")
         draft_model, draft_kind = load_drafter(draft_path, kind=model_cfg.get("draft_kind"))
@@ -276,6 +284,7 @@ def run(model_id, model_cfg, quant, block_sizes, kv_bits_opts, tier_names,
                         "reasoning_effort": model_cfg.get("reasoning_effort"),
                         "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
                         "draft_model_path": (model_cfg.get("draft_model") if bs else None),
+                        "draft_precision": (draft_precision if bs else None),
                         "ts": datetime.now(timezone.utc).isoformat(), "error": None,
                     }
                     try:
@@ -345,9 +354,19 @@ def main():
     ap.add_argument("--kv-bits", default=None,
                     help="comma-separated; 0 means unquantized. e.g. 0,8")
     ap.add_argument("--no-resume", action="store_true")
+    ap.add_argument("--draft-alt", action="store_true",
+                    help="use the model's alternate drafter (draft_model_alt) — for "
+                         "comparing drafter precision at matched block size")
     args = ap.parse_args()
 
     model_cfg = C.MLX_MODELS_CONFIG[args.model]
+    if args.draft_alt:
+        alt = model_cfg.get("draft_model_alt")
+        if not alt:
+            log(f"no draft_model_alt configured for {args.model}")
+            return
+        # Copied, not mutated in place: the registry is shared with other harnesses.
+        model_cfg = dict(model_cfg, draft_model=alt)
     quants = [args.quant] if args.quant else model_cfg["quant_order"]
     quants = [q for q in quants if os.path.isdir(model_cfg["quants"][q])]
     if not quants:

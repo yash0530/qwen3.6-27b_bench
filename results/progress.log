@@ -2605,3 +2605,23 @@
 [10:04:37]   progress 2/2 (1 min elapsed, ETA 0 min)
 [10:04:37] DONE [mlx_vlm] qwen3.6-27b/mlx8 in 1.4 min
 [10:04:37] consolidated 831 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[10:15:34] loading target qwen3.8-27b/mlx8 from /Users/yash/Models/qwen3.8-27b-mlx-8bit ...
+[10:15:37] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[10:15:37]   drafter kind resolved to 'mtp'
+[10:15:37]   drafter is compatible with the target
+[10:15:37] START [mlx_vlm/speed] qwen3.8-27b/mlx8: 2 generations (tiers=['shallow'] blocks=[0, 5] kv_bits=[None] cap=512)
+[10:16:31]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q2_coding: 512 tok @ 9.8 tok/s, prefill 197@201 tok/s
+[10:16:31]   progress 1/2 (1 min elapsed, ETA 1 min)
+[10:17:01]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp5 kvfp16 q2_coding: 512 tok @ 17.2 tok/s, acc 40%, prefill 197@322 tok/s
+[10:17:01]   progress 2/2 (1 min elapsed, ETA 0 min)
+[10:17:01] DONE [mlx_vlm] qwen3.8-27b/mlx8 in 1.4 min
+[10:17:01] consolidated 831 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[10:17:12] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 2 generations (passes=[1] quants=['q6_ud'] draft_ns=[0, 4] cap=512)
+[10:17:12] launch [speed] qwen3.8-27b q6_ud off pass1 tier=shallow kv=fp16 ...
+[10:18:06]   ok qwen3.8-27b q6_ud off p1 q2_coding: 512 tok @ 10.7 tok/s, ttft 915ms
+[10:18:06]   progress 1/2 (1 min elapsed, ETA 1 min)
+[10:18:06] launch [speed] qwen3.8-27b q6_ud mtp4 pass1 tier=shallow kv=fp16 ...
+[10:18:43]   ok qwen3.8-27b q6_ud mtp4 p1 q2_coding: 512 tok @ 14.8 tok/s, acc 36%, ttft 780ms
+[10:18:43]   progress 2/2 (2 min elapsed, ETA 0 min)
+[10:18:43] DONE run in 1.5 min
+[10:18:43] consolidated 833 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
