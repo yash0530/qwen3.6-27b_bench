@@ -2627,3 +2627,7 @@
 [10:18:43] consolidated 833 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
 [11:17:18] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 25 generations (passes=[1] quants=['q8'] draft_ns=[0, 1, 2, 3, 4] cap=1024)
 [11:17:18] launch [speed] qwen3.8-27b q8 off pass1 tier=shallow kv=fp16 ...
+[11:19:08]   ok qwen3.8-27b q8 off p1 q1_model_selection: 1024 tok @ 9.8 tok/s, ttft 1008ms
+[11:19:08]   progress 1/25 (2 min elapsed, ETA 44 min)
+[11:21:15] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[11:21:15] launch [speed] qwen3.8-27b q8 off pass1 tier=shallow kv=fp16 ...

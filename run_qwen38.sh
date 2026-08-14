@@ -45,10 +45,13 @@ PY
 # ---------------------------------------------------------------- A. quant screen
 # One MTP setting (unsloth's dense recommendation), fp16 KV, shallow + agent depth.
 # This is the stage that ranks the quants; everything after it refines a shortlist.
-stage "A1/6  GGUF quant screen: 9 quants, mtp2, shallow+agent"
+# --draft-ns 0,2 is the whole point of the staging: MTP off plus one representative
+# depth. Without it bench.py sweeps the model's full draft_ns on every quant, which is
+# five times the work and spends most of it tuning quants that lose on quality anyway.
+stage "A1/6  GGUF quant screen: 9 quants, mtp off + n=2, shallow+agent"
 for q in q8 q8_ud q8_ggml q6_ud q6 q5_ud q5 q4_ud q4_ggml; do
   log "  quant $q"
-  python3 -u bench.py --model "$M" --quant "$q" --phase speed \
+  python3 -u bench.py --model "$M" --quant "$q" --phase speed --draft-ns 0,2 \
     --tiers shallow,agent --kv-quant none >> "$L/qwen38_gguf.log" 2>&1
   log "    exit=$?"
 done
@@ -111,8 +114,26 @@ python3 bench.py --consolidate-only >> "$L/qwen38.log" 2>&1
 # ------------------------------------------------------------- D. deep tier (64k)
 stage "D6/6  deep tier on the winner, plus controls"
 python3 -u drift_check.py >> "$L/qwen38.log" 2>&1
+# Deep-tier prefill costs minutes per generation, so this is MTP off plus the one depth
+# that actually won at agent depth — chosen from the stage C data rather than assumed.
+# A full depth sweep at 64k would spend hours refining a curve already established.
+BEST_N=$($PY - <<'PY' 2>/dev/null || echo 2
+import json, collections, statistics as st
+c = collections.defaultdict(list)
+for ln in open('results/results.jsonl'):
+    try: r = json.loads(ln)
+    except Exception: continue
+    if (r.get('model') == 'qwen3.8-27b' and r.get('runtime') == 'gguf'
+            and not r.get('error') and not r.get('smoke')
+            and r.get('prompt_tier') == 'agent' and (r.get('draft_n') or 0) > 0
+            and r.get('predicted_per_second')):
+        c[r['draft_n']].append(r['predicted_per_second'])
+print(max(c, key=lambda k: st.mean(c[k])) if c else 2)
+PY
+)
+log "  deep-tier draft depth chosen from agent data: n=$BEST_N"
 for q in $(echo "$TOP_GGUF" | cut -d' ' -f1-2); do
-  python3 -u bench.py --model "$M" --quant "$q" --phase speed \
+  python3 -u bench.py --model "$M" --quant "$q" --phase speed --draft-ns "0,$BEST_N" \
     --tiers deep --kv-quant none >> "$L/qwen38_gguf.log" 2>&1
 done
 $PY -u bench_mlx.py --model "$M" --phase speed \

@@ -444,6 +444,10 @@ def main():
                     help="comma-separated prompt-depth tiers, e.g. shallow,agent,deep")
     ap.add_argument("--kv-quant", dest="kv_quant", default=None,
                     help="comma-separated KV cache types, e.g. none,q8_0 (matches MLX --kv-bits)")
+    ap.add_argument("--draft-ns", dest="draft_ns", default=None,
+                    help="comma-separated speculative depths, e.g. 0,2 (default: the "
+                         "model's full draft_ns sweep). The GGUF counterpart to "
+                         "bench_mlx.py --blocks.")
     ap.add_argument("--consolidate-only", action="store_true")
     args = ap.parse_args()
 
@@ -475,7 +479,16 @@ def main():
         return
 
     allq = [q["id"] for q in QUESTIONS]
-    draft_ns = model_cfg["draft_ns"]
+    # Restricting the speculative depths matters for a multi-quant sweep: screening nine
+    # quants at one depth costs a fifth of what sweeping every depth on every quant does,
+    # and most of that work would be spent tuning quants that lose on quality anyway.
+    # The MLX arm has had --blocks for this since the tier sweep; this is its counterpart.
+    draft_ns = ([int(x) for x in args.draft_ns.split(",")] if args.draft_ns
+                else model_cfg["draft_ns"])
+    unknown = [n for n in draft_ns if n not in model_cfg["draft_ns"]]
+    if unknown:
+        log(f"note: draft_ns {unknown} are outside the model's configured sweep "
+            f"{model_cfg['draft_ns']}")
 
     # Prompts come from the shared cache so both runtimes send identical bytes.
     built = T.load_cached() if args.tiers or args.kv_quant else None
