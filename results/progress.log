@@ -2631,3 +2631,280 @@
 [11:19:08]   progress 1/25 (2 min elapsed, ETA 44 min)
 [11:21:15] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
 [11:21:15] launch [speed] qwen3.8-27b q8 off pass1 tier=shallow kv=fp16 ...
+[11:23:02]   ok qwen3.8-27b q8 off p1 q2_coding: 1024 tok @ 9.8 tok/s, ttft 734ms
+[11:23:02]   progress 1/10 (2 min elapsed, ETA 16 min)
+[11:24:46]   ok qwen3.8-27b q8 off p1 q3_architecture: 1024 tok @ 9.9 tok/s, ttft 757ms
+[11:24:46]   progress 2/10 (4 min elapsed, ETA 14 min)
+[11:26:31]   ok qwen3.8-27b q8 off p1 q4_finance_reasoning: 1024 tok @ 9.9 tok/s, ttft 1014ms
+[11:26:31]   progress 3/10 (5 min elapsed, ETA 12 min)
+[11:28:16]   ok qwen3.8-27b q8 off p1 q5_debugging: 1024 tok @ 9.9 tok/s, ttft 751ms
+[11:28:16]   progress 4/10 (7 min elapsed, ETA 11 min)
+[11:28:16] launch [speed] qwen3.8-27b q8 mtp2 pass1 tier=shallow kv=fp16 ...
+[11:29:22]   ok qwen3.8-27b q8 mtp2 p1 q1_model_selection: 1024 tok @ 16.3 tok/s, acc 57%, ttft 1027ms
+[11:29:22]   progress 5/10 (8 min elapsed, ETA 8 min)
+[11:30:32]   ok qwen3.8-27b q8 mtp2 p1 q2_coding: 1024 tok @ 14.7 tok/s, acc 47%, ttft 762ms
+[11:30:32]   progress 6/10 (9 min elapsed, ETA 6 min)
+[11:31:45]   ok qwen3.8-27b q8 mtp2 p1 q3_architecture: 1024 tok @ 14.3 tok/s, acc 46%, ttft 810ms
+[11:31:45]   progress 7/10 (11 min elapsed, ETA 5 min)
+[11:32:59]   ok qwen3.8-27b q8 mtp2 p1 q4_finance_reasoning: 1024 tok @ 14.0 tok/s, acc 45%, ttft 1104ms
+[11:32:59]   progress 8/10 (12 min elapsed, ETA 3 min)
+[11:34:10]   ok qwen3.8-27b q8 mtp2 p1 q5_debugging: 1024 tok @ 14.6 tok/s, acc 49%, ttft 819ms
+[11:34:10]   progress 9/10 (13 min elapsed, ETA 1 min)
+[11:34:11] DONE run in 12.9 min
+[11:34:11] consolidated 843 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[11:34:11] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[11:34:11] launch [speed] qwen3.8-27b q8 off pass1 tier=agent kv=fp16 ...
+[11:37:23]   ok qwen3.8-27b q8 off p1 q1_model_selection: 1024 tok @ 9.1 tok/s, ttft 78110ms
+[11:37:23]   progress 1/10 (3 min elapsed, ETA 29 min)
+[11:40:33]   ok qwen3.8-27b q8 off p1 q2_coding: 1024 tok @ 9.1 tok/s, ttft 76928ms
+[11:40:33]   progress 2/10 (6 min elapsed, ETA 25 min)
+[11:43:42]   ok qwen3.8-27b q8 off p1 q3_architecture: 1024 tok @ 9.1 tok/s, ttft 76805ms
+[11:43:42]   progress 3/10 (10 min elapsed, ETA 22 min)
+[11:46:52]   ok qwen3.8-27b q8 off p1 q4_finance_reasoning: 1024 tok @ 9.1 tok/s, ttft 76921ms
+[11:46:52]   progress 4/10 (13 min elapsed, ETA 19 min)
+[11:50:01]   ok qwen3.8-27b q8 off p1 q5_debugging: 1024 tok @ 9.1 tok/s, ttft 77366ms
+[11:50:01]   progress 5/10 (16 min elapsed, ETA 16 min)
+[11:50:02] launch [speed] qwen3.8-27b q8 mtp2 pass1 tier=agent kv=fp16 ...
+[11:52:39]   ok qwen3.8-27b q8 mtp2 p1 q1_model_selection: 1024 tok @ 13.9 tok/s, acc 61%, ttft 80368ms
+[11:52:39]   progress 6/10 (18 min elapsed, ETA 12 min)
+[11:55:28]   ok qwen3.8-27b q8 mtp2 p1 q2_coding: 1024 tok @ 11.8 tok/s, acc 45%, ttft 83208ms
+[11:55:28]   progress 7/10 (21 min elapsed, ETA 9 min)
+[11:58:13]   ok qwen3.8-27b q8 mtp2 p1 q3_architecture: 1024 tok @ 12.8 tok/s, acc 53%, ttft 84472ms
+[11:58:13]   progress 8/10 (24 min elapsed, ETA 6 min)
+[12:01:07]   ok qwen3.8-27b q8 mtp2 p1 q4_finance_reasoning: 1024 tok @ 11.4 tok/s, acc 42%, ttft 84093ms
+[12:01:07]   progress 9/10 (27 min elapsed, ETA 3 min)
+[12:03:57]   ok qwen3.8-27b q8 mtp2 p1 q5_debugging: 1024 tok @ 11.9 tok/s, acc 46%, ttft 84127ms
+[12:03:57]   progress 10/10 (30 min elapsed, ETA 0 min)
+[12:03:58] DONE run in 29.8 min
+[12:03:58] consolidated 853 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[12:03:58] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8_ud'] draft_ns=[0, 2] cap=1024)
+[12:03:58] launch [speed] qwen3.8-27b q8_ud off pass1 tier=shallow kv=fp16 ...
+[12:05:58]   ok qwen3.8-27b q8_ud off p1 q1_model_selection: 1024 tok @ 9.2 tok/s, ttft 1017ms
+[12:05:58]   progress 1/10 (2 min elapsed, ETA 18 min)
+[12:07:51]   ok qwen3.8-27b q8_ud off p1 q2_coding: 1024 tok @ 9.2 tok/s, ttft 782ms
+[12:07:51]   progress 2/10 (4 min elapsed, ETA 16 min)
+[12:09:43]   ok qwen3.8-27b q8_ud off p1 q3_architecture: 1024 tok @ 9.2 tok/s, ttft 767ms
+[12:09:43]   progress 3/10 (6 min elapsed, ETA 13 min)
+[12:11:35]   ok qwen3.8-27b q8_ud off p1 q4_finance_reasoning: 1024 tok @ 9.2 tok/s, ttft 1027ms
+[12:11:35]   progress 4/10 (8 min elapsed, ETA 11 min)
+[12:13:27]   ok qwen3.8-27b q8_ud off p1 q5_debugging: 1024 tok @ 9.2 tok/s, ttft 762ms
+[12:13:27]   progress 5/10 (9 min elapsed, ETA 9 min)
+[12:13:27] launch [speed] qwen3.8-27b q8_ud mtp2 pass1 tier=shallow kv=fp16 ...
+[12:14:39]   ok qwen3.8-27b q8_ud mtp2 p1 q1_model_selection: 1024 tok @ 14.9 tok/s, acc 60%, ttft 1045ms
+[12:14:39]   progress 6/10 (11 min elapsed, ETA 7 min)
+[12:15:47]   ok qwen3.8-27b q8_ud mtp2 p1 q2_coding: 1024 tok @ 15.3 tok/s, acc 63%, ttft 774ms
+[12:15:47]   progress 7/10 (12 min elapsed, ETA 5 min)
+[12:17:07]   ok qwen3.8-27b q8_ud mtp2 p1 q3_architecture: 1024 tok @ 12.9 tok/s, acc 45%, ttft 796ms
+[12:17:07]   progress 8/10 (13 min elapsed, ETA 3 min)
+[12:18:26]   ok qwen3.8-27b q8_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 13.2 tok/s, acc 48%, ttft 1133ms
+[12:18:26]   progress 9/10 (14 min elapsed, ETA 2 min)
+[12:19:45]   ok qwen3.8-27b q8_ud mtp2 p1 q5_debugging: 1024 tok @ 13.1 tok/s, acc 49%, ttft 832ms
+[12:19:45]   progress 10/10 (16 min elapsed, ETA 0 min)
+[12:19:45] DONE run in 15.8 min
+[12:19:45] consolidated 863 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[12:19:45] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8_ud'] draft_ns=[0, 2] cap=1024)
+[12:19:45] launch [speed] qwen3.8-27b q8_ud off pass1 tier=agent kv=fp16 ...
+[12:23:07]   ok qwen3.8-27b q8_ud off p1 q1_model_selection: 1024 tok @ 8.5 tok/s, ttft 79474ms
+[12:23:07]   progress 1/10 (3 min elapsed, ETA 30 min)
+[12:26:26]   ok qwen3.8-27b q8_ud off p1 q2_coding: 1024 tok @ 8.5 tok/s, ttft 79180ms
+[12:26:26]   progress 2/10 (7 min elapsed, ETA 27 min)
+[12:29:46]   ok qwen3.8-27b q8_ud off p1 q3_architecture: 1024 tok @ 8.5 tok/s, ttft 79448ms
+[12:29:46]   progress 3/10 (10 min elapsed, ETA 23 min)
+[12:33:05]   ok qwen3.8-27b q8_ud off p1 q4_finance_reasoning: 1024 tok @ 8.5 tok/s, ttft 79649ms
+[12:33:05]   progress 4/10 (13 min elapsed, ETA 20 min)
+[12:36:25]   ok qwen3.8-27b q8_ud off p1 q5_debugging: 1024 tok @ 8.5 tok/s, ttft 79571ms
+[12:36:25]   progress 5/10 (17 min elapsed, ETA 17 min)
+[12:36:25] launch [speed] qwen3.8-27b q8_ud mtp2 pass1 tier=agent kv=fp16 ...
+[12:39:11]   ok qwen3.8-27b q8_ud mtp2 p1 q1_model_selection: 1024 tok @ 12.6 tok/s, acc 60%, ttft 81759ms
+[12:39:11]   progress 6/10 (19 min elapsed, ETA 13 min)
+[12:42:03]   ok qwen3.8-27b q8_ud mtp2 p1 q2_coding: 1024 tok @ 11.6 tok/s, acc 52%, ttft 84039ms
+[12:42:03]   progress 7/10 (22 min elapsed, ETA 10 min)
+[12:45:01]   ok qwen3.8-27b q8_ud mtp2 p1 q3_architecture: 1024 tok @ 11.0 tok/s, acc 47%, ttft 84585ms
+[12:45:01]   progress 8/10 (25 min elapsed, ETA 6 min)
+[12:47:57]   ok qwen3.8-27b q8_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 11.2 tok/s, acc 48%, ttft 84976ms
+[12:47:57]   progress 9/10 (28 min elapsed, ETA 3 min)
+[12:50:51]   ok qwen3.8-27b q8_ud mtp2 p1 q5_debugging: 1024 tok @ 11.5 tok/s, acc 51%, ttft 84828ms
+[12:50:51]   progress 10/10 (31 min elapsed, ETA 0 min)
+[12:50:52] DONE run in 31.1 min
+[12:50:52] consolidated 873 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[12:50:52] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8_ggml'] draft_ns=[0, 2] cap=1024)
+[12:50:52] launch [speed] qwen3.8-27b q8_ggml off pass1 tier=shallow kv=fp16 ...
+[12:52:44]   ok qwen3.8-27b q8_ggml off p1 q1_model_selection: 1024 tok @ 9.9 tok/s, ttft 1006ms
+[12:52:44]   progress 1/10 (2 min elapsed, ETA 17 min)
+[12:54:28]   ok qwen3.8-27b q8_ggml off p1 q2_coding: 1024 tok @ 9.9 tok/s, ttft 813ms
+[12:54:28]   progress 2/10 (4 min elapsed, ETA 14 min)
+[12:56:13]   ok qwen3.8-27b q8_ggml off p1 q3_architecture: 1024 tok @ 9.9 tok/s, ttft 760ms
+[12:56:13]   progress 3/10 (5 min elapsed, ETA 12 min)
+[12:57:58]   ok qwen3.8-27b q8_ggml off p1 q4_finance_reasoning: 1024 tok @ 9.9 tok/s, ttft 1015ms
+[12:57:58]   progress 4/10 (7 min elapsed, ETA 11 min)
+[12:59:43]   ok qwen3.8-27b q8_ggml off p1 q5_debugging: 1024 tok @ 9.9 tok/s, ttft 775ms
+[12:59:43]   progress 5/10 (9 min elapsed, ETA 9 min)
+[12:59:43] launch [speed] qwen3.8-27b q8_ggml mtp2 pass1 tier=shallow kv=fp16 ...
+[13:00:52]   ok qwen3.8-27b q8_ggml mtp2 p1 q1_model_selection: 1024 tok @ 15.7 tok/s, acc 57%, ttft 1035ms
+[13:00:52]   progress 6/10 (10 min elapsed, ETA 7 min)
+[13:01:59]   ok qwen3.8-27b q8_ggml mtp2 p1 q2_coding: 1024 tok @ 15.5 tok/s, acc 56%, ttft 816ms
+[13:01:59]   progress 7/10 (11 min elapsed, ETA 5 min)
+[13:03:15]   ok qwen3.8-27b q8_ggml mtp2 p1 q3_architecture: 1024 tok @ 13.6 tok/s, acc 44%, ttft 870ms
+[13:03:15]   progress 8/10 (12 min elapsed, ETA 3 min)
+[13:04:31]   ok qwen3.8-27b q8_ggml mtp2 p1 q4_finance_reasoning: 1024 tok @ 13.7 tok/s, acc 45%, ttft 1194ms
+[13:04:31]   progress 9/10 (14 min elapsed, ETA 2 min)
+[13:05:43]   ok qwen3.8-27b q8_ggml mtp2 p1 q5_debugging: 1024 tok @ 14.4 tok/s, acc 49%, ttft 861ms
+[13:05:43]   progress 10/10 (15 min elapsed, ETA 0 min)
+[13:05:43] DONE run in 14.9 min
+[13:05:43] consolidated 883 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[13:05:43] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8_ggml'] draft_ns=[0, 2] cap=1024)
+[13:05:43] launch [speed] qwen3.8-27b q8_ggml off pass1 tier=agent kv=fp16 ...
+[13:08:59]   ok qwen3.8-27b q8_ggml off p1 q1_model_selection: 1024 tok @ 9.1 tok/s, ttft 80773ms
+[13:08:59]   progress 1/10 (3 min elapsed, ETA 29 min)
+[13:12:12]   ok qwen3.8-27b q8_ggml off p1 q2_coding: 1024 tok @ 9.1 tok/s, ttft 80267ms
+[13:12:12]   progress 2/10 (6 min elapsed, ETA 26 min)
+[13:15:25]   ok qwen3.8-27b q8_ggml off p1 q3_architecture: 1024 tok @ 9.1 tok/s, ttft 80338ms
+[13:15:25]   progress 3/10 (10 min elapsed, ETA 23 min)
+[13:18:38]   ok qwen3.8-27b q8_ggml off p1 q4_finance_reasoning: 1024 tok @ 9.1 tok/s, ttft 80335ms
+[13:18:38]   progress 4/10 (13 min elapsed, ETA 19 min)
+[13:21:51]   ok qwen3.8-27b q8_ggml off p1 q5_debugging: 1024 tok @ 9.1 tok/s, ttft 80355ms
+[13:21:51]   progress 5/10 (16 min elapsed, ETA 16 min)
+[13:21:51] launch [speed] qwen3.8-27b q8_ggml mtp2 pass1 tier=agent kv=fp16 ...
+[13:24:31]   ok qwen3.8-27b q8_ggml mtp2 p1 q1_model_selection: 1024 tok @ 13.7 tok/s, acc 61%, ttft 82506ms
+[13:24:31]   progress 6/10 (19 min elapsed, ETA 13 min)
+[13:27:23]   ok qwen3.8-27b q8_ggml mtp2 p1 q2_coding: 1024 tok @ 11.7 tok/s, acc 45%, ttft 84428ms
+[13:27:23]   progress 7/10 (22 min elapsed, ETA 9 min)
+[13:30:08]   ok qwen3.8-27b q8_ggml mtp2 p1 q3_architecture: 1024 tok @ 12.7 tok/s, acc 52%, ttft 84566ms
+[13:30:08]   progress 8/10 (24 min elapsed, ETA 6 min)
+[13:33:01]   ok qwen3.8-27b q8_ggml mtp2 p1 q4_finance_reasoning: 1024 tok @ 11.6 tok/s, acc 44%, ttft 84655ms
+[13:33:01]   progress 9/10 (27 min elapsed, ETA 3 min)
+[13:35:45]   ok qwen3.8-27b q8_ggml mtp2 p1 q5_debugging: 1024 tok @ 12.9 tok/s, acc 54%, ttft 84623ms
+[13:35:45]   progress 10/10 (30 min elapsed, ETA 0 min)
+[13:35:46] DONE run in 30.0 min
+[13:35:46] consolidated 893 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[13:35:46] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q6_ud'] draft_ns=[0, 2] cap=1024)
+[13:35:46] launch [speed] qwen3.8-27b q6_ud off pass1 tier=shallow kv=fp16 ...
+[13:37:29]   ok qwen3.8-27b q6_ud off p1 q1_model_selection: 1024 tok @ 10.7 tok/s, ttft 1024ms
+[13:37:29]   progress 1/10 (2 min elapsed, ETA 16 min)
+[13:39:07]   ok qwen3.8-27b q6_ud off p1 q2_coding: 1024 tok @ 10.5 tok/s, ttft 831ms
+[13:39:07]   progress 2/10 (3 min elapsed, ETA 13 min)
+[13:40:45]   ok qwen3.8-27b q6_ud off p1 q3_architecture: 1024 tok @ 10.6 tok/s, ttft 842ms
+[13:40:45]   progress 3/10 (5 min elapsed, ETA 12 min)
+[13:42:23]   ok qwen3.8-27b q6_ud off p1 q4_finance_reasoning: 1024 tok @ 10.6 tok/s, ttft 1178ms
+[13:42:23]   progress 4/10 (7 min elapsed, ETA 10 min)
+[13:44:01]   ok qwen3.8-27b q6_ud off p1 q5_debugging: 1024 tok @ 10.6 tok/s, ttft 847ms
+[13:44:01]   progress 5/10 (8 min elapsed, ETA 8 min)
+[13:44:01] launch [speed] qwen3.8-27b q6_ud mtp2 pass1 tier=shallow kv=fp16 ...
+[13:45:17]   ok qwen3.8-27b q6_ud mtp2 p1 q1_model_selection: 1024 tok @ 14.0 tok/s, acc 59%, ttft 1062ms
+[13:45:17]   progress 6/10 (10 min elapsed, ETA 6 min)
+[13:46:38]   ok qwen3.8-27b q6_ud mtp2 p1 q2_coding: 1024 tok @ 12.8 tok/s, acc 50%, ttft 858ms
+[13:46:38]   progress 7/10 (11 min elapsed, ETA 5 min)
+[13:48:03]   ok qwen3.8-27b q6_ud mtp2 p1 q3_architecture: 1024 tok @ 12.2 tok/s, acc 46%, ttft 879ms
+[13:48:03]   progress 8/10 (12 min elapsed, ETA 3 min)
+[13:49:30]   ok qwen3.8-27b q6_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 12.0 tok/s, acc 44%, ttft 1187ms
+[13:49:30]   progress 9/10 (14 min elapsed, ETA 2 min)
+[13:50:56]   ok qwen3.8-27b q6_ud mtp2 p1 q5_debugging: 1024 tok @ 12.0 tok/s, acc 45%, ttft 878ms
+[13:50:56]   progress 10/10 (15 min elapsed, ETA 0 min)
+[13:50:56] DONE run in 15.2 min
+[13:50:56] consolidated 903 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[13:50:56] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q6_ud'] draft_ns=[0, 2] cap=1024)
+[13:50:56] launch [speed] qwen3.8-27b q6_ud off pass1 tier=agent kv=fp16 ...
+[13:54:06]   ok qwen3.8-27b q6_ud off p1 q1_model_selection: 1024 tok @ 9.7 tok/s, ttft 82327ms
+[13:54:06]   progress 1/10 (3 min elapsed, ETA 29 min)
+[13:57:15]   ok qwen3.8-27b q6_ud off p1 q2_coding: 1024 tok @ 9.7 tok/s, ttft 82562ms
+[13:57:15]   progress 2/10 (6 min elapsed, ETA 25 min)
+[14:00:23]   ok qwen3.8-27b q6_ud off p1 q3_architecture: 1024 tok @ 9.7 tok/s, ttft 82449ms
+[14:00:23]   progress 3/10 (9 min elapsed, ETA 22 min)
+[14:03:31]   ok qwen3.8-27b q6_ud off p1 q4_finance_reasoning: 1024 tok @ 9.7 tok/s, ttft 82549ms
+[14:03:31]   progress 4/10 (13 min elapsed, ETA 19 min)
+[14:06:39]   ok qwen3.8-27b q6_ud off p1 q5_debugging: 1024 tok @ 9.7 tok/s, ttft 82399ms
+[14:06:39]   progress 5/10 (16 min elapsed, ETA 16 min)
+[14:06:39] launch [speed] qwen3.8-27b q6_ud mtp2 pass1 tier=agent kv=fp16 ...
+[14:09:33]   ok qwen3.8-27b q6_ud mtp2 p1 q1_model_selection: 1024 tok @ 11.7 tok/s, acc 56%, ttft 84734ms
+[14:09:33]   progress 6/10 (19 min elapsed, ETA 12 min)
+[14:12:27]   ok qwen3.8-27b q6_ud mtp2 p1 q2_coding: 1024 tok @ 11.6 tok/s, acc 55%, ttft 85724ms
+[14:12:27]   progress 7/10 (22 min elapsed, ETA 9 min)
+[14:15:32]   ok qwen3.8-27b q6_ud mtp2 p1 q3_architecture: 1024 tok @ 10.4 tok/s, acc 44%, ttft 85785ms
+[14:15:32]   progress 8/10 (25 min elapsed, ETA 6 min)
+[14:18:35]   ok qwen3.8-27b q6_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 10.6 tok/s, acc 45%, ttft 85922ms
+[14:18:35]   progress 9/10 (28 min elapsed, ETA 3 min)
+[14:21:33]   ok qwen3.8-27b q6_ud mtp2 p1 q5_debugging: 1024 tok @ 11.1 tok/s, acc 51%, ttft 85816ms
+[14:21:33]   progress 10/10 (31 min elapsed, ETA 0 min)
+[14:21:33] DONE run in 30.6 min
+[14:21:33] consolidated 913 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[14:21:33] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q6'] draft_ns=[0, 2] cap=1024)
+[14:21:33] launch [speed] qwen3.8-27b q6 off pass1 tier=shallow kv=fp16 ...
+[14:23:07]   ok qwen3.8-27b q6 off p1 q1_model_selection: 1024 tok @ 11.5 tok/s, ttft 1025ms
+[14:23:07]   progress 1/10 (2 min elapsed, ETA 14 min)
+[14:24:38]   ok qwen3.8-27b q6 off p1 q2_coding: 1024 tok @ 11.4 tok/s, ttft 872ms
+[14:24:38]   progress 2/10 (3 min elapsed, ETA 12 min)
+[14:26:08]   ok qwen3.8-27b q6 off p1 q3_architecture: 1024 tok @ 11.4 tok/s, ttft 875ms
+[14:26:08]   progress 3/10 (5 min elapsed, ETA 11 min)
+[14:27:39]   ok qwen3.8-27b q6 off p1 q4_finance_reasoning: 1024 tok @ 11.4 tok/s, ttft 1249ms
+[14:27:39]   progress 4/10 (6 min elapsed, ETA 9 min)
+[14:29:09]   ok qwen3.8-27b q6 off p1 q5_debugging: 1024 tok @ 11.4 tok/s, ttft 869ms
+[14:29:09]   progress 5/10 (8 min elapsed, ETA 8 min)
+[14:29:09] launch [speed] qwen3.8-27b q6 mtp2 pass1 tier=shallow kv=fp16 ...
+[14:30:39]   ok qwen3.8-27b q6 mtp2 p1 q1_model_selection: 1024 tok @ 11.8 tok/s, acc 54%, ttft 1072ms
+[14:30:39]   progress 6/10 (9 min elapsed, ETA 6 min)
+[14:32:07]   ok qwen3.8-27b q6 mtp2 p1 q2_coding: 1024 tok @ 11.8 tok/s, acc 55%, ttft 870ms
+[14:32:07]   progress 7/10 (11 min elapsed, ETA 5 min)
+[14:33:46]   ok qwen3.8-27b q6 mtp2 p1 q3_architecture: 1024 tok @ 10.5 tok/s, acc 43%, ttft 895ms
+[14:33:46]   progress 8/10 (12 min elapsed, ETA 3 min)
+[14:35:24]   ok qwen3.8-27b q6 mtp2 p1 q4_finance_reasoning: 1024 tok @ 10.6 tok/s, acc 45%, ttft 1205ms
+[14:35:24]   progress 9/10 (14 min elapsed, ETA 2 min)
+[14:36:59]   ok qwen3.8-27b q6 mtp2 p1 q5_debugging: 1024 tok @ 10.8 tok/s, acc 46%, ttft 874ms
+[14:36:59]   progress 10/10 (15 min elapsed, ETA 0 min)
+[14:37:00] DONE run in 15.4 min
+[14:37:00] consolidated 923 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[14:37:00] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q6'] draft_ns=[0, 2] cap=1024)
+[14:37:00] launch [speed] qwen3.8-27b q6 off pass1 tier=agent kv=fp16 ...
+[14:40:04]   ok qwen3.8-27b q6 off p1 q1_model_selection: 1024 tok @ 10.4 tok/s, ttft 83658ms
+[14:40:04]   progress 1/10 (3 min elapsed, ETA 28 min)
+[14:43:06]   ok qwen3.8-27b q6 off p1 q2_coding: 1024 tok @ 10.4 tok/s, ttft 83864ms
+[14:43:06]   progress 2/10 (6 min elapsed, ETA 24 min)
+[14:46:09]   ok qwen3.8-27b q6 off p1 q3_architecture: 1024 tok @ 10.4 tok/s, ttft 83711ms
+[14:46:09]   progress 3/10 (9 min elapsed, ETA 21 min)
+[14:49:11]   ok qwen3.8-27b q6 off p1 q4_finance_reasoning: 1024 tok @ 10.4 tok/s, ttft 83644ms
+[14:49:11]   progress 4/10 (12 min elapsed, ETA 18 min)
+[14:52:13]   ok qwen3.8-27b q6 off p1 q5_debugging: 1024 tok @ 10.4 tok/s, ttft 83564ms
+[14:52:13]   progress 5/10 (15 min elapsed, ETA 15 min)
+[14:52:13] launch [speed] qwen3.8-27b q6 mtp2 pass1 tier=agent kv=fp16 ...
+[14:55:17]   ok qwen3.8-27b q6 mtp2 p1 q1_model_selection: 1024 tok @ 10.6 tok/s, acc 56%, ttft 85960ms
+[14:55:17]   progress 6/10 (18 min elapsed, ETA 12 min)
+[14:58:26]   ok qwen3.8-27b q6 mtp2 p1 q2_coding: 1024 tok @ 10.0 tok/s, acc 51%, ttft 87019ms
+[14:58:26]   progress 7/10 (21 min elapsed, ETA 9 min)
+[15:01:45]   ok qwen3.8-27b q6 mtp2 p1 q3_architecture: 1024 tok @ 9.2 tok/s, acc 42%, ttft 87064ms
+[15:01:45]   progress 8/10 (25 min elapsed, ETA 6 min)
+[15:04:59]   ok qwen3.8-27b q6 mtp2 p1 q4_finance_reasoning: 1024 tok @ 9.7 tok/s, acc 48%, ttft 87992ms
+[15:04:59]   progress 9/10 (28 min elapsed, ETA 3 min)
+[15:08:11]   ok qwen3.8-27b q6 mtp2 p1 q5_debugging: 1024 tok @ 9.7 tok/s, acc 48%, ttft 87458ms
+[15:08:11]   progress 10/10 (31 min elapsed, ETA 0 min)
+[15:08:11] DONE run in 31.2 min
+[15:08:11] consolidated 933 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[15:08:11] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q5_ud'] draft_ns=[0, 2] cap=1024)
+[15:08:11] launch [speed] qwen3.8-27b q5_ud off pass1 tier=shallow kv=fp16 ...
+[15:09:38]   ok qwen3.8-27b q5_ud off p1 q1_model_selection: 1024 tok @ 12.5 tok/s, ttft 1155ms
+[15:09:38]   progress 1/10 (1 min elapsed, ETA 13 min)
+[15:11:01]   ok qwen3.8-27b q5_ud off p1 q2_coding: 1024 tok @ 12.5 tok/s, ttft 912ms
+[15:11:01]   progress 2/10 (3 min elapsed, ETA 11 min)
+[15:12:24]   ok qwen3.8-27b q5_ud off p1 q3_architecture: 1024 tok @ 12.5 tok/s, ttft 917ms
+[15:12:24]   progress 3/10 (4 min elapsed, ETA 10 min)
+[15:13:47]   ok qwen3.8-27b q5_ud off p1 q4_finance_reasoning: 1024 tok @ 12.5 tok/s, ttft 1250ms
+[15:13:47]   progress 4/10 (6 min elapsed, ETA 8 min)
+[15:15:10]   ok qwen3.8-27b q5_ud off p1 q5_debugging: 1024 tok @ 12.5 tok/s, ttft 918ms
+[15:15:10]   progress 5/10 (7 min elapsed, ETA 7 min)
+[15:15:10] launch [speed] qwen3.8-27b q5_ud mtp2 pass1 tier=shallow kv=fp16 ...
+[15:16:42]   ok qwen3.8-27b q5_ud mtp2 p1 q1_model_selection: 1024 tok @ 11.6 tok/s, acc 58%, ttft 1107ms
+[15:16:42]   progress 6/10 (9 min elapsed, ETA 6 min)
+[15:18:20]   ok qwen3.8-27b q5_ud mtp2 p1 q2_coding: 1024 tok @ 10.5 tok/s, acc 48%, ttft 910ms
+[15:18:20]   progress 7/10 (10 min elapsed, ETA 4 min)
+[15:19:55]   ok qwen3.8-27b q5_ud mtp2 p1 q3_architecture: 1024 tok @ 11.0 tok/s, acc 53%, ttft 924ms
+[15:19:55]   progress 8/10 (12 min elapsed, ETA 3 min)
+[15:21:37]   ok qwen3.8-27b q5_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 10.1 tok/s, acc 45%, ttft 1238ms
+[15:21:37]   progress 9/10 (13 min elapsed, ETA 1 min)
+[15:23:16]   ok qwen3.8-27b q5_ud mtp2 p1 q5_debugging: 1024 tok @ 10.4 tok/s, acc 48%, ttft 916ms
+[15:23:16]   progress 10/10 (15 min elapsed, ETA 0 min)
+[15:23:16] DONE run in 15.1 min
+[15:23:16] consolidated 943 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[15:23:16] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q5_ud'] draft_ns=[0, 2] cap=1024)
+[15:23:16] launch [speed] qwen3.8-27b q5_ud off pass1 tier=agent kv=fp16 ...
+[15:26:15]   ok qwen3.8-27b q5_ud off p1 q1_model_selection: 1024 tok @ 11.4 tok/s, ttft 87071ms
+[15:26:15]   progress 1/10 (3 min elapsed, ETA 27 min)
+[15:29:04]   ok qwen3.8-27b q5_ud off p1 q2_coding: 1024 tok @ 11.7 tok/s, ttft 81933ms
+[15:29:04]   progress 2/10 (6 min elapsed, ETA 23 min)
