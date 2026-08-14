@@ -142,9 +142,54 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 
 - 316/500 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
 
+## Warm-cache TTFT (multi-turn session at agent depth)
+
+_The deciding measurement. An agent loop re-sends a large stable preamble every turn, so what matters is TTFT on turns 2+, not the cold first turn._
+
+| model | engine | cold (t1) | warm mean (t2-t5) | reduction |
+|---|---|---|---|---|
+| Qwen 3.6 27B (Q8) | gguf | 85.0 s | **1.68 s** | 98% |
+| Qwen 3.6 27B (MLX-8bit) | mlx | 55.4 s | **55.95 s** | -1% |
+| Qwen 3.6 35B A3B (Q8) | gguf | 24.9 s | **0.57 s** | 98% |
+| Qwen 3.6 35B A3B (MLX-8bit) | mlx | 14.1 s | **12.74 s** | 10% |
+
+## Append-only continuation (MLX)
+
+_mlx_vlm.server re-renders the chat template each request, which forces a cache rewind Qwen 3.6's hybrid cache cannot do. Appending to the token sequence the cache already holds needs no rewind — so MLX's warm-cache deficit is a serving-layer gap, not an engine limitation._
+
+| model | cold TTFT | warm TTFT | speedup | output preserved |
+|---|---|---|---|---|
+| Qwen 3.6 27B (MLX-8bit) | 55.83 s | **0.49 s** | 115x | NO (see notes) |
+| Qwen 3.6 35B A3B (MLX-8bit) | 12.63 s | **0.14 s** | 87x | yes |
+
+## Concurrency (shallow prompts, aggregate chars/s | mean TTFT)
+
+_`gguf-mtp` is `-np 1` + MTP (requests queue; what llm-serve runs). `gguf-batch` is `-np N` with MTP off. llama.cpp cannot do both._
+
+**qwen3.6-27b**
+
+| arm | c=1 | c=2 | c=3 | c=4 | c=6 | c=8 | c=10 |
+|---|---|---|---|---|---|---|---|
+| mlx | 52 · 0.6s | 30 · 1.4s | 32 · 1.7s | 31 · 2.7s | 31 · 3.7s | 31 · 4.7s | 32 · 106.1s |
+| gguf-mtp | 62 · 1.0s | 69 · 14.8s | 70 · 30.4s | 69 · 45.9s | 68 · 75.4s | 69 · 105.5s | 70 · 137.8s |
+| gguf-batch | 34 · 1.0s | 66 · 1.6s | 90 · 2.5s | 106 · 3.3s | 113 · 4.9s | 120 · 6.0s | 109 · 7.7s |
+
+**qwen3.6-35b-a3b**
+
+| arm | c=1 | c=2 | c=3 | c=4 | c=6 | c=8 | c=10 |
+|---|---|---|---|---|---|---|---|
+| mlx | 254 · 0.3s | 254 · 0.5s | 272 · 0.7s | 277 · 1.0s | 284 · 1.5s | 301 · 1.9s | 311 · 12.2s |
+| gguf-mtp | 235 · 0.3s | 263 · 4.0s | 274 · 7.8s | 281 · 11.3s | 277 · 18.7s | 281 · 26.0s | 283 · 33.6s |
+| gguf-batch | 198 · 0.3s | 318 · 0.5s | 363 · 0.6s | 410 · 0.8s | 420 · 1.3s | 451 · 1.5s | 411 · 2.0s |
+
+## Machine drift control
+
+- Re-measured an unchanged GGUF cell (tier `agent`, draft-n 3): decode **-4.5%**, prefill **-5.7%** versus the stored value. Cross-engine margins below ~5% are unresolved.
+
 ## Measurement notes and known limitations
 
 - **Arm parity is gated by `validate_parity.py`.** Run it before trusting any GGUF-vs-MLX number here. It exists because an earlier revision compared the two arms for ~250 runs while they were doing *different work*: `enable_thinking` was passed to `stream_generate` but not to `apply_chat_template`, so the Qwen3.6 template emitted a pre-closed `<think></think>` block and the MLX arm never reasoned, while llama.cpp under `--jinja` reasoned throughout. Both arms ran green and produced plausible tok/s. The checker measures reasoning rate per arm (95% vs 0% at the time) and fails on a gap over 15%, along with prompt-length parity, empty answers, missing acceptance, and cache leakage.
+- **Acted on, and verified end-to-end.** The fp16-KV finding below was applied to `local-setup` (`llm-serve`, branch `tune/kv-fp16-and-draft-depth`) and re-measured on the live server with the 35B at 23k depth: RSS 38.7 -> 41.0 GB (50 GB wired limit), cold TTFT 28.90 -> 24.01 s, decode +11.6%, warm turn 5.27 -> 4.76 s. The 27B draft depth was raised 2 -> 3 in the same change.
 - **MLX does not reuse prompt prefixes for Qwen 3.6; llama.cpp does.** This is the single most decision-relevant finding, because an agent loop re-sends a large stable preamble every turn. Measured over a 5-turn session at 23k depth: llama.cpp warm TTFT **1.68 s** (27B) / **0.57 s** (35B) against cold 85 s / 24.9 s, i.e. near-perfect reuse. MLX stays flat at ~55.5-56.6 s (27B) and ~12.6 s (35B) across all turns.
   - mlx_vlm's Automatic Prompt Caching is **off unless `APC_ENABLED=1`** (`apc.py:3769`). Enabling it — verified live via `/v1/cache/stats` — changed nothing: `lookups_hit=0, lookups_miss=0, stores=0`.
   - Probable cause is architectural. Qwen 3.6 is hybrid: `qwen3_5/language.py:2615` returns `ArraysCache` for Gated Delta Network layers and `KVCache` for attention layers. Block-mode APC requires *every* entry to be a `KVCache` (`apc.py:292`), so it cannot apply. The 'exact' whole-prefix fallback nominally accepts `ArraysCache` but stores nothing in practice. llama.cpp's slot cache does longest-common-prefix reuse, which survives a growing conversation; exact whole-prefix snapshots do not.

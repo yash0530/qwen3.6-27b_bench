@@ -244,6 +244,101 @@ def build_summary(speed, full, scores, mlx_speed=None, mlx_full=None):
     return summary
 
 
+def _read_jsonl(name):
+    p = os.path.join(C.RESULTS, name)
+    if not os.path.exists(p):
+        return []
+    out = []
+    with open(p) as f:
+        for ln in f:
+            try:
+                out.append(json.loads(ln))
+            except Exception:
+                pass
+    return out
+
+
+def _aux_sections():
+    """Warm-cache, concurrency and append-only tables.
+
+    These live in their own jsonl files rather than results.jsonl because they measure
+    whole sessions and client fan-out, not single generations. They are the measurements
+    that actually decided the recommendation, so they belong in the report rather than
+    only in the raw data.
+    """
+    L = []
+
+    warm = _read_jsonl("warmcache.jsonl")
+    if warm:
+        by = {}
+        for r in warm:
+            by.setdefault((r["model"], r["arm"]), {})[r["turn"]] = r["ttft_ms"] / 1000
+        L.append("## Warm-cache TTFT (multi-turn session at agent depth)\n")
+        L.append("_The deciding measurement. An agent loop re-sends a large stable preamble "
+                 "every turn, so what matters is TTFT on turns 2+, not the cold first turn._\n")
+        L.append("| model | engine | cold (t1) | warm mean (t2-t5) | reduction |")
+        L.append("|---|---|---|---|---|")
+        for k in sorted(by):
+            t = by[k]
+            w = [t[i] for i in sorted(t) if i > 1]
+            if not w or 1 not in t:
+                continue
+            wm = sum(w) / len(w)
+            L.append(f"| {get_label(k[0], 'q8' if k[1] == 'gguf' else 'mlx8')} | {k[1]} | "
+                     f"{t[1]:.1f} s | **{wm:.2f} s** | {(1 - wm / t[1]) * 100:.0f}% |")
+        L.append("")
+
+    ao = _read_jsonl("append_only.jsonl")
+    if ao:
+        L.append("## Append-only continuation (MLX)\n")
+        L.append("_mlx_vlm.server re-renders the chat template each request, which forces a "
+                 "cache rewind Qwen 3.6's hybrid cache cannot do. Appending to the token "
+                 "sequence the cache already holds needs no rewind — so MLX's warm-cache "
+                 "deficit is a serving-layer gap, not an engine limitation._\n")
+        L.append("| model | cold TTFT | warm TTFT | speedup | output preserved |")
+        L.append("|---|---|---|---|---|")
+        for r in ao:
+            L.append(f"| {get_label(r['model'], 'mlx8')} | {r['ttft_cold_s']:.2f} s | "
+                     f"**{r['ttft_warm_s']:.2f} s** | {(r['speedup'] or 0):.0f}x | "
+                     f"{'yes' if r['output_preserved'] else 'NO (see notes)'} |")
+        L.append("")
+
+    conc = _read_jsonl("concurrency.jsonl")
+    if conc:
+        by = {}
+        for r in conc:
+            by[(r["model"], r["arm"], r["concurrency"])] = r
+        models = sorted({k[0] for k in by})
+        arms = ["mlx", "gguf-mtp", "gguf-batch"]
+        levels = sorted({k[2] for k in by})
+        L.append("## Concurrency (shallow prompts, aggregate chars/s | mean TTFT)\n")
+        L.append("_`gguf-mtp` is `-np 1` + MTP (requests queue; what llm-serve runs). "
+                 "`gguf-batch` is `-np N` with MTP off. llama.cpp cannot do both._\n")
+        for m in models:
+            L.append(f"**{m}**\n")
+            L.append("| arm | " + " | ".join(f"c={c}" for c in levels) + " |")
+            L.append("|---" * (len(levels) + 1) + "|")
+            for a in arms:
+                cells = []
+                for c in levels:
+                    r = by.get((m, a, c))
+                    cells.append(f"{(r['aggregate_chars_per_s'] or 0):.0f} · "
+                                 f"{(r['ttft_ms_mean'] or 0) / 1000:.1f}s" if r else "—")
+                L.append(f"| {a} | " + " | ".join(cells) + " |")
+            L.append("")
+
+    drift = _read_jsonl("drift.jsonl")
+    if drift:
+        d = drift[-1]
+        L.append("## Machine drift control\n")
+        L.append(f"- Re-measured an unchanged GGUF cell (tier `{d['tier']}`, draft-n "
+                 f"{d['draft_n']}): decode **{d['drift_tok_pct']:+.1f}%**, prefill "
+                 f"**{d['drift_prefill_pct']:+.1f}%** versus the stored value. Cross-engine "
+                 f"margins below ~5% are unresolved.\n")
+
+    return L
+
+
 def determinism_check(speed, mlx_speed=None):
     """Does speculative decoding change the output under a fixed seed?
 
@@ -585,6 +680,8 @@ def write_report(summary, has_quality, has_mlx=False):
              f"different output than their MTP-off baseline (fixed seed). 0 = MTP is "
              f"output-preserving on this build; >0 flags the known determinism bug.\n")
 
+    L.extend(_aux_sections())
+
     L.append("## Measurement notes and known limitations\n")
     L.append("- **Arm parity is gated by `validate_parity.py`.** Run it before trusting any "
              "GGUF-vs-MLX number here. It exists because an earlier revision compared the two "
@@ -595,6 +692,11 @@ def write_report(summary, has_quality, has_mlx=False):
              "green and produced plausible tok/s. The checker measures reasoning rate per arm "
              "(95% vs 0% at the time) and fails on a gap over 15%, along with prompt-length "
              "parity, empty answers, missing acceptance, and cache leakage.")
+    L.append("- **Acted on, and verified end-to-end.** The fp16-KV finding below was applied to "
+             "`local-setup` (`llm-serve`, branch `tune/kv-fp16-and-draft-depth`) and re-measured "
+             "on the live server with the 35B at 23k depth: RSS 38.7 -> 41.0 GB (50 GB wired "
+             "limit), cold TTFT 28.90 -> 24.01 s, decode +11.6%, warm turn 5.27 -> 4.76 s. The "
+             "27B draft depth was raised 2 -> 3 in the same change.")
     L.append("- **MLX does not reuse prompt prefixes for Qwen 3.6; llama.cpp does.** This is the "
              "single most decision-relevant finding, because an agent loop re-sends a large stable "
              "preamble every turn. Measured over a 5-turn session at 23k depth: llama.cpp warm TTFT "
