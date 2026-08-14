@@ -60,8 +60,9 @@ MODELS_CONFIG = {
         "reasoning_format": "deepseek",
         "quants": {
             "q4_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q4_K_XL.gguf"),
-            "q5": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q5_K_M.gguf"),
-            "q5_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf"),
+            # The Q5 pair was dropped mid-sweep and its weights deleted. The shallow-tier
+            # q5_ud rows already recorded are kept in results.jsonl: they are real
+            # measurements and they are half the evidence for the MTP crossover below Q8.
             "q6": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q6_K.gguf"),
             "q6_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q6_K_XL.gguf"),
             "q8": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q8_0.gguf"),
@@ -72,8 +73,7 @@ MODELS_CONFIG = {
         },
         # Screening order: the reference quant first, so an interrupted run still has
         # the baseline every other quant is compared against.
-        "quant_order": ["q8", "q8_ud", "q8_ggml", "q6_ud", "q6",
-                        "q5_ud", "q5", "q4_ud", "q4_ggml"],
+        "quant_order": ["q8", "q8_ud", "q8_ggml", "q6_ud", "q6", "q4_ud", "q4_ggml"],
         "draft_sidecars": {
             "q4_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
             "q8_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
@@ -146,8 +146,11 @@ MLX_MODELS_CONFIG = {
             "mlx8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-8bit"),
             "mlx6": os.path.expanduser("~/Models/qwen3.8-27b-mlx-6bit"),
             "mxfp8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-mxfp8"),
+            # Added so the 4-bit tier is not GGUF-only: q4_ud and q4_ggml would otherwise
+            # have had nothing to be compared against on the MLX side.
+            "mlx4": os.path.expanduser("~/Models/qwen3.8-27b-mlx-4bit"),
         },
-        "quant_order": ["mlx8", "mlx6", "mxfp8"],
+        "quant_order": ["mlx8", "mlx6", "mxfp8", "mlx4"],
         "draft_model": os.path.expanduser("~/Models/qwen3.8-27b-mtp-mlx-8bit"),
         # bf16 alternate, kept as the acceptance control: on 3.6 the quantized MTP heads
         # were reported to collapse acceptance, and this drafter is only available

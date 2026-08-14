@@ -45,21 +45,25 @@ PY
 # ---------------------------------------------------------------- A. quant screen
 # One MTP setting (unsloth's dense recommendation), fp16 KV, shallow + agent depth.
 # This is the stage that ranks the quants; everything after it refines a shortlist.
+# MLX runs before the remaining GGUF quants: the Q8-class GGUF cells that decide the
+# llama.cpp-vs-MLX question are already measured, so the MLX arm is now the highest-value
+# unknown, while the Q4 quants only refine a curve whose shape is established.
+stage "A1/6  MLX quant screen: 3 targets, block 3, shallow+agent"
+$PY -u bench_mlx.py --model "$M" --phase speed \
+  --tiers shallow,agent --blocks 0,3 --kv-bits 0 >> "$L/qwen38_mlx.log" 2>&1
+log "  exit=$?"
+
 # --draft-ns 0,2 is the whole point of the staging: MTP off plus one representative
 # depth. Without it bench.py sweeps the model's full draft_ns on every quant, which is
 # five times the work and spends most of it tuning quants that lose on quality anyway.
-stage "A1/6  GGUF quant screen: 9 quants, mtp off + n=2, shallow+agent"
-for q in q8 q8_ud q8_ggml q6_ud q6 q5_ud q5 q4_ud q4_ggml; do
+# The Q5 pair was dropped mid-sweep and deleted; already-measured quants resume-skip.
+stage "A2/6  GGUF quant screen: remaining quants, mtp off + n=2, shallow+agent"
+for q in q4_ud q4_ggml q8 q8_ud q8_ggml q6_ud q6; do
   log "  quant $q"
   python3 -u bench.py --model "$M" --quant "$q" --phase speed --draft-ns 0,2 \
     --tiers shallow,agent --kv-quant none >> "$L/qwen38_gguf.log" 2>&1
   log "    exit=$?"
 done
-
-stage "A2/6  MLX quant screen: 3 targets, block 3, shallow+agent"
-$PY -u bench_mlx.py --model "$M" --phase speed \
-  --tiers shallow,agent --blocks 0,3 --kv-bits 0 >> "$L/qwen38_mlx.log" 2>&1
-log "  exit=$?"
 
 python3 bench.py --consolidate-only >> "$L/qwen38.log" 2>&1
 
@@ -67,7 +71,7 @@ python3 bench.py --consolidate-only >> "$L/qwen38.log" 2>&1
 # Unbounded generations, MTP off, fp16 KV, shallow — the canonical config, matched
 # across arms so the judge compares answers rather than serving settings.
 stage "B3/6  full-length phase for quality grading (all candidates)"
-for q in q8 q8_ud q8_ggml q6_ud q6 q5_ud q5 q4_ud q4_ggml; do
+for q in q4_ud q4_ggml q8 q8_ud q8_ggml q6_ud q6; do
   python3 -u bench.py --model "$M" --quant "$q" --phase full >> "$L/qwen38_gguf.log" 2>&1
 done
 $PY -u bench_mlx.py --model "$M" --phase full >> "$L/qwen38_mlx.log" 2>&1

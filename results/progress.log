@@ -2908,3 +2908,17 @@
 [15:26:15]   progress 1/10 (3 min elapsed, ETA 27 min)
 [15:29:04]   ok qwen3.8-27b q5_ud off p1 q2_coding: 1024 tok @ 11.7 tok/s, ttft 81933ms
 [15:29:04]   progress 2/10 (6 min elapsed, ETA 23 min)
+[15:31:53]   ok qwen3.8-27b q5_ud off p1 q3_architecture: 1024 tok @ 11.5 tok/s, ttft 80315ms
+[15:31:53]   progress 3/10 (9 min elapsed, ETA 20 min)
+[15:34:38] loading target qwen3.8-27b/mlx8 from /Users/yash/Models/qwen3.8-27b-mlx-8bit ...
+[15:34:41] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[15:34:41]   drafter kind resolved to 'mtp'
+[15:34:41]   drafter is compatible with the target
+[15:34:41] START [mlx_vlm/speed] qwen3.8-27b/mlx8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[15:36:31]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q1_model_selection: 1024 tok @ 9.5 tok/s, prefill 272@253 tok/s
+[15:36:31]   progress 1/20 (2 min elapsed, ETA 35 min)
+[15:42:34] loading target qwen3.8-27b/mlx8 from /Users/yash/Models/qwen3.8-27b-mlx-8bit ...
+[15:42:38] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[15:42:38]   drafter kind resolved to 'mtp'
+[15:42:38]   drafter is compatible with the target
+[15:42:38] START [mlx_vlm/speed] qwen3.8-27b/mlx8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
