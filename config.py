@@ -64,20 +64,10 @@ MODELS_CONFIG = {
     #   1.11x at the same size because its head ships as a separate Q8 sidecar — the
     #   same fixed-precision-drafter mechanism that gives MLX its advantage, confirmed
     #   within one engine.
-    "qwen3.8-27b": {
-        "name": "Qwen 3.8 27B",
-        "reasoning": True,
-        "reasoning_format": "deepseek",
-        "quants": {
-            "q8": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q8_0.gguf"),
-        },
-        "quant_order": ["q8"],
-        "draft_ns": [0, 1, 2, 3, 4],
-        # Qwen's own thinking-mode recommendation for 3.8 is temp 1.0 (3.6 used 0.6).
-        # Applied to both runtimes so the arms stay comparable to each other, while
-        # still serving this model the way its authors intend.
-        "sampling": {"temp": 1.0, "top_p": 0.95, "top_k": 20},
-    },
+    # The Qwen 3.8 GGUF arm was retired on 2026-08-15 and its last file deleted: MLX
+    # won every matched-size comparison and matched its warm-cache TTFT, so llm-serve
+    # serves this model from MLX and there is nothing left for llama.cpp to do here.
+    # All seven quants' measurements remain in results.jsonl.
     "gemma4-31b": {
         "name": "Gemma 4 31B",
         "reasoning": False,
