@@ -48,12 +48,36 @@ def load():
 
 
 def arm(r):
+    """Which arm a record belongs to, or "legacy" if it cannot be compared.
+
+    Records with no `runtime` predate the harness rewrite, and therefore predate the
+    split_think fix that stopped truncated reasoning being filed as the *answer*. They
+    report thinking_tokens == 0 for runs that did reason, so counting them as GGUF makes
+    a correct arm look like it stopped reasoning — a failure in the data's history rather
+    than in the comparison under test. They are excluded, not repaired: the raw text is
+    still there for anyone who wants to re-derive them.
+    """
     rt = r.get("runtime")
     if rt == "mlx_vlm":
         return "mlx"
-    if rt in (None, "gguf"):
+    if rt == "gguf":
         return "gguf"
     return "legacy"
+
+
+def reasoned(r):
+    """Did this run actually reason?
+
+    Prefer the recorded token split over sniffing the text. The heuristic below was
+    calibrated on Qwen 3.6's reasoning openings and reports 0% on Qwen 3.8, whose traces
+    start differently — which looks exactly like a broken arm when nothing is wrong.
+    thinking_tokens is written by both harnesses from the same split_think(), so it is
+    directly comparable across engines in a way that prose sniffing is not.
+    """
+    tt = r.get("thinking_tokens")
+    if tt is not None:
+        return tt > 0
+    return looks_like_reasoning(r.get("raw_text"))
 
 
 def looks_like_reasoning(raw):
@@ -79,20 +103,22 @@ def main():
 
     # 1. Reasoning parity — the check that was missing.
     print("1. Reasoning engagement (both arms must reason, or neither)")
-    for phase in ("speed", "full"):
-        rates = {}
-        for a in ("gguf", "mlx"):
-            rows = [r for r in recs if arm(r) == a and r.get("phase") == phase
-                    and r.get("raw_text")]
-            if not rows:
-                continue
-            rates[a] = sum(1 for r in rows if looks_like_reasoning(r["raw_text"])) / len(rows)
-        if len(rates) == 2:
-            gap = abs(rates["gguf"] - rates["mlx"])
-            check(f"{phase}: reasoning rate gguf={rates['gguf']:.0%} mlx={rates['mlx']:.0%}",
-                  gap <= 0.15, f"gap {gap:.0%} (must be <=15%)")
-        elif rates:
-            warn(f"{phase}: only one arm present", str(rates))
+    models = sorted({r.get("model") or "?" for r in recs})
+    for model in models:
+        for phase in ("speed", "full"):
+            rates = {}
+            for a in ("gguf", "mlx"):
+                rows = [r for r in recs if arm(r) == a and r.get("phase") == phase
+                        and (r.get("model") or "?") == model and r.get("raw_text")]
+                if not rows:
+                    continue
+                rates[a] = sum(1 for r in rows if reasoned(r)) / len(rows)
+            if len(rates) == 2:
+                gap = abs(rates["gguf"] - rates["mlx"])
+                check(f"{model} {phase}: gguf={rates['gguf']:.0%} mlx={rates['mlx']:.0%}",
+                      gap <= 0.15, f"gap {gap:.0%} (must be <=15%)")
+            elif rates:
+                warn(f"{model} {phase}: only one arm present", str(rates))
 
     # 2. Identical prompt depth per tier — both arms must see the same bytes.
     # Grouped per model, not just per tier: once more than one model family is in
@@ -119,8 +145,17 @@ def main():
         if not rows:
             continue
         empty = [r for r in rows if not (r.get("answer_text") or "").strip()]
+        # Separate the two ways an answer can be missing. Hitting the token cap while
+        # still reasoning is a budget finding about the model, not a broken harness;
+        # an empty answer that finished normally is a real defect.
+        capped = [r for r in empty
+                  if (r.get("thinking_tokens") or 0) >= (r.get("n_predict_cap") or 0) - 2]
+        broken = [r for r in empty if r not in capped]
         check(f"{a}: {len(rows) - len(empty)}/{len(rows)} full-phase runs have an answer",
-              not empty, f"{len(empty)} empty")
+              not broken, f"{len(broken)} empty for reasons other than the token cap")
+        if capped:
+            warn(f"{a}: {len(capped)} full-phase runs hit the cap mid-reasoning",
+                 "raise FULL_N_PREDICT or lower reasoning_effort before grading these")
 
     # 4. Speculative rows must carry acceptance.
     print("\n4. Acceptance recorded for every speculative run")

@@ -222,7 +222,7 @@
     <header>
       <h1>Local LLM Benchmark Suite Dashboard</h1>
       <p class="meta-subtitle">
-        Speed sweep: 400 runs · full-length: 30 runs · 
+        Speed sweep: 553 runs · full-length: 37 runs · 
         temp 0.6, seed 42, ctx 16384
       </p>
     </header>
@@ -291,6 +291,86 @@
       </div>
 
       <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (Q4_K_M (ggml-org))</div>
+        <div class="card-stat">14.8 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.13x speedup vs off) (49% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (UD-Q4_K_XL)</div>
+        <div class="card-stat">12.1 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (0.89x speedup vs off) (52% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>12288 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (UD-Q5_K_XL)</div>
+        <div class="card-stat">10.7 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (0.88x speedup vs off) (50% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (Q6_K)</div>
+        <div class="card-stat">10.5 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (0.96x speedup vs off) (49% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (UD-Q6_K_XL)</div>
+        <div class="card-stat">11.8 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.17x speedup vs off) (49% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (Q8)</div>
+        <div class="card-stat">13.6 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.43x speedup vs off) (49% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>12288 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (Q8_0 (ggml-org))</div>
+        <div class="card-stat">13.5 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.43x speedup vs off) (51% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-primary">GGUF</span> Qwen 3.8 27B (UD-Q8_K_XL)</div>
+        <div class="card-stat">12.7 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Peak config: <strong>draft-n=2</strong> (1.44x speedup vs off) (52% accept)<br>
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
         <div class="card-title"><span class="badge badge-accent">MLX</span> qwen3.6-27b (MLX-8bit)</div>
         <div class="card-stat">15.8 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
         <div class="card-detail">
@@ -305,6 +385,42 @@
         <div class="card-detail">
           Quality: <strong>8.4/10</strong><br>
           Avg response size: <strong>7180 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.8 27B (MLX-4bit)</div>
+        <div class="card-stat">27.2 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.8 27B (MLX-6bit)</div>
+        <div class="card-stat">21.1 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.8 27B (MLX-8bit)</div>
+        <div class="card-stat">16.3 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="badge badge-accent">MLX</span> Qwen 3.8 27B (MLX-mxfp8)</div>
+        <div class="card-stat">17.1 <span style="font-size: 1rem; font-weight: normal; color: var(--text-muted);">tok/s</span></div>
+        <div class="card-detail">
+          Quality: <strong>ungraded</strong><br>
+          Avg response size: <strong>0 tokens</strong>
         </div>
       </div>
     </div>
@@ -673,6 +789,166 @@
           <td>745</td>
           <td>55997 ms</td>
         </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q4_K_M (ggml-org))</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>13.1</strong></td>
+          <td>±0.7</td>
+          <td>-</td>
+          <td>300</td>
+          <td>38060 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q4_K_M (ggml-org))</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>14.8</strong></td>
+          <td>±1.3</td>
+          <td>49%</td>
+          <td>291</td>
+          <td>39375 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q4_K_XL)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>13.6</strong></td>
+          <td>±0.8</td>
+          <td>-</td>
+          <td>280</td>
+          <td>40030 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q4_K_XL)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>12.1</strong></td>
+          <td>±1.3</td>
+          <td>52%</td>
+          <td>273</td>
+          <td>41380 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q5_K_XL)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>12.1</strong></td>
+          <td>±0.5</td>
+          <td>-</td>
+          <td>255</td>
+          <td>31809 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q5_K_XL)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>10.7</strong></td>
+          <td>±0.5</td>
+          <td>50%</td>
+          <td>243</td>
+          <td>1019 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q6_K)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>10.9</strong></td>
+          <td>±0.5</td>
+          <td>-</td>
+          <td>265</td>
+          <td>42333 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q6_K)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>10.5</strong></td>
+          <td>±0.8</td>
+          <td>49%</td>
+          <td>259</td>
+          <td>44041 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q6_K_XL)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>10.1</strong></td>
+          <td>±0.5</td>
+          <td>-</td>
+          <td>272</td>
+          <td>41701 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q6_K_XL)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>11.8</strong></td>
+          <td>±1.0</td>
+          <td>49%</td>
+          <td>262</td>
+          <td>43285 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>9.5</strong></td>
+          <td>±0.4</td>
+          <td>-</td>
+          <td>295</td>
+          <td>39039 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>13.6</strong></td>
+          <td>±1.5</td>
+          <td>49%</td>
+          <td>276</td>
+          <td>42079 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8_0 (ggml-org))</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>9.5</strong></td>
+          <td>±0.4</td>
+          <td>-</td>
+          <td>286</td>
+          <td>40644 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8_0 (ggml-org))</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>13.5</strong></td>
+          <td>±1.3</td>
+          <td>51%</td>
+          <td>267</td>
+          <td>42555 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q8_K_XL)</strong></td>
+          <td><span class="badge badge-primary">off</span></td>
+          <td><strong>8.9</strong></td>
+          <td>±0.3</td>
+          <td>-</td>
+          <td>289</td>
+          <td>40168 ms</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q8_K_XL)</strong></td>
+          <td><span class="badge badge-primary">mtp2</span></td>
+          <td><strong>12.7</strong></td>
+          <td>±1.4</td>
+          <td>52%</td>
+          <td>274</td>
+          <td>42477 ms</td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -740,6 +1016,70 @@
         </tr>
 
         <tr>
+          <td><strong>Qwen 3.8 27B (Q4_K_M (ggml-org))</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q4_K_XL)</strong></td>
+          <td><strong>12288</strong></td>
+          <td>12288</td>
+          <td>0</td>
+          <td>0/4</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q5_K_XL)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q6_K)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q6_K_XL)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8)</strong></td>
+          <td><strong>12288</strong></td>
+          <td>12287</td>
+          <td>0</td>
+          <td>0/3</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (Q8_0 (ggml-org))</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (UD-Q8_K_XL)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
           <td><strong>qwen3.6-27b (MLX-8bit)</strong></td>
           <td><strong>7037</strong></td>
           <td>4647</td>
@@ -754,6 +1094,38 @@
           <td>2628</td>
           <td>5/5</td>
         </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (MLX-4bit)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (MLX-6bit)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (MLX-8bit)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
+
+        <tr>
+          <td><strong>Qwen 3.8 27B (MLX-mxfp8)</strong></td>
+          <td><strong>0</strong></td>
+          <td>0</td>
+          <td>0</td>
+          <td>0/0</td>
+        </tr>
         </tbody>
       </table>
     </div>
@@ -762,7 +1134,7 @@
     <div class="card" style="margin-bottom: 40px;">
       <div class="card-detail">
         <p style="margin: 0; font-size: 1rem;">
-          🔍 Out of compared runs, <strong>316/500</strong> speculative decoding runs diverged from the MTP-off baseline under a fixed seed.
+          🔍 Out of compared runs, <strong>410/655</strong> speculative decoding runs diverged from the MTP-off baseline under a fixed seed.
         </p>
       </div>
     </div>

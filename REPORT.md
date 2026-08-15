@@ -1,6 +1,6 @@
 # Local LLM Benchmarks — Multi-Model Analysis
 
-_Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
+_Speed sweep: 553 runs · full-length: 37 runs · temp 0.6, seed 42, ctx 16384._
 
 ## TL;DR
 
@@ -10,8 +10,20 @@ _Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
 - **Qwen 3.6 35B A3B (Q5)** — peak **76.2 tok/s** at draft-n=2 (1.27x vs off) (67% accept); quality ungraded; ~7612 tok/answer.
 - **Qwen 3.6 35B A3B (Q6_K)** — peak **70.5 tok/s** at draft-n=1 (1.24x vs off) (78% accept); quality ungraded; ~6782 tok/answer.
 - **Qwen 3.6 35B A3B (Q8)** — peak **51.6 tok/s** at draft-n=1 (1.16x vs off) (79% accept); quality 7.2/10; ~7780 tok/answer.
+- **Qwen 3.8 27B (Q4_K_M (ggml-org))** — peak **14.8 tok/s** at draft-n=2 (1.13x vs off) (49% accept); quality ungraded; ~0 tok/answer.
+- **Qwen 3.8 27B (UD-Q4_K_XL)** — peak **12.1 tok/s** at draft-n=2 (0.89x vs off) (52% accept); quality ungraded; ~12288 tok/answer.
+- **Qwen 3.8 27B (UD-Q5_K_XL)** — peak **10.7 tok/s** at draft-n=2 (0.88x vs off) (50% accept); quality ungraded; ~0 tok/answer.
+- **Qwen 3.8 27B (Q6_K)** — peak **10.5 tok/s** at draft-n=2 (0.96x vs off) (49% accept); quality ungraded; ~0 tok/answer.
+- **Qwen 3.8 27B (UD-Q6_K_XL)** — peak **11.8 tok/s** at draft-n=2 (1.17x vs off) (49% accept); quality ungraded; ~0 tok/answer.
+- **Qwen 3.8 27B (Q8)** — peak **13.6 tok/s** at draft-n=2 (1.43x vs off) (49% accept); quality ungraded; ~12288 tok/answer.
+- **Qwen 3.8 27B (Q8_0 (ggml-org))** — peak **13.5 tok/s** at draft-n=2 (1.43x vs off) (51% accept); quality ungraded; ~0 tok/answer.
+- **Qwen 3.8 27B (UD-Q8_K_XL)** — peak **12.7 tok/s** at draft-n=2 (1.44x vs off) (52% accept); quality ungraded; ~0 tok/answer.
 - **qwen3.6-27b (MLX-8bit)** (MLX) — **15.8 tok/s**, quality 7.5/10, ~7037 tok/answer.
 - **Qwen 3.6 35B A3B (MLX-8bit)** (MLX) — **70.7 tok/s**, quality 8.4/10, ~7180 tok/answer.
+- **Qwen 3.8 27B (MLX-4bit)** (MLX) — **27.2 tok/s**, quality ungraded, ~0 tok/answer.
+- **Qwen 3.8 27B (MLX-6bit)** (MLX) — **21.1 tok/s**, quality ungraded, ~0 tok/answer.
+- **Qwen 3.8 27B (MLX-8bit)** (MLX) — **16.3 tok/s**, quality ungraded, ~0 tok/answer.
+- **Qwen 3.8 27B (MLX-mxfp8)** (MLX) — **17.1 tok/s**, quality ungraded, ~0 tok/answer.
 
 ## Charts
 
@@ -67,6 +79,22 @@ _Speed sweep: 400 runs · full-length: 30 runs · temp 0.6, seed 42, ctx 16384._
 | Qwen 3.6 35B A3B (Q8) | mtp2 | 50.3 | 13.2 | 67 | 753 | 55781 |
 | Qwen 3.6 35B A3B (Q8) | mtp3 | 47.1 | 13.0 | 58 | 753 | 55861 |
 | Qwen 3.6 35B A3B (Q8) | mtp4 | 42.5 | 11.8 | 49 | 745 | 55997 |
+| Qwen 3.8 27B (Q4_K_M (ggml-org)) | off | 13.1 | 0.7 | - | 300 | 38060 |
+| Qwen 3.8 27B (Q4_K_M (ggml-org)) | mtp2 | 14.8 | 1.3 | 49 | 291 | 39375 |
+| Qwen 3.8 27B (UD-Q4_K_XL) | off | 13.6 | 0.8 | - | 280 | 40030 |
+| Qwen 3.8 27B (UD-Q4_K_XL) | mtp2 | 12.1 | 1.3 | 52 | 273 | 41380 |
+| Qwen 3.8 27B (UD-Q5_K_XL) | off | 12.1 | 0.5 | - | 255 | 31809 |
+| Qwen 3.8 27B (UD-Q5_K_XL) | mtp2 | 10.7 | 0.5 | 50 | 243 | 1019 |
+| Qwen 3.8 27B (Q6_K) | off | 10.9 | 0.5 | - | 265 | 42333 |
+| Qwen 3.8 27B (Q6_K) | mtp2 | 10.5 | 0.8 | 49 | 259 | 44041 |
+| Qwen 3.8 27B (UD-Q6_K_XL) | off | 10.1 | 0.5 | - | 272 | 41701 |
+| Qwen 3.8 27B (UD-Q6_K_XL) | mtp2 | 11.8 | 1.0 | 49 | 262 | 43285 |
+| Qwen 3.8 27B (Q8) | off | 9.5 | 0.4 | - | 295 | 39039 |
+| Qwen 3.8 27B (Q8) | mtp2 | 13.6 | 1.5 | 49 | 276 | 42079 |
+| Qwen 3.8 27B (Q8_0 (ggml-org)) | off | 9.5 | 0.4 | - | 286 | 40644 |
+| Qwen 3.8 27B (Q8_0 (ggml-org)) | mtp2 | 13.5 | 1.3 | 51 | 267 | 42555 |
+| Qwen 3.8 27B (UD-Q8_K_XL) | off | 8.9 | 0.3 | - | 289 | 40168 |
+| Qwen 3.8 27B (UD-Q8_K_XL) | mtp2 | 12.7 | 1.4 | 52 | 274 | 42477 |
 
 ## MLX by prompt depth and KV precision
 
@@ -122,6 +150,22 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 | Qwen 3.6 35B A3B (MLX-8bit) | shallow | fp16 | mtp3 | 69.2 | 2.6 | 65 | 846 | 291 | 40.9 |
 | Qwen 3.6 35B A3B (MLX-8bit) | shallow | fp16 | mtp4 | 64.0 | 3.2 | 54 | 845 | 302 | 41.0 |
 | Qwen 3.6 35B A3B (MLX-8bit) | shallow | fp16 | mtp5 | 58.1 | 3.4 | 46 | 845 | 310 | 41.1 |
+| Qwen 3.8 27B (MLX-4bit) | agent | fp16 | off | 15.9 | 0.5 | - | 433 | 53420 | 40.9 |
+| Qwen 3.8 27B (MLX-4bit) | agent | fp16 | mtp3 | 20.0 | 0.7 | 47 | 436 | 53038 | 40.9 |
+| Qwen 3.8 27B (MLX-4bit) | shallow | fp16 | off | 18.1 | 0.0 | - | 353 | 1407 | 40.9 |
+| Qwen 3.8 27B (MLX-4bit) | shallow | fp16 | mtp3 | 27.2 | 1.1 | 56 | 392 | 715 | 40.9 |
+| Qwen 3.8 27B (MLX-6bit) | agent | fp16 | off | 11.9 | 0.0 | - | 410 | 56327 | 40.9 |
+| Qwen 3.8 27B (MLX-6bit) | agent | fp16 | mtp3 | 16.6 | 0.8 | 49 | 405 | 57144 | 40.9 |
+| Qwen 3.8 27B (MLX-6bit) | shallow | fp16 | off | 12.9 | 0.0 | - | 317 | 4826 | 40.9 |
+| Qwen 3.8 27B (MLX-6bit) | shallow | fp16 | mtp3 | 21.1 | 0.9 | 57 | 362 | 786 | 40.9 |
+| Qwen 3.8 27B (MLX-8bit) | agent | fp16 | off | 9.4 | 0.0 | - | 412 | 56047 | 40.9 |
+| Qwen 3.8 27B (MLX-8bit) | agent | fp16 | mtp3 | 13.6 | 0.5 | 49 | 415 | 55788 | 40.9 |
+| Qwen 3.8 27B (MLX-8bit) | shallow | fp16 | off | 9.8 | 0.2 | - | 299 | 1141 | 35.0 |
+| Qwen 3.8 27B (MLX-8bit) | shallow | fp16 | mtp3 | 16.3 | 0.7 | 55 | 358 | 822 | 35.6 |
+| Qwen 3.8 27B (MLX-mxfp8) | agent | fp16 | off | 9.5 | 0.0 | - | 410 | 56419 | 40.9 |
+| Qwen 3.8 27B (MLX-mxfp8) | agent | fp16 | mtp3 | 13.8 | 0.6 | 49 | 406 | 57013 | 40.9 |
+| Qwen 3.8 27B (MLX-mxfp8) | shallow | fp16 | off | 10.1 | 0.0 | - | 311 | 2761 | 40.9 |
+| Qwen 3.8 27B (MLX-mxfp8) | shallow | fp16 | mtp3 | 17.1 | 0.5 | 59 | 359 | 819 | 40.9 |
 
 ## Full-length output (8192 cap, off config)
 
@@ -133,14 +177,26 @@ _Decode rate at ~200 tok (`shallow`) does not predict the agent loop, which send
 | Qwen 3.6 35B A3B (Q5) | 7612 | 5517 | 2091 | 5/5 |
 | Qwen 3.6 35B A3B (Q6_K) | 6782 | 4267 | 2511 | 5/5 |
 | Qwen 3.6 35B A3B (Q8) | 7780 | 5029 | 2747 | 5/5 |
+| Qwen 3.8 27B (Q4_K_M (ggml-org)) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (UD-Q4_K_XL) | 12288 | 12288 | 0 | 0/4 |
+| Qwen 3.8 27B (UD-Q5_K_XL) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (Q6_K) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (UD-Q6_K_XL) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (Q8) | 12288 | 12287 | 0 | 0/3 |
+| Qwen 3.8 27B (Q8_0 (ggml-org)) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (UD-Q8_K_XL) | 0 | 0 | 0 | 0/0 |
 | qwen3.6-27b (MLX-8bit) | 7037 | 4647 | 2386 | 5/5 |
 | Qwen 3.6 35B A3B (MLX-8bit) | 7180 | 4546 | 2628 | 5/5 |
+| Qwen 3.8 27B (MLX-4bit) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (MLX-6bit) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (MLX-8bit) | 0 | 0 | 0 | 0/0 |
+| Qwen 3.8 27B (MLX-mxfp8) | 0 | 0 | 0 | 0/0 |
 
 ## Output determinism (MTP correctness probe, #23302)
 
-- llama.cpp: 212/320 diverged · MLX: 104/180 diverged
+- llama.cpp: 226/395 diverged · MLX: 184/260 diverged
 
-- 316/500 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
+- 410/655 MTP runs produced a different output than their MTP-off baseline (fixed seed). 0 = MTP is output-preserving on this build; >0 flags the known determinism bug.
 
 ## Warm-cache TTFT (multi-turn session at agent depth)
 
@@ -152,6 +208,8 @@ _The deciding measurement. An agent loop re-sends a large stable preamble every 
 | qwen3.6-27b (MLX-8bit) | mlx | 55.4 s | **55.95 s** | -1% |
 | Qwen 3.6 35B A3B (Q8) | gguf | 24.9 s | **0.57 s** | 98% |
 | Qwen 3.6 35B A3B (MLX-8bit) | mlx | 14.1 s | **12.74 s** | 10% |
+| Qwen 3.8 27B (Q8) | gguf | 76.9 s | **1.50 s** | 98% |
+| Qwen 3.8 27B (MLX-8bit) | mlx | 84.5 s | **1.28 s** | 98% |
 
 ## Append-only continuation (MLX)
 
@@ -161,6 +219,7 @@ _mlx_vlm.server re-renders the chat template each request, which forces a cache 
 |---|---|---|---|---|
 | qwen3.6-27b (MLX-8bit) | 55.83 s | **0.49 s** | 115x | NO (see notes) |
 | Qwen 3.6 35B A3B (MLX-8bit) | 12.63 s | **0.14 s** | 87x | yes |
+| Qwen 3.8 27B (MLX-8bit) | 56.64 s | **0.47 s** | 119x | NO (see notes) |
 
 ## Concurrency (shallow prompts, aggregate chars/s | mean TTFT)
 
@@ -181,6 +240,25 @@ _`gguf-mtp` is `-np 1` + MTP (requests queue; what llm-serve runs). `gguf-batch`
 | mlx | 254 · 0.3s | 254 · 0.5s | 272 · 0.7s | 277 · 1.0s | 284 · 1.5s | 301 · 1.9s | 311 · 12.2s |
 | gguf-mtp | 235 · 0.3s | 263 · 4.0s | 274 · 7.8s | 281 · 11.3s | 277 · 18.7s | 281 · 26.0s | 283 · 33.6s |
 | gguf-batch | 198 · 0.3s | 318 · 0.5s | 363 · 0.6s | 410 · 0.8s | 420 · 1.3s | 451 · 1.5s | 411 · 2.0s |
+
+## Quant comparison — Qwen 3.8 27B (agent depth, ~23k tokens)
+
+| Runtime | Quant | Size | Decode tok/s | Best | MTP accept | Agreement (jaccard) | Prefix |
+|---|---|---:|---:|---:|---:|---:|---:|
+| MLX | `mlx4` | 16.1 GB | 18.0 | 21.3 | 47% | — | — |
+| MLX | `mlx6` | 22.8 GB | 14.3 | 18.0 | 49% | — | — |
+| llama.cpp | `q4_ggml` | — | 13.1 | 14.9 | 50% | — | — |
+| llama.cpp | `q4_ud` | — | 12.0 | 12.8 | 50% | — | — |
+| MLX | `mxfp8` | — | 11.7 | 14.5 | 49% | — | — |
+| llama.cpp | `q5_ud` | — | 11.6 | 11.7 | — | — | — |
+| MLX | `mlx8` | 29.5 GB | 11.5 | 14.1 | 49% | — | — |
+| llama.cpp | `q8_ggml` | — | 10.8 | 13.7 | 51% | — | — |
+| llama.cpp | `q8` | 29.0 GB | 10.7 | 13.9 | 49% | — | — |
+| llama.cpp | `q6_ud` | — | 10.4 | 11.7 | 50% | — | — |
+| llama.cpp | `q6` | — | 10.1 | 10.6 | 49% | — | — |
+| llama.cpp | `q8_ud` | — | 10.1 | 12.6 | 52% | — | — |
+
+Agreement is measured against the reference quant on full-length answers: vocabulary overlap and the length of the common leading run. It is a text proxy for capability retention — the rigorous measurement is KL divergence against BF16, which needs logits the serving APIs do not expose.
 
 ## Machine drift control
 

@@ -108,48 +108,28 @@ MODELS_CONFIG = {
 # drafter proposes block_size - 1 tokens (speculative/dflash.py:140), so a block size of
 # 1 proposes nothing, emits a single token and stops. Valid depths start at 2; 0 is off.
 MLX_MODELS_CONFIG = {
-    "qwen3.6-35b-a3b": {
-        "name": "Qwen 3.6 35B A3B",
-        "reasoning": True,
-        "quants": {
-            "mlx8": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mlx-8bit"),
-        },
-        "quant_order": ["mlx8"],
-        "draft_model": os.path.expanduser("~/Models/qwen3.6-35b-a3b-mtp-bf16"),
-        "draft_kind": None,
-        # MoE: published acceptance is ~11% (one MTP layer cannot predict expert
-        # routing), so this arm confirms or refutes that rather than sweeping.
-        # See the 27B note above for why depths start at 2, not 1.
-        "draft_block_ns": [0, 2, 3],
-        "kv_bits_opts": [None, 8],
-        "tiers": ["shallow", "agent"],
-    },
-    # Qwen 3.8 27B MLX arm. Three targets from two uploaders, because MLX quant quality
-    # across sources is exactly as unmeasured as the GGUF side.
-    #
-    # The drafter is a caveat, not a footnote: mlx-community published no MTP head for
-    # 3.8 (they did for 3.6), so the only option is vvsotnikov's, and a drafter is only
-    # valid against the checkpoint it was distilled from. Acceptance is therefore
-    # expected to hold on the matching 8-bit target and may collapse on the other two.
-    # Phase 0 measures that rather than assuming it, and any target where acceptance
-    # collapses is benchmarked MTP-off and labelled, not quietly reported as slow.
+    # Qwen 3.6 35B A3B was retired from the MLX arm on 2026-08-15 and its weights
+    # deleted: llm-serve serves that model from GGUF, so the MLX build existed only
+    # for the 3.6 study, which is complete and written up in REPORT.md. Its
+    # measurements remain in results.jsonl.
     "qwen3.8-27b": {
         "name": "Qwen 3.8 27B",
         "reasoning": True,
         "quants": {
             "mlx8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-8bit"),
             "mlx6": os.path.expanduser("~/Models/qwen3.8-27b-mlx-6bit"),
-            "mxfp8": os.path.expanduser("~/Models/qwen3.8-27b-mlx-mxfp8"),
+            # mxfp8 was removed on 2026-08-15: it landed within 1.5% of mlx8 at a
+            # similar size, which is inside the machine-drift floor, so 8-bit float
+            # buys nothing over 8-bit integer here. Its rows stay in results.jsonl.
             # Added so the 4-bit tier is not GGUF-only: q4_ud and q4_ggml would otherwise
             # have had nothing to be compared against on the MLX side.
             "mlx4": os.path.expanduser("~/Models/qwen3.8-27b-mlx-4bit"),
         },
-        "quant_order": ["mlx8", "mlx6", "mxfp8", "mlx4"],
+        "quant_order": ["mlx8", "mlx6", "mlx4"],
         "draft_model": os.path.expanduser("~/Models/qwen3.8-27b-mtp-mlx-8bit"),
-        # bf16 alternate, kept as the acceptance control: on 3.6 the quantized MTP heads
-        # were reported to collapse acceptance, and this drafter is only available
-        # quantized from a third party, so the two are compared directly in Phase C.
-        "draft_model_alt": os.path.expanduser("~/Models/qwen3.8-27b-mtp-mlx-bf16"),
+        # The bf16 alternate drafter was deleted with the stage C sweep it existed for.
+        # The 8-bit head holds 47-49% acceptance across every target size, so the
+        # collapse seen with quantized MTP heads on 3.6 MoE models does not occur here.
         "draft_kind": None,           # auto-detected from the drafter's model_type
         "draft_block_ns": [0, 2, 3, 4, 5],
         "kv_bits_opts": [None, 8],
