@@ -51,33 +51,27 @@ MODELS_CONFIG = {
     # both smaller and closer to BF16, so the ggml-org quants are carried as a
     # cross-uploader control rather than assuming UD wins by construction.
     #
-    # `draft_sidecar`: every unsloth quant carries the MTP head inline (verified by
-    # reading the GGUF tensor names: blk.64.nextn.*), so they need no extra file. The
-    # ggml-org quants carry none and must be pointed at an `mtp-*.gguf` sidecar.
+    # The screen ran seven GGUF quants across both uploaders. MLX won every matched-size
+    # comparison — by 10% at 8-bit and 54-59% at 6- and 4-bit — so the six losing GGUFs
+    # were deleted on 2026-08-14 and only the Q8_0 reference is kept. It stays for two
+    # reasons: it is the quant `llm-serve` currently serves, and it is the baseline the
+    # quality and agreement measurements are scored against. Their speed rows survive in
+    # results.jsonl, including the finding those files were carried to establish:
+    #
+    #   llama.cpp's MTP speedup decays with quantization and goes net-negative below Q8
+    #   (q8 1.36x, q6_ud 1.14x, q6 0.95x, q4_ud 0.87x) at flat ~50% acceptance, because
+    #   the unsloth head is quantized inline with the model. ggml-org's q4_ggml held
+    #   1.11x at the same size because its head ships as a separate Q8 sidecar — the
+    #   same fixed-precision-drafter mechanism that gives MLX its advantage, confirmed
+    #   within one engine.
     "qwen3.8-27b": {
         "name": "Qwen 3.8 27B",
         "reasoning": True,
         "reasoning_format": "deepseek",
         "quants": {
-            "q4_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q4_K_XL.gguf"),
-            # The Q5 pair was dropped mid-sweep and its weights deleted. The shallow-tier
-            # q5_ud rows already recorded are kept in results.jsonl: they are real
-            # measurements and they are half the evidence for the MTP crossover below Q8.
-            "q6": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q6_K.gguf"),
-            "q6_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q6_K_XL.gguf"),
             "q8": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q8_0.gguf"),
-            "q8_ud": os.path.expanduser("~/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q8_K_XL.gguf"),
-            # Cross-uploader control (no inline MTP; see draft_sidecars below).
-            "q4_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/Qwen3.8-27B-Q4_K_M.gguf"),
-            "q8_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/Qwen3.8-27B-Q8_0.gguf"),
         },
-        # Screening order: the reference quant first, so an interrupted run still has
-        # the baseline every other quant is compared against.
-        "quant_order": ["q8", "q8_ud", "q8_ggml", "q6_ud", "q6", "q4_ud", "q4_ggml"],
-        "draft_sidecars": {
-            "q4_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
-            "q8_ggml": os.path.expanduser("~/Models/qwen3.8-27b-gguf-ggml/mtp-Qwen3.8-27B-Q8_0.gguf"),
-        },
+        "quant_order": ["q8"],
         "draft_ns": [0, 1, 2, 3, 4],
         # Qwen's own thinking-mode recommendation for 3.8 is temp 1.0 (3.6 used 0.6).
         # Applied to both runtimes so the arms stay comparable to each other, while

@@ -58,7 +58,7 @@ log "  exit=$?"
 # five times the work and spends most of it tuning quants that lose on quality anyway.
 # The Q5 pair was dropped mid-sweep and deleted; already-measured quants resume-skip.
 stage "A2/6  GGUF quant screen: remaining quants, mtp off + n=2, shallow+agent"
-for q in q4_ud q4_ggml q8 q8_ud q8_ggml q6_ud q6; do
+for q in q8; do
   log "  quant $q"
   python3 -u bench.py --model "$M" --quant "$q" --phase speed --draft-ns 0,2 \
     --tiers shallow,agent --kv-quant none >> "$L/qwen38_gguf.log" 2>&1
@@ -71,7 +71,7 @@ python3 bench.py --consolidate-only >> "$L/qwen38.log" 2>&1
 # Unbounded generations, MTP off, fp16 KV, shallow — the canonical config, matched
 # across arms so the judge compares answers rather than serving settings.
 stage "B3/6  full-length phase for quality grading (all candidates)"
-for q in q4_ud q4_ggml q8 q8_ud q8_ggml q6_ud q6; do
+for q in q8; do
   python3 -u bench.py --model "$M" --quant "$q" --phase full >> "$L/qwen38_gguf.log" 2>&1
 done
 $PY -u bench_mlx.py --model "$M" --phase full >> "$L/qwen38_mlx.log" 2>&1

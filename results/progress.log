@@ -2922,3 +2922,554 @@
 [15:42:38]   drafter kind resolved to 'mtp'
 [15:42:38]   drafter is compatible with the target
 [15:42:38] START [mlx_vlm/speed] qwen3.8-27b/mlx8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[15:44:27]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q1_model_selection: 1024 tok @ 9.5 tok/s, prefill 272@255 tok/s
+[15:44:27]   progress 1/20 (2 min elapsed, ETA 35 min)
+[15:46:14]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q2_coding: 1024 tok @ 9.7 tok/s, prefill 197@280 tok/s
+[15:46:14]   progress 2/20 (4 min elapsed, ETA 32 min)
+[15:48:00]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q3_architecture: 1024 tok @ 9.7 tok/s, prefill 236@326 tok/s
+[15:48:00]   progress 3/20 (5 min elapsed, ETA 30 min)
+[15:49:44]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 9.9 tok/s, prefill 278@329 tok/s
+[15:49:44]   progress 4/20 (7 min elapsed, ETA 28 min)
+[15:51:28]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q5_debugging: 1024 tok @ 9.9 tok/s, prefill 228@322 tok/s
+[15:51:28]   progress 5/20 (9 min elapsed, ETA 27 min)
+[15:52:28]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 17.2 tok/s, acc 62%, prefill 272@363 tok/s
+[15:52:28]   progress 6/20 (10 min elapsed, ETA 23 min)
+[15:53:31]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 16.5 tok/s, acc 56%, prefill 197@324 tok/s
+[15:53:31]   progress 7/20 (11 min elapsed, ETA 20 min)
+[15:54:39]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 15.3 tok/s, acc 48%, prefill 236@372 tok/s
+[15:54:39]   progress 8/20 (12 min elapsed, ETA 18 min)
+[15:55:45]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 15.7 tok/s, acc 51%, prefill 278@366 tok/s
+[15:55:45]   progress 9/20 (13 min elapsed, ETA 16 min)
+[15:56:47]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 16.7 tok/s, acc 58%, prefill 228@365 tok/s
+[15:56:47]   progress 10/20 (14 min elapsed, ETA 14 min)
+[15:59:32]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q1_model_selection: 1024 tok @ 9.4 tok/s, prefill 23054@412 tok/s
+[15:59:32]   progress 11/20 (17 min elapsed, ETA 14 min)
+[16:02:17]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q2_coding: 1024 tok @ 9.4 tok/s, prefill 23054@415 tok/s
+[16:02:17]   progress 12/20 (20 min elapsed, ETA 13 min)
+[16:05:02]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q3_architecture: 1024 tok @ 9.4 tok/s, prefill 23054@415 tok/s
+[16:05:02]   progress 13/20 (22 min elapsed, ETA 12 min)
+[16:07:47]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 9.4 tok/s, prefill 23053@415 tok/s
+[16:07:47]   progress 14/20 (25 min elapsed, ETA 11 min)
+[16:10:32]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q5_debugging: 1024 tok @ 9.4 tok/s, prefill 23053@415 tok/s
+[16:10:32]   progress 15/20 (28 min elapsed, ETA 9 min)
+[16:12:41]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 14.1 tok/s, acc 53%, prefill 23054@416 tok/s
+[16:12:41]   progress 16/20 (30 min elapsed, ETA 8 min)
+[16:14:50]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q2_coding: 1024 tok @ 13.8 tok/s, acc 51%, prefill 23054@415 tok/s
+[16:14:50]   progress 17/20 (32 min elapsed, ETA 6 min)
+[16:17:04]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 13.1 tok/s, acc 46%, prefill 23054@415 tok/s
+[16:17:04]   progress 18/20 (34 min elapsed, ETA 4 min)
+[16:19:19]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 12.9 tok/s, acc 44%, prefill 23053@415 tok/s
+[16:19:19]   progress 19/20 (37 min elapsed, ETA 2 min)
+[16:21:28]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 13.8 tok/s, acc 51%, prefill 23053@414 tok/s
+[16:21:28]   progress 20/20 (39 min elapsed, ETA 0 min)
+[16:21:28] DONE [mlx_vlm] qwen3.8-27b/mlx8 in 38.8 min
+[16:21:29] consolidated 967 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[16:21:29] loading target qwen3.8-27b/mlx6 from /Users/yash/Models/qwen3.8-27b-mlx-6bit ...
+[16:21:36] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[16:21:36]   drafter kind resolved to 'mtp'
+[16:21:36]   drafter is compatible with the target
+[16:21:36] START [mlx_vlm/speed] qwen3.8-27b/mlx6: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[16:23:19]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q1_model_selection: 1024 tok @ 12.8 tok/s, prefill 272@253 tok/s
+[16:23:19]   progress 1/20 (2 min elapsed, ETA 32 min)
+[16:24:39]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q2_coding: 1024 tok @ 12.9 tok/s, prefill 197@297 tok/s
+[16:24:39]   progress 2/20 (3 min elapsed, ETA 27 min)
+[16:25:59]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q3_architecture: 1024 tok @ 12.8 tok/s, prefill 236@343 tok/s
+[16:25:59]   progress 3/20 (4 min elapsed, ETA 25 min)
+[16:27:20]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 12.8 tok/s, prefill 278@339 tok/s
+[16:27:20]   progress 4/20 (6 min elapsed, ETA 23 min)
+[16:28:40]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q5_debugging: 1024 tok @ 12.8 tok/s, prefill 228@338 tok/s
+[16:28:40]   progress 5/20 (7 min elapsed, ETA 21 min)
+[16:29:27]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 22.1 tok/s, acc 63%, prefill 272@363 tok/s
+[16:29:27]   progress 6/20 (8 min elapsed, ETA 18 min)
+[16:30:17]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 21.1 tok/s, acc 57%, prefill 197@329 tok/s
+[16:30:17]   progress 7/20 (9 min elapsed, ETA 16 min)
+[16:31:09]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 19.7 tok/s, acc 49%, prefill 236@378 tok/s
+[16:31:09]   progress 8/20 (10 min elapsed, ETA 14 min)
+[16:32:00]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 20.5 tok/s, acc 54%, prefill 278@368 tok/s
+[16:32:00]   progress 9/20 (10 min elapsed, ETA 13 min)
+[16:32:47]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 22.0 tok/s, acc 62%, prefill 228@374 tok/s
+[16:32:47]   progress 10/20 (11 min elapsed, ETA 11 min)
+[16:35:10]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q1_model_selection: 1024 tok @ 11.9 tok/s, prefill 23054@406 tok/s
+[16:35:10]   progress 11/20 (14 min elapsed, ETA 11 min)
+[16:37:33]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q2_coding: 1024 tok @ 11.9 tok/s, prefill 23054@406 tok/s
+[16:37:33]   progress 12/20 (16 min elapsed, ETA 11 min)
+[16:39:55]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q3_architecture: 1024 tok @ 11.9 tok/s, prefill 23054@408 tok/s
+[16:39:55]   progress 13/20 (18 min elapsed, ETA 10 min)
+[16:42:18]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 11.9 tok/s, prefill 23053@409 tok/s
+[16:42:18]   progress 14/20 (21 min elapsed, ETA 9 min)
+[16:44:41]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q5_debugging: 1024 tok @ 11.9 tok/s, prefill 23053@408 tok/s
+[16:44:41]   progress 15/20 (23 min elapsed, ETA 8 min)
+[16:46:39]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 16.4 tok/s, acc 48%, prefill 23054@408 tok/s
+[16:46:39]   progress 16/20 (25 min elapsed, ETA 6 min)
+[16:48:34]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q2_coding: 1024 tok @ 17.9 tok/s, acc 57%, prefill 23054@400 tok/s
+[16:48:34]   progress 17/20 (27 min elapsed, ETA 5 min)
+[16:50:36]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 16.1 tok/s, acc 47%, prefill 23054@396 tok/s
+[16:50:36]   progress 18/20 (29 min elapsed, ETA 3 min)
+[16:52:41]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 15.5 tok/s, acc 43%, prefill 23053@391 tok/s
+[16:52:41]   progress 19/20 (31 min elapsed, ETA 2 min)
+[16:54:41]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 16.8 tok/s, acc 51%, prefill 23053@391 tok/s
+[16:54:41]   progress 20/20 (33 min elapsed, ETA 0 min)
+[16:54:41] DONE [mlx_vlm] qwen3.8-27b/mlx6 in 33.1 min
+[16:54:41] consolidated 987 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[16:54:41] loading target qwen3.8-27b/mxfp8 from /Users/yash/Models/qwen3.8-27b-mlx-mxfp8 ...
+[16:54:48] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[16:54:48]   drafter kind resolved to 'mtp'
+[16:54:48]   drafter is compatible with the target
+[16:54:48] START [mlx_vlm/speed] qwen3.8-27b/mxfp8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[16:56:41]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q1_model_selection: 1024 tok @ 10.1 tok/s, prefill 272@259 tok/s
+[16:56:41]   progress 1/20 (2 min elapsed, ETA 36 min)
+[16:58:23]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q2_coding: 1024 tok @ 10.1 tok/s, prefill 197@283 tok/s
+[16:58:23]   progress 2/20 (4 min elapsed, ETA 32 min)
+[17:00:05]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q3_architecture: 1024 tok @ 10.1 tok/s, prefill 236@331 tok/s
+[17:00:05]   progress 3/20 (5 min elapsed, ETA 30 min)
+[17:01:47]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 10.1 tok/s, prefill 278@328 tok/s
+[17:01:47]   progress 4/20 (7 min elapsed, ETA 28 min)
+[17:03:29]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q5_debugging: 1024 tok @ 10.1 tok/s, prefill 228@325 tok/s
+[17:03:29]   progress 5/20 (9 min elapsed, ETA 26 min)
+[17:04:28]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 17.4 tok/s, acc 61%, prefill 272@360 tok/s
+[17:04:28]   progress 6/20 (10 min elapsed, ETA 23 min)
+[17:05:30]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 16.8 tok/s, acc 57%, prefill 197@323 tok/s
+[17:05:30]   progress 7/20 (11 min elapsed, ETA 20 min)
+[17:06:29]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 17.4 tok/s, acc 60%, prefill 236@376 tok/s
+[17:06:29]   progress 8/20 (12 min elapsed, ETA 18 min)
+[17:07:33]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 16.4 tok/s, acc 53%, prefill 278@365 tok/s
+[17:07:33]   progress 9/20 (13 min elapsed, ETA 16 min)
+[17:08:32]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 17.6 tok/s, acc 62%, prefill 228@369 tok/s
+[17:08:32]   progress 10/20 (14 min elapsed, ETA 14 min)
+[17:11:15]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q1_model_selection: 1024 tok @ 9.5 tok/s, prefill 23054@410 tok/s
+[17:11:15]   progress 11/20 (16 min elapsed, ETA 13 min)
+[17:13:59]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q2_coding: 1024 tok @ 9.5 tok/s, prefill 23054@410 tok/s
+[17:13:59]   progress 12/20 (19 min elapsed, ETA 13 min)
+[17:16:43]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q3_architecture: 1024 tok @ 9.5 tok/s, prefill 23054@410 tok/s
+[17:16:43]   progress 13/20 (22 min elapsed, ETA 12 min)
+[17:19:27]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 9.5 tok/s, prefill 23053@410 tok/s
+[17:19:27]   progress 14/20 (25 min elapsed, ETA 11 min)
+[17:22:10]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q5_debugging: 1024 tok @ 9.5 tok/s, prefill 23053@410 tok/s
+[17:22:10]   progress 15/20 (27 min elapsed, ETA 9 min)
+[17:24:19]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 14.1 tok/s, acc 52%, prefill 23054@411 tok/s
+[17:24:19]   progress 16/20 (30 min elapsed, ETA 7 min)
+[17:26:27]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q2_coding: 1024 tok @ 14.5 tok/s, acc 55%, prefill 23054@406 tok/s
+[17:26:27]   progress 17/20 (32 min elapsed, ETA 6 min)
+[17:28:42]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 13.2 tok/s, acc 45%, prefill 23054@399 tok/s
+[17:28:42]   progress 18/20 (34 min elapsed, ETA 4 min)
+[17:30:59]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 13.0 tok/s, acc 43%, prefill 23053@396 tok/s
+[17:30:59]   progress 19/20 (36 min elapsed, ETA 2 min)
+[17:33:11]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 14.0 tok/s, acc 51%, prefill 23053@393 tok/s
+[17:33:11]   progress 20/20 (38 min elapsed, ETA 0 min)
+[17:33:11] DONE [mlx_vlm] qwen3.8-27b/mxfp8 in 38.4 min
+[17:33:11] consolidated 1007 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[17:33:11] loading target qwen3.8-27b/mlx4 from /Users/yash/Models/qwen3.8-27b-mlx-4bit ...
+[17:33:15] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[17:33:15]   drafter kind resolved to 'mtp'
+[17:33:15]   drafter is compatible with the target
+[17:33:15] START [mlx_vlm/speed] qwen3.8-27b/mlx4: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[17:34:16]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q1_model_selection: 1024 tok @ 18.0 tok/s, prefill 272@288 tok/s
+[17:34:16]   progress 1/20 (1 min elapsed, ETA 19 min)
+[17:35:14]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q2_coding: 1024 tok @ 18.1 tok/s, prefill 197@326 tok/s
+[17:35:14]   progress 2/20 (2 min elapsed, ETA 18 min)
+[17:36:11]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q3_architecture: 1024 tok @ 18.0 tok/s, prefill 236@381 tok/s
+[17:36:11]   progress 3/20 (3 min elapsed, ETA 17 min)
+[17:37:09]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 18.0 tok/s, prefill 278@376 tok/s
+[17:37:09]   progress 4/20 (4 min elapsed, ETA 16 min)
+[17:38:06]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q5_debugging: 1024 tok @ 18.0 tok/s, prefill 228@372 tok/s
+[17:38:06]   progress 5/20 (5 min elapsed, ETA 15 min)
+[17:38:43]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 28.4 tok/s, acc 61%, prefill 272@394 tok/s
+[17:38:43]   progress 6/20 (5 min elapsed, ETA 13 min)
+[17:39:21]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 27.0 tok/s, acc 55%, prefill 197@351 tok/s
+[17:39:21]   progress 7/20 (6 min elapsed, ETA 11 min)
+[17:40:01]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 25.9 tok/s, acc 51%, prefill 236@411 tok/s
+[17:40:01]   progress 8/20 (7 min elapsed, ETA 10 min)
+[17:40:41]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 26.0 tok/s, acc 51%, prefill 278@401 tok/s
+[17:40:41]   progress 9/20 (7 min elapsed, ETA 9 min)
+[17:41:18]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 28.4 tok/s, acc 62%, prefill 228@401 tok/s
+[17:41:18]   progress 10/20 (8 min elapsed, ETA 8 min)
+[17:43:14]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q1_model_selection: 1024 tok @ 16.2 tok/s, prefill 23054@438 tok/s
+[17:43:14]   progress 11/20 (10 min elapsed, ETA 8 min)
+[17:45:10]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q2_coding: 1024 tok @ 16.0 tok/s, prefill 23054@439 tok/s
+[17:45:10]   progress 12/20 (12 min elapsed, ETA 8 min)
+[17:47:09]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q3_architecture: 1024 tok @ 15.7 tok/s, prefill 23054@434 tok/s
+[17:47:09]   progress 13/20 (14 min elapsed, ETA 7 min)
+[17:49:13]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 14.8 tok/s, prefill 23053@420 tok/s
+[17:49:13]   progress 14/20 (16 min elapsed, ETA 7 min)
+[17:51:18]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q5_debugging: 1024 tok @ 15.2 tok/s, prefill 23053@400 tok/s
+[17:51:18]   progress 15/20 (18 min elapsed, ETA 6 min)
+[17:53:00]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 20.8 tok/s, acc 52%, prefill 23054@434 tok/s
+[17:53:00]   progress 16/20 (20 min elapsed, ETA 5 min)
+[17:54:47]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q2_coding: 1024 tok @ 19.1 tok/s, acc 43%, prefill 23054@432 tok/s
+[17:54:47]   progress 17/20 (22 min elapsed, ETA 4 min)
+[17:56:33]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 19.6 tok/s, acc 46%, prefill 23054@432 tok/s
+[17:56:33]   progress 18/20 (23 min elapsed, ETA 3 min)
+[17:58:20]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 19.2 tok/s, acc 43%, prefill 23053@433 tok/s
+[17:58:20]   progress 19/20 (25 min elapsed, ETA 1 min)
+[18:00:04]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 20.2 tok/s, acc 49%, prefill 23053@433 tok/s
+[18:00:04]   progress 20/20 (27 min elapsed, ETA 0 min)
+[18:00:04] DONE [mlx_vlm] qwen3.8-27b/mlx4 in 26.8 min
+[18:00:04] consolidated 1027 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[18:00:04] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q4_ud'] draft_ns=[0, 2] cap=1024)
+[18:00:04] launch [speed] qwen3.8-27b q4_ud off pass1 tier=shallow kv=fp16 ...
+[18:01:20]   ok qwen3.8-27b q4_ud off p1 q1_model_selection: 1024 tok @ 14.4 tok/s, ttft 1149ms
+[18:01:20]   progress 1/10 (1 min elapsed, ETA 11 min)
+[18:02:32]   ok qwen3.8-27b q4_ud off p1 q2_coding: 1024 tok @ 14.4 tok/s, ttft 791ms
+[18:02:32]   progress 2/10 (2 min elapsed, ETA 10 min)
+[18:03:44]   ok qwen3.8-27b q4_ud off p1 q3_architecture: 1024 tok @ 14.4 tok/s, ttft 811ms
+[18:03:44]   progress 3/10 (4 min elapsed, ETA 9 min)
+[18:04:56]   ok qwen3.8-27b q4_ud off p1 q4_finance_reasoning: 1024 tok @ 14.4 tok/s, ttft 1090ms
+[18:04:56]   progress 4/10 (5 min elapsed, ETA 7 min)
+[18:06:08]   ok qwen3.8-27b q4_ud off p1 q5_debugging: 1024 tok @ 14.4 tok/s, ttft 801ms
+[18:06:08]   progress 5/10 (6 min elapsed, ETA 6 min)
+[18:06:09] launch [speed] qwen3.8-27b q4_ud mtp2 pass1 tier=shallow kv=fp16 ...
+[18:07:24]   ok qwen3.8-27b q4_ud mtp2 p1 q1_model_selection: 1024 tok @ 14.1 tok/s, acc 60%, ttft 1119ms
+[18:07:24]   progress 6/10 (7 min elapsed, ETA 5 min)
+[18:08:39]   ok qwen3.8-27b q4_ud mtp2 p1 q2_coding: 1024 tok @ 13.8 tok/s, acc 58%, ttft 803ms
+[18:08:39]   progress 7/10 (9 min elapsed, ETA 4 min)
+[18:09:57]   ok qwen3.8-27b q4_ud mtp2 p1 q3_architecture: 1024 tok @ 13.3 tok/s, acc 56%, ttft 834ms
+[18:09:57]   progress 8/10 (10 min elapsed, ETA 2 min)
+[18:11:26]   ok qwen3.8-27b q4_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 11.6 tok/s, acc 43%, ttft 1111ms
+[18:11:26]   progress 9/10 (11 min elapsed, ETA 1 min)
+[18:12:48]   ok qwen3.8-27b q4_ud mtp2 p1 q5_debugging: 1024 tok @ 12.7 tok/s, acc 53%, ttft 827ms
+[18:12:48]   progress 10/10 (13 min elapsed, ETA 0 min)
+[18:12:48] DONE run in 12.7 min
+[18:12:48] consolidated 1037 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[18:12:48] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q4_ud'] draft_ns=[0, 2] cap=1024)
+[18:12:48] launch [speed] qwen3.8-27b q4_ud off pass1 tier=agent kv=fp16 ...
+[18:15:29]   ok qwen3.8-27b q4_ud off p1 q1_model_selection: 1024 tok @ 12.8 tok/s, ttft 79504ms
+[18:15:29]   progress 1/10 (3 min elapsed, ETA 24 min)
+[18:18:08]   ok qwen3.8-27b q4_ud off p1 q2_coding: 1024 tok @ 12.8 tok/s, ttft 79042ms
+[18:18:08]   progress 2/10 (5 min elapsed, ETA 21 min)
+[18:20:47]   ok qwen3.8-27b q4_ud off p1 q3_architecture: 1024 tok @ 12.8 tok/s, ttft 79012ms
+[18:20:47]   progress 3/10 (8 min elapsed, ETA 19 min)
+[18:23:26]   ok qwen3.8-27b q4_ud off p1 q4_finance_reasoning: 1024 tok @ 12.8 tok/s, ttft 79026ms
+[18:23:26]   progress 4/10 (11 min elapsed, ETA 16 min)
+[18:26:05]   ok qwen3.8-27b q4_ud off p1 q5_debugging: 1024 tok @ 12.8 tok/s, ttft 79072ms
+[18:26:05]   progress 5/10 (13 min elapsed, ETA 13 min)
+[18:26:05] launch [speed] qwen3.8-27b q4_ud mtp2 pass1 tier=agent kv=fp16 ...
+[18:28:54]   ok qwen3.8-27b q4_ud mtp2 p1 q1_model_selection: 1024 tok @ 12.0 tok/s, acc 56%, ttft 81371ms
+[18:28:54]   progress 6/10 (16 min elapsed, ETA 11 min)
+[18:31:45]   ok qwen3.8-27b q4_ud mtp2 p1 q2_coding: 1024 tok @ 11.4 tok/s, acc 51%, ttft 81384ms
+[18:31:45]   progress 7/10 (19 min elapsed, ETA 8 min)
+[18:34:37]   ok qwen3.8-27b q4_ud mtp2 p1 q3_architecture: 1024 tok @ 11.3 tok/s, acc 50%, ttft 81325ms
+[18:34:37]   progress 8/10 (22 min elapsed, ETA 5 min)
+[18:37:36]   ok qwen3.8-27b q4_ud mtp2 p1 q4_finance_reasoning: 1024 tok @ 10.4 tok/s, acc 45%, ttft 81377ms
+[18:37:36]   progress 9/10 (25 min elapsed, ETA 3 min)
+[18:40:38]   ok qwen3.8-27b q4_ud mtp2 p1 q5_debugging: 1024 tok @ 10.5 tok/s, acc 47%, ttft 83644ms
+[18:40:38]   progress 10/10 (28 min elapsed, ETA 0 min)
+[18:40:38] DONE run in 27.8 min
+[18:40:38] consolidated 1047 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[18:40:38] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q4_ggml'] draft_ns=[0, 2] cap=1024)
+[18:40:38] launch [speed] qwen3.8-27b q4_ggml off pass1 tier=shallow kv=fp16 ...
+[18:41:58]   ok qwen3.8-27b q4_ggml off p1 q1_model_selection: 1024 tok @ 13.8 tok/s, ttft 1005ms
+[18:41:58]   progress 1/10 (1 min elapsed, ETA 12 min)
+[18:43:13]   ok qwen3.8-27b q4_ggml off p1 q2_coding: 1024 tok @ 13.8 tok/s, ttft 730ms
+[18:43:13]   progress 2/10 (3 min elapsed, ETA 10 min)
+[18:44:27]   ok qwen3.8-27b q4_ggml off p1 q3_architecture: 1024 tok @ 13.9 tok/s, ttft 753ms
+[18:44:27]   progress 3/10 (4 min elapsed, ETA 9 min)
+[18:45:42]   ok qwen3.8-27b q4_ggml off p1 q4_finance_reasoning: 1024 tok @ 13.9 tok/s, ttft 1008ms
+[18:45:42]   progress 4/10 (5 min elapsed, ETA 8 min)
+[18:46:57]   ok qwen3.8-27b q4_ggml off p1 q5_debugging: 1024 tok @ 13.9 tok/s, ttft 747ms
+[18:46:57]   progress 5/10 (6 min elapsed, ETA 6 min)
+[18:46:57] launch [speed] qwen3.8-27b q4_ggml mtp2 pass1 tier=shallow kv=fp16 ...
+[18:48:00]   ok qwen3.8-27b q4_ggml mtp2 p1 q1_model_selection: 1024 tok @ 17.4 tok/s, acc 57%, ttft 1028ms
+[18:48:00]   progress 6/10 (7 min elapsed, ETA 5 min)
+[18:49:04]   ok qwen3.8-27b q4_ggml mtp2 p1 q2_coding: 1024 tok @ 16.1 tok/s, acc 49%, ttft 755ms
+[18:49:04]   progress 7/10 (8 min elapsed, ETA 4 min)
+[18:50:13]   ok qwen3.8-27b q4_ggml mtp2 p1 q3_architecture: 1024 tok @ 15.1 tok/s, acc 43%, ttft 777ms
+[18:50:13]   progress 8/10 (10 min elapsed, ETA 2 min)
+[18:51:22]   ok qwen3.8-27b q4_ggml mtp2 p1 q4_finance_reasoning: 1024 tok @ 15.0 tok/s, acc 42%, ttft 1036ms
+[18:51:22]   progress 9/10 (11 min elapsed, ETA 1 min)
+[18:52:27]   ok qwen3.8-27b q4_ggml mtp2 p1 q5_debugging: 1024 tok @ 16.0 tok/s, acc 48%, ttft 771ms
+[18:52:27]   progress 10/10 (12 min elapsed, ETA 0 min)
+[18:52:27] DONE run in 11.8 min
+[18:52:27] consolidated 1057 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[18:52:27] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q4_ggml'] draft_ns=[0, 2] cap=1024)
+[18:52:27] launch [speed] qwen3.8-27b q4_ggml off pass1 tier=agent kv=fp16 ...
+[18:55:07]   ok qwen3.8-27b q4_ggml off p1 q1_model_selection: 1024 tok @ 12.4 tok/s, ttft 75275ms
+[18:55:07]   progress 1/10 (3 min elapsed, ETA 24 min)
+[18:57:45]   ok qwen3.8-27b q4_ggml off p1 q2_coding: 1024 tok @ 12.4 tok/s, ttft 75262ms
+[18:57:45]   progress 2/10 (5 min elapsed, ETA 21 min)
+[19:00:23]   ok qwen3.8-27b q4_ggml off p1 q3_architecture: 1024 tok @ 12.4 tok/s, ttft 75306ms
+[19:00:23]   progress 3/10 (8 min elapsed, ETA 18 min)
+[19:03:01]   ok qwen3.8-27b q4_ggml off p1 q4_finance_reasoning: 1024 tok @ 12.4 tok/s, ttft 75260ms
+[19:03:01]   progress 4/10 (11 min elapsed, ETA 16 min)
+[19:05:38]   ok qwen3.8-27b q4_ggml off p1 q5_debugging: 1024 tok @ 12.4 tok/s, ttft 75257ms
+[19:05:38]   progress 5/10 (13 min elapsed, ETA 13 min)
+[19:05:39] launch [speed] qwen3.8-27b q4_ggml mtp2 pass1 tier=agent kv=fp16 ...
+[19:08:07]   ok qwen3.8-27b q4_ggml mtp2 p1 q1_model_selection: 1024 tok @ 14.9 tok/s, acc 58%, ttft 77873ms
+[19:08:07]   progress 6/10 (16 min elapsed, ETA 10 min)
+[19:10:39]   ok qwen3.8-27b q4_ggml mtp2 p1 q2_coding: 1024 tok @ 13.9 tok/s, acc 50%, ttft 77934ms
+[19:10:39]   progress 7/10 (18 min elapsed, ETA 8 min)
+[19:13:12]   ok qwen3.8-27b q4_ggml mtp2 p1 q3_architecture: 1024 tok @ 13.6 tok/s, acc 49%, ttft 77864ms
+[19:13:12]   progress 8/10 (21 min elapsed, ETA 5 min)
+[19:15:50]   ok qwen3.8-27b q4_ggml mtp2 p1 q4_finance_reasoning: 1024 tok @ 12.7 tok/s, acc 42%, ttft 77847ms
+[19:15:50]   progress 9/10 (23 min elapsed, ETA 3 min)
+[19:18:24]   ok qwen3.8-27b q4_ggml mtp2 p1 q5_debugging: 1024 tok @ 13.6 tok/s, acc 48%, ttft 77862ms
+[19:18:24]   progress 10/10 (26 min elapsed, ETA 0 min)
+[19:18:24] DONE run in 25.9 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8 off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8 mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8 off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8 mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8_ud'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8_ud off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8_ud mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8_ud'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8_ud off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8_ud mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8_ggml'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8_ggml off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8_ggml mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:24] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8_ggml'] draft_ns=[0, 2] cap=1024)
+[19:18:24] skip [speed] qwen3.8-27b q8_ggml off pass1 (already done)
+[19:18:24] skip [speed] qwen3.8-27b q8_ggml mtp2 pass1 (already done)
+[19:18:24] DONE run in 0.0 min
+[19:18:24] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q6_ud'] draft_ns=[0, 2] cap=1024)
+[19:18:25] skip [speed] qwen3.8-27b q6_ud off pass1 (already done)
+[19:18:25] skip [speed] qwen3.8-27b q6_ud mtp2 pass1 (already done)
+[19:18:25] DONE run in 0.0 min
+[19:18:25] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q6_ud'] draft_ns=[0, 2] cap=1024)
+[19:18:25] skip [speed] qwen3.8-27b q6_ud off pass1 (already done)
+[19:18:25] skip [speed] qwen3.8-27b q6_ud mtp2 pass1 (already done)
+[19:18:25] DONE run in 0.0 min
+[19:18:25] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q6'] draft_ns=[0, 2] cap=1024)
+[19:18:25] skip [speed] qwen3.8-27b q6 off pass1 (already done)
+[19:18:25] skip [speed] qwen3.8-27b q6 mtp2 pass1 (already done)
+[19:18:25] DONE run in 0.0 min
+[19:18:25] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q6'] draft_ns=[0, 2] cap=1024)
+[19:18:25] skip [speed] qwen3.8-27b q6 off pass1 (already done)
+[19:18:25] skip [speed] qwen3.8-27b q6 mtp2 pass1 (already done)
+[19:18:25] DONE run in 0.0 min
+[19:18:25] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] consolidated 1067 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[19:18:25] START model=qwen3.8-27b phase=full tier=shallow kv=fp16 ctx=16384: 5 generations (passes=[1] quants=['q4_ud'] draft_ns=[0] cap=12288)
+[19:18:25] launch [full] qwen3.8-27b q4_ud off pass1 tier=shallow kv=fp16 ...
+[19:32:49]   ok qwen3.8-27b q4_ud off p1 q1_model_selection: 12288 tok @ 14.3 tok/s, ttft 1065ms
+[19:32:49]   progress 1/5 (14 min elapsed, ETA 58 min)
+[19:47:10]   ok qwen3.8-27b q4_ud off p1 q2_coding: 12288 tok @ 14.3 tok/s, ttft 835ms
+[19:47:10]   progress 2/5 (29 min elapsed, ETA 43 min)
+[20:01:32]   ok qwen3.8-27b q4_ud off p1 q3_architecture: 12288 tok @ 14.3 tok/s, ttft 865ms
+[20:01:32]   progress 3/5 (43 min elapsed, ETA 29 min)
+[20:15:55]   ok qwen3.8-27b q4_ud off p1 q4_finance_reasoning: 12288 tok @ 14.3 tok/s, ttft 1152ms
+[20:15:55]   progress 4/5 (57 min elapsed, ETA 14 min)
+[20:17:08] loading target qwen3.8-27b/mlx8 from /Users/yash/Models/qwen3.8-27b-mlx-8bit ...
+[20:17:11] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[20:17:11]   drafter kind resolved to 'mtp'
+[20:17:11]   drafter is compatible with the target
+[20:17:12] START [mlx_vlm/speed] qwen3.8-27b/mlx8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[20:18:57]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q1_model_selection: 1024 tok @ 9.8 tok/s, prefill 272@257 tok/s
+[20:18:57]   progress 1/20 (2 min elapsed, ETA 33 min)
+[20:20:41]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q2_coding: 1024 tok @ 9.9 tok/s, prefill 197@282 tok/s
+[20:20:41]   progress 2/20 (3 min elapsed, ETA 31 min)
+[20:22:25]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q3_architecture: 1024 tok @ 9.9 tok/s, prefill 236@329 tok/s
+[20:22:25]   progress 3/20 (5 min elapsed, ETA 30 min)
+[20:24:09]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 9.9 tok/s, prefill 278@330 tok/s
+[20:24:09]   progress 4/20 (7 min elapsed, ETA 28 min)
+[20:25:53]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow off kvfp16 q5_debugging: 1024 tok @ 9.9 tok/s, prefill 228@322 tok/s
+[20:25:53]   progress 5/20 (9 min elapsed, ETA 26 min)
+[20:26:53]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 17.2 tok/s, acc 62%, prefill 272@363 tok/s
+[20:26:53]   progress 6/20 (10 min elapsed, ETA 23 min)
+[20:27:56]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 16.5 tok/s, acc 56%, prefill 197@324 tok/s
+[20:27:56]   progress 7/20 (11 min elapsed, ETA 20 min)
+[20:29:04]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 15.2 tok/s, acc 48%, prefill 236@374 tok/s
+[20:29:04]   progress 8/20 (12 min elapsed, ETA 18 min)
+[20:30:10]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 15.7 tok/s, acc 51%, prefill 278@367 tok/s
+[20:30:10]   progress 9/20 (13 min elapsed, ETA 16 min)
+[20:31:12]   ok [mlx_vlm] qwen3.8-27b mlx8 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 16.7 tok/s, acc 58%, prefill 228@366 tok/s
+[20:31:12]   progress 10/20 (14 min elapsed, ETA 14 min)
+[20:33:57]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q1_model_selection: 1024 tok @ 9.4 tok/s, prefill 23054@411 tok/s
+[20:33:57]   progress 11/20 (17 min elapsed, ETA 14 min)
+[20:36:42]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q2_coding: 1024 tok @ 9.4 tok/s, prefill 23054@411 tok/s
+[20:36:42]   progress 12/20 (20 min elapsed, ETA 13 min)
+[20:39:27]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q3_architecture: 1024 tok @ 9.4 tok/s, prefill 23054@410 tok/s
+[20:39:27]   progress 13/20 (22 min elapsed, ETA 12 min)
+[20:42:13]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 9.4 tok/s, prefill 23053@409 tok/s
+[20:42:13]   progress 14/20 (25 min elapsed, ETA 11 min)
+[20:44:58]   ok [mlx_vlm] qwen3.8-27b mlx8 agent off kvfp16 q5_debugging: 1024 tok @ 9.4 tok/s, prefill 23053@410 tok/s
+[20:44:58]   progress 15/20 (28 min elapsed, ETA 9 min)
+[20:47:07]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 14.1 tok/s, acc 53%, prefill 23054@411 tok/s
+[20:47:07]   progress 16/20 (30 min elapsed, ETA 7 min)
+[20:49:17]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q2_coding: 1024 tok @ 13.9 tok/s, acc 51%, prefill 23054@413 tok/s
+[20:49:17]   progress 17/20 (32 min elapsed, ETA 6 min)
+[20:51:31]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 13.1 tok/s, acc 46%, prefill 23054@415 tok/s
+[20:51:31]   progress 18/20 (34 min elapsed, ETA 4 min)
+[20:53:46]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 12.9 tok/s, acc 44%, prefill 23053@416 tok/s
+[20:53:46]   progress 19/20 (37 min elapsed, ETA 2 min)
+[20:55:55]   ok [mlx_vlm] qwen3.8-27b mlx8 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 13.9 tok/s, acc 51%, prefill 23053@416 tok/s
+[20:55:55]   progress 20/20 (39 min elapsed, ETA 0 min)
+[20:55:55] DONE [mlx_vlm] qwen3.8-27b/mlx8 in 38.7 min
+[20:55:55] consolidated 1091 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[20:55:55] loading target qwen3.8-27b/mlx6 from /Users/yash/Models/qwen3.8-27b-mlx-6bit ...
+[20:56:02] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[20:56:02]   drafter kind resolved to 'mtp'
+[20:56:02]   drafter is compatible with the target
+[20:56:02] START [mlx_vlm/speed] qwen3.8-27b/mlx6: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[20:57:41]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q1_model_selection: 1024 tok @ 12.9 tok/s, prefill 272@288 tok/s
+[20:57:41]   progress 1/20 (2 min elapsed, ETA 31 min)
+[20:59:01]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q2_coding: 1024 tok @ 12.9 tok/s, prefill 197@297 tok/s
+[20:59:01]   progress 2/20 (3 min elapsed, ETA 27 min)
+[21:00:21]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q3_architecture: 1024 tok @ 12.9 tok/s, prefill 236@343 tok/s
+[21:00:21]   progress 3/20 (4 min elapsed, ETA 24 min)
+[21:01:42]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 12.9 tok/s, prefill 278@339 tok/s
+[21:01:42]   progress 4/20 (6 min elapsed, ETA 23 min)
+[21:03:02]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow off kvfp16 q5_debugging: 1024 tok @ 12.9 tok/s, prefill 228@338 tok/s
+[21:03:02]   progress 5/20 (7 min elapsed, ETA 21 min)
+[21:03:49]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 22.2 tok/s, acc 63%, prefill 272@363 tok/s
+[21:03:49]   progress 6/20 (8 min elapsed, ETA 18 min)
+[21:04:38]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 21.1 tok/s, acc 57%, prefill 197@329 tok/s
+[21:04:38]   progress 7/20 (9 min elapsed, ETA 16 min)
+[21:05:31]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 19.7 tok/s, acc 49%, prefill 236@379 tok/s
+[21:05:31]   progress 8/20 (9 min elapsed, ETA 14 min)
+[21:06:21]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 20.5 tok/s, acc 54%, prefill 278@368 tok/s
+[21:06:21]   progress 9/20 (10 min elapsed, ETA 13 min)
+[21:07:08]   ok [mlx_vlm] qwen3.8-27b mlx6 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 22.0 tok/s, acc 62%, prefill 228@374 tok/s
+[21:07:08]   progress 10/20 (11 min elapsed, ETA 11 min)
+[21:09:30]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q1_model_selection: 1024 tok @ 11.9 tok/s, prefill 23054@412 tok/s
+[21:09:30]   progress 11/20 (13 min elapsed, ETA 11 min)
+[21:11:52]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q2_coding: 1024 tok @ 11.9 tok/s, prefill 23054@413 tok/s
+[21:11:52]   progress 12/20 (16 min elapsed, ETA 11 min)
+[21:14:13]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q3_architecture: 1024 tok @ 11.9 tok/s, prefill 23054@413 tok/s
+[21:14:13]   progress 13/20 (18 min elapsed, ETA 10 min)
+[21:16:35]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 11.9 tok/s, prefill 23053@413 tok/s
+[21:16:35]   progress 14/20 (21 min elapsed, ETA 9 min)
+[21:18:57]   ok [mlx_vlm] qwen3.8-27b mlx6 agent off kvfp16 q5_debugging: 1024 tok @ 11.9 tok/s, prefill 23053@413 tok/s
+[21:18:57]   progress 15/20 (23 min elapsed, ETA 8 min)
+[21:20:55]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 16.5 tok/s, acc 48%, prefill 23054@413 tok/s
+[21:20:55]   progress 16/20 (25 min elapsed, ETA 6 min)
+[21:22:48]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q2_coding: 1024 tok @ 18.0 tok/s, acc 57%, prefill 23054@412 tok/s
+[21:22:48]   progress 17/20 (27 min elapsed, ETA 5 min)
+[21:24:47]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 16.3 tok/s, acc 47%, prefill 23054@412 tok/s
+[21:24:47]   progress 18/20 (29 min elapsed, ETA 3 min)
+[21:26:48]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 15.7 tok/s, acc 43%, prefill 23053@412 tok/s
+[21:26:48]   progress 19/20 (31 min elapsed, ETA 2 min)
+[21:28:44]   ok [mlx_vlm] qwen3.8-27b mlx6 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 17.0 tok/s, acc 51%, prefill 23053@412 tok/s
+[21:28:44]   progress 20/20 (33 min elapsed, ETA 0 min)
+[21:28:44] DONE [mlx_vlm] qwen3.8-27b/mlx6 in 32.7 min
+[21:28:44] consolidated 1111 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[21:28:44] loading target qwen3.8-27b/mxfp8 from /Users/yash/Models/qwen3.8-27b-mlx-mxfp8 ...
+[21:28:51] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[21:28:52]   drafter kind resolved to 'mtp'
+[21:28:52]   drafter is compatible with the target
+[21:28:52] START [mlx_vlm/speed] qwen3.8-27b/mxfp8: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[21:30:43]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q1_model_selection: 1024 tok @ 10.1 tok/s, prefill 272@313 tok/s
+[21:30:43]   progress 1/20 (2 min elapsed, ETA 35 min)
+[21:32:24]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q2_coding: 1024 tok @ 10.1 tok/s, prefill 197@284 tok/s
+[21:32:24]   progress 2/20 (4 min elapsed, ETA 32 min)
+[21:34:06]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q3_architecture: 1024 tok @ 10.1 tok/s, prefill 236@331 tok/s
+[21:34:06]   progress 3/20 (5 min elapsed, ETA 30 min)
+[21:35:48]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 10.1 tok/s, prefill 278@328 tok/s
+[21:35:48]   progress 4/20 (7 min elapsed, ETA 28 min)
+[21:37:29]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow off kvfp16 q5_debugging: 1024 tok @ 10.1 tok/s, prefill 228@325 tok/s
+[21:37:29]   progress 5/20 (9 min elapsed, ETA 26 min)
+[21:38:29]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 17.5 tok/s, acc 61%, prefill 272@361 tok/s
+[21:38:29]   progress 6/20 (10 min elapsed, ETA 22 min)
+[21:39:30]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 16.9 tok/s, acc 57%, prefill 197@323 tok/s
+[21:39:30]   progress 7/20 (11 min elapsed, ETA 20 min)
+[21:40:30]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 17.4 tok/s, acc 60%, prefill 236@376 tok/s
+[21:40:30]   progress 8/20 (12 min elapsed, ETA 17 min)
+[21:41:33]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 16.4 tok/s, acc 53%, prefill 278@365 tok/s
+[21:41:33]   progress 9/20 (13 min elapsed, ETA 16 min)
+[21:42:32]   ok [mlx_vlm] qwen3.8-27b mxfp8 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 17.6 tok/s, acc 62%, prefill 228@369 tok/s
+[21:42:32]   progress 10/20 (14 min elapsed, ETA 14 min)
+[21:45:15]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q1_model_selection: 1024 tok @ 9.6 tok/s, prefill 23054@410 tok/s
+[21:45:15]   progress 11/20 (16 min elapsed, ETA 13 min)
+[21:47:59]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q2_coding: 1024 tok @ 9.6 tok/s, prefill 23054@410 tok/s
+[21:47:59]   progress 12/20 (19 min elapsed, ETA 13 min)
+[21:50:42]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q3_architecture: 1024 tok @ 9.6 tok/s, prefill 23054@409 tok/s
+[21:50:42]   progress 13/20 (22 min elapsed, ETA 12 min)
+[21:53:26]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 9.6 tok/s, prefill 23053@408 tok/s
+[21:53:26]   progress 14/20 (25 min elapsed, ETA 11 min)
+[21:56:10]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent off kvfp16 q5_debugging: 1024 tok @ 9.5 tok/s, prefill 23053@408 tok/s
+[21:56:10]   progress 15/20 (27 min elapsed, ETA 9 min)
+[21:58:18]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 14.1 tok/s, acc 52%, prefill 23054@409 tok/s
+[21:58:18]   progress 16/20 (29 min elapsed, ETA 7 min)
+[22:00:25]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q2_coding: 1024 tok @ 14.5 tok/s, acc 55%, prefill 23054@410 tok/s
+[22:00:25]   progress 17/20 (32 min elapsed, ETA 6 min)
+[22:02:39]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 13.2 tok/s, acc 45%, prefill 23054@410 tok/s
+[22:02:39]   progress 18/20 (34 min elapsed, ETA 4 min)
+[22:04:54]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 13.0 tok/s, acc 43%, prefill 23053@411 tok/s
+[22:04:54]   progress 19/20 (36 min elapsed, ETA 2 min)
+[22:07:03]   ok [mlx_vlm] qwen3.8-27b mxfp8 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 14.0 tok/s, acc 51%, prefill 23053@411 tok/s
+[22:07:03]   progress 20/20 (38 min elapsed, ETA 0 min)
+[22:07:03] DONE [mlx_vlm] qwen3.8-27b/mxfp8 in 38.2 min
+[22:07:03] consolidated 1131 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[22:07:03] loading target qwen3.8-27b/mlx4 from /Users/yash/Models/qwen3.8-27b-mlx-4bit ...
+[22:07:07] loading drafter from /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit ...
+[22:07:07]   drafter kind resolved to 'mtp'
+[22:07:07]   drafter is compatible with the target
+[22:07:07] START [mlx_vlm/speed] qwen3.8-27b/mlx4: 20 generations (tiers=['shallow', 'agent'] blocks=[0, 3] kv_bits=[None] cap=1024)
+[22:08:08]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q1_model_selection: 1024 tok @ 18.1 tok/s, prefill 272@330 tok/s
+[22:08:08]   progress 1/20 (1 min elapsed, ETA 19 min)
+[22:09:05]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q2_coding: 1024 tok @ 18.1 tok/s, prefill 197@326 tok/s
+[22:09:05]   progress 2/20 (2 min elapsed, ETA 18 min)
+[22:10:02]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q3_architecture: 1024 tok @ 18.1 tok/s, prefill 236@381 tok/s
+[22:10:02]   progress 3/20 (3 min elapsed, ETA 17 min)
+[22:11:00]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q4_finance_reasoning: 1024 tok @ 18.1 tok/s, prefill 278@375 tok/s
+[22:11:00]   progress 4/20 (4 min elapsed, ETA 15 min)
+[22:11:57]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow off kvfp16 q5_debugging: 1024 tok @ 18.1 tok/s, prefill 228@372 tok/s
+[22:11:57]   progress 5/20 (5 min elapsed, ETA 14 min)
+[22:12:34]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q1_model_selection: 1024 tok @ 28.4 tok/s, acc 61%, prefill 272@394 tok/s
+[22:12:34]   progress 6/20 (5 min elapsed, ETA 13 min)
+[22:13:12]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q2_coding: 1024 tok @ 27.1 tok/s, acc 55%, prefill 197@352 tok/s
+[22:13:12]   progress 7/20 (6 min elapsed, ETA 11 min)
+[22:13:52]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q3_architecture: 1024 tok @ 26.0 tok/s, acc 51%, prefill 236@410 tok/s
+[22:13:52]   progress 8/20 (7 min elapsed, ETA 10 min)
+[22:14:32]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 26.1 tok/s, acc 51%, prefill 278@400 tok/s
+[22:14:32]   progress 9/20 (7 min elapsed, ETA 9 min)
+[22:15:08]   ok [mlx_vlm] qwen3.8-27b mlx4 shallow mtp3 kvfp16 q5_debugging: 1024 tok @ 28.5 tok/s, acc 62%, prefill 228@401 tok/s
+[22:15:08]   progress 10/20 (8 min elapsed, ETA 8 min)
+[22:17:04]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q1_model_selection: 1024 tok @ 16.3 tok/s, prefill 23054@438 tok/s
+[22:17:04]   progress 11/20 (10 min elapsed, ETA 8 min)
+[22:19:00]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q2_coding: 1024 tok @ 16.3 tok/s, prefill 23054@440 tok/s
+[22:19:00]   progress 12/20 (12 min elapsed, ETA 8 min)
+[22:20:55]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q3_architecture: 1024 tok @ 16.3 tok/s, prefill 23054@439 tok/s
+[22:20:55]   progress 13/20 (14 min elapsed, ETA 7 min)
+[22:22:50]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q4_finance_reasoning: 1024 tok @ 16.3 tok/s, prefill 23053@439 tok/s
+[22:22:50]   progress 14/20 (16 min elapsed, ETA 7 min)
+[22:24:46]   ok [mlx_vlm] qwen3.8-27b mlx4 agent off kvfp16 q5_debugging: 1024 tok @ 16.2 tok/s, prefill 23053@439 tok/s
+[22:24:46]   progress 15/20 (18 min elapsed, ETA 6 min)
+[22:26:26]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q1_model_selection: 1024 tok @ 21.3 tok/s, acc 52%, prefill 23054@439 tok/s
+[22:26:26]   progress 16/20 (19 min elapsed, ETA 5 min)
+[22:28:12]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q2_coding: 1024 tok @ 19.5 tok/s, acc 43%, prefill 23054@438 tok/s
+[22:28:12]   progress 17/20 (21 min elapsed, ETA 4 min)
+[22:29:55]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q3_architecture: 1024 tok @ 20.0 tok/s, acc 46%, prefill 23054@438 tok/s
+[22:29:55]   progress 18/20 (23 min elapsed, ETA 3 min)
+[22:31:40]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q4_finance_reasoning: 1024 tok @ 19.6 tok/s, acc 43%, prefill 23053@439 tok/s
+[22:31:40]   progress 19/20 (25 min elapsed, ETA 1 min)
+[22:33:22]   ok [mlx_vlm] qwen3.8-27b mlx4 agent mtp3 kvfp16 q5_debugging: 1024 tok @ 20.7 tok/s, acc 49%, prefill 23053@438 tok/s
+[22:33:22]   progress 20/20 (26 min elapsed, ETA 0 min)
+[22:33:22] DONE [mlx_vlm] qwen3.8-27b/mlx4 in 26.3 min
+[22:33:22] consolidated 1151 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[22:33:23] START model=qwen3.8-27b phase=speed tier=shallow kv=fp16 ctx=16384: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[22:33:23] skip [speed] qwen3.8-27b q8 off pass1 (already done)
+[22:33:23] skip [speed] qwen3.8-27b q8 mtp2 pass1 (already done)
+[22:33:23] DONE run in 0.0 min
+[22:33:23] consolidated 1151 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[22:33:23] START model=qwen3.8-27b phase=speed tier=agent kv=fp16 ctx=32768: 10 generations (passes=[1] quants=['q8'] draft_ns=[0, 2] cap=1024)
+[22:33:23] skip [speed] qwen3.8-27b q8 off pass1 (already done)
+[22:33:23] skip [speed] qwen3.8-27b q8 mtp2 pass1 (already done)
+[22:33:23] DONE run in 0.0 min
+[22:33:23] consolidated 1151 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[22:33:23] consolidated 1151 records -> /Users/yash/Desktop/Programming/local_llm_bench/results/results.json
+[22:33:23] START model=qwen3.8-27b phase=full tier=shallow kv=fp16 ctx=16384: 5 generations (passes=[1] quants=['q8'] draft_ns=[0] cap=12288)
+[22:33:23] launch [full] qwen3.8-27b q8 off pass1 tier=shallow kv=fp16 ...
+[22:54:42]   ok qwen3.8-27b q8 off p1 q1_model_selection: 12288 tok @ 9.7 tok/s, ttft 1005ms
+[22:54:42]   progress 1/5 (21 min elapsed, ETA 85 min)
+[23:15:56]   ok qwen3.8-27b q8 off p1 q2_coding: 12288 tok @ 9.7 tok/s, ttft 791ms
+[23:15:56]   progress 2/5 (43 min elapsed, ETA 64 min)
+[23:37:14]   ok qwen3.8-27b q8 off p1 q3_architecture: 12288 tok @ 9.6 tok/s, ttft 805ms
+[23:37:14]   progress 3/5 (64 min elapsed, ETA 43 min)

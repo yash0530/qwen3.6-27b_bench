@@ -72,6 +72,10 @@ def main():
     ap.add_argument("--model", default="qwen3.8-27b", choices=list(C.MODELS_CONFIG.keys()))
     ap.add_argument("--tier", default="agent", choices=T.TIER_ORDER)
     ap.add_argument("--draft-n", type=int, default=None)
+    # Which MLX target to warm. Hardcoding mlx8 predated the quant sweep; the
+    # candidate that has to be tested is whichever one is actually a contender.
+    ap.add_argument("--quant", default="mlx8",
+                    help="MLX quant key to serve (mlx arm only)")
     args = ap.parse_args()
 
     model_cfg = C.MODELS_CONFIG[args.model]
@@ -96,7 +100,10 @@ def main():
             f"({need_tokens} tokens capacity)")
 
     argv = server_argv(arm_key, model_cfg, mlx_cfg, draft_n, 1)
-    model_name = mlx_cfg.get("quants", {}).get("mlx8") if args.arm == "mlx" else "qwen-local"
+    model_name = (mlx_cfg.get("quants", {}).get(args.quant)
+                  if args.arm == "mlx" else "qwen-local")
+    if args.arm == "mlx" and not model_name:
+        log(f"unknown MLX quant {args.quant!r} for {args.model}"); return 1
 
     srv = Server(argv, os.path.join(C.LOGS, f"warm_{args.arm}_{args.model}.log"))
     log(f"=== warm-cache: arm={args.arm} model={args.model} tier={args.tier} draft_n={draft_n} ===")
@@ -142,6 +149,9 @@ def main():
             rec = {
                 "ts": datetime.now(timezone.utc).isoformat(),
                 "arm": args.arm, "model": args.model, "tier": args.tier,
+                # Which build was actually served. Without this an MLX row is
+                # ambiguous across four quants of the same model.
+                "quant": args.quant if args.arm == "mlx" else "q8",
                 "draft_n": draft_n, "turn": turn,
                 "ttft_ms": r["ttft_ms"], "wall_ms": r["wall_ms"],
                 "n_messages": len(messages),
