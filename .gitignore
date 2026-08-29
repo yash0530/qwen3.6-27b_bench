@@ -3,6 +3,7 @@ __pycache__/
 results/logs/
 .DS_Store
 .mlxenv/
+.mlxenv-0617/
 results/mlx_run.log
 
 # Working backups taken while iterating on the harness (24MB+, not reproducible artifacts)
