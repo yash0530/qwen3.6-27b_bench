@@ -1,0 +1,1224 @@
+INFO:     Started server process [42074]
+INFO:     Waiting for application startup.
+2026-08-29 12:47:00,687 - INFO - Pre-loading language model: /Users/yash/Models/qwen3.8-27b-mlx-4bit
+2026-08-29 12:47:00,688 - INFO - APC enabled (block_size=16, num_blocks=2048, hash=fast, disk=False)
+2026-08-29 12:47:00,689 - INFO - Loading model: /Users/yash/Models/qwen3.8-27b-mlx-4bit
+2026-08-29 12:47:02,567 - INFO - Model and processor loaded successfully.
+2026-08-29 12:47:02,567 - INFO - Loading speculative drafter (mtp): /Users/yash/Models/qwen3.8-27b-mtp-mlx-8bit
+2026-08-29 12:47:02,613 - INFO - Drafter ready; speculative decoding enabled.
+2026-08-29 12:47:02,613 - INFO - APC self-check ok mode=exact schema=v1 layers=64 types=[ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache,ArraysCache,ArraysCache,ArraysCache,KVCache] caps=[checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable,checkpoint,checkpoint,checkpoint,pageable]
+2026-08-29 12:47:02,613 - INFO - Language model ready, continuous batching enabled.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8089 (Press CTRL+C to quit)
+INFO:     127.0.0.1:50829 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50830 - "GET /health HTTP/1.1" 200 OK
+2026-08-29 12:47:09,447 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50834 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:47:09,467 - INFO - Generation queued: request=1171fc4d0 prompt_tokens=18867 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:47:09,473 - INFO - Prefill started: request=1171fc4d0 backend=continuous_batching prompt_tokens=18867 images=0 audio=0 videos=0
+2026-08-29 12:47:13,543 - INFO - Prefill progress: request=1171fc4d0 tokens=2048/18867 (10.9%)
+2026-08-29 12:47:17,647 - INFO - Prefill progress: request=1171fc4d0 tokens=4096/18867 (21.7%)
+2026-08-29 12:47:21,875 - INFO - Prefill progress: request=1171fc4d0 tokens=6144/18867 (32.6%)
+2026-08-29 12:47:26,089 - INFO - Prefill progress: request=1171fc4d0 tokens=8192/18867 (43.4%)
+2026-08-29 12:47:30,481 - INFO - Prefill progress: request=1171fc4d0 tokens=10240/18867 (54.3%)
+2026-08-29 12:47:34,885 - INFO - Prefill progress: request=1171fc4d0 tokens=12288/18867 (65.1%)
+2026-08-29 12:47:39,401 - INFO - Prefill progress: request=1171fc4d0 tokens=14336/18867 (76.0%)
+2026-08-29 12:47:44,064 - INFO - Prefill progress: request=1171fc4d0 tokens=16384/18867 (86.8%)
+2026-08-29 12:47:48,814 - INFO - Prefill progress: request=1171fc4d0 tokens=18432/18867 (97.7%)
+2026-08-29 12:47:50,075 - INFO - Prefill progress: request=1171fc4d0 tokens=18851/18867 (99.9%)
+2026-08-29 12:47:50,330 - INFO - Prefill completed: request=1171fc4d0 prompt_tokens=18867 cached_tokens=0 elapsed=40.796s rate=462.5 tok/s
+2026-08-29 12:47:50,330 - INFO - Decode started: request=1171fc4d0 time_to_first_token=40.882s
+2026-08-29 12:47:50,732 - INFO - Decode progress: request=1171fc4d0 generated_tokens=10 elapsed=0.402s rate=10.0 tok/s
+2026-08-29 12:47:51,121 - INFO - Decode progress: request=1171fc4d0 generated_tokens=20 elapsed=0.791s rate=10.0 tok/s
+2026-08-29 12:47:51,416 - INFO - Decode progress: request=1171fc4d0 generated_tokens=30 elapsed=1.086s rate=176460.1 tok/s
+2026-08-29 12:47:51,804 - INFO - Decode progress: request=1171fc4d0 generated_tokens=40 elapsed=1.474s rate=10.8 tok/s
+2026-08-29 12:47:52,180 - INFO - Decode progress: request=1171fc4d0 generated_tokens=50 elapsed=1.850s rate=148148.1 tok/s
+2026-08-29 12:47:52,739 - INFO - Decode progress: request=1171fc4d0 generated_tokens=60 elapsed=2.409s rate=10.4 tok/s
+2026-08-29 12:47:53,028 - INFO - Decode progress: request=1171fc4d0 generated_tokens=70 elapsed=2.698s rate=30848.0 tok/s
+2026-08-29 12:47:53,124 - INFO - Decode completed: request=1171fc4d0 generated_tokens=72 elapsed=2.794s rate=25.4 tok/s finish_reason=stop
+2026-08-29 12:47:53,125 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=18867 generated_tokens=72 elapsed=43.696s prefill=462.5 tok/s decode=25.8 tok/s finish_reason=tool_calls in_flight=0
+2026-08-29 12:47:53,159 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50834 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:47:53,193 - INFO - Generation queued: request=660ea6d80 prompt_tokens=41511 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:47:53,200 - INFO - Prefill started: request=660ea6d80 backend=continuous_batching prompt_tokens=41511 images=0 audio=0 videos=0
+2026-08-29 12:47:57,250 - INFO - Prefill progress: request=660ea6d80 tokens=2048/41511 (4.9%)
+2026-08-29 12:48:01,517 - INFO - Prefill progress: request=660ea6d80 tokens=4096/41511 (9.9%)
+2026-08-29 12:48:05,740 - INFO - Prefill progress: request=660ea6d80 tokens=6144/41511 (14.8%)
+2026-08-29 12:48:10,126 - INFO - Prefill progress: request=660ea6d80 tokens=8192/41511 (19.7%)
+2026-08-29 12:48:14,527 - INFO - Prefill progress: request=660ea6d80 tokens=10240/41511 (24.7%)
+2026-08-29 12:48:19,007 - INFO - Prefill progress: request=660ea6d80 tokens=12288/41511 (29.6%)
+2026-08-29 12:48:23,630 - INFO - Prefill progress: request=660ea6d80 tokens=14336/41511 (34.5%)
+2026-08-29 12:48:28,222 - INFO - Prefill progress: request=660ea6d80 tokens=16384/41511 (39.5%)
+2026-08-29 12:48:32,946 - INFO - Prefill progress: request=660ea6d80 tokens=18432/41511 (44.4%)
+2026-08-29 12:48:37,660 - INFO - Prefill progress: request=660ea6d80 tokens=20480/41511 (49.3%)
+2026-08-29 12:48:42,552 - INFO - Prefill progress: request=660ea6d80 tokens=22528/41511 (54.3%)
+2026-08-29 12:48:47,409 - INFO - Prefill progress: request=660ea6d80 tokens=24576/41511 (59.2%)
+2026-08-29 12:48:52,464 - INFO - Prefill progress: request=660ea6d80 tokens=26624/41511 (64.1%)
+2026-08-29 12:48:57,494 - INFO - Prefill progress: request=660ea6d80 tokens=28672/41511 (69.1%)
+2026-08-29 12:49:02,742 - INFO - Prefill progress: request=660ea6d80 tokens=30720/41511 (74.0%)
+2026-08-29 12:49:07,932 - INFO - Prefill progress: request=660ea6d80 tokens=32768/41511 (78.9%)
+2026-08-29 12:49:13,306 - INFO - Prefill progress: request=660ea6d80 tokens=34816/41511 (83.9%)
+2026-08-29 12:49:18,679 - INFO - Prefill progress: request=660ea6d80 tokens=36864/41511 (88.8%)
+2026-08-29 12:49:24,204 - INFO - Prefill progress: request=660ea6d80 tokens=38912/41511 (93.7%)
+2026-08-29 12:49:29,772 - INFO - Prefill progress: request=660ea6d80 tokens=40960/41511 (98.7%)
+2026-08-29 12:49:31,845 - INFO - Prefill progress: request=660ea6d80 tokens=41495/41511 (100.0%)
+2026-08-29 12:49:32,210 - INFO - Prefill completed: request=660ea6d80 prompt_tokens=41511 cached_tokens=0 elapsed=98.993s rate=419.3 tok/s
+2026-08-29 12:49:32,210 - INFO - Decode started: request=660ea6d80 time_to_first_token=99.050s
+2026-08-29 12:49:32,681 - INFO - Decode progress: request=660ea6d80 generated_tokens=10 elapsed=0.470s rate=156862.8 tok/s
+2026-08-29 12:49:33,241 - INFO - Decode progress: request=660ea6d80 generated_tokens=20 elapsed=1.030s rate=24742.1 tok/s
+2026-08-29 12:49:33,691 - INFO - Decode progress: request=660ea6d80 generated_tokens=30 elapsed=1.480s rate=25779.2 tok/s
+2026-08-29 12:49:34,251 - INFO - Decode progress: request=660ea6d80 generated_tokens=40 elapsed=2.040s rate=27681.7 tok/s
+2026-08-29 12:49:34,703 - INFO - Decode progress: request=660ea6d80 generated_tokens=50 elapsed=2.493s rate=56208.2 tok/s
+2026-08-29 12:49:35,150 - INFO - Decode progress: request=660ea6d80 generated_tokens=60 elapsed=2.940s rate=9.3 tok/s
+2026-08-29 12:49:35,916 - INFO - Decode progress: request=660ea6d80 generated_tokens=70 elapsed=3.706s rate=9.3 tok/s
+2026-08-29 12:49:36,581 - INFO - Decode progress: request=660ea6d80 generated_tokens=80 elapsed=4.371s rate=32741.8 tok/s
+2026-08-29 12:49:37,032 - INFO - Decode progress: request=660ea6d80 generated_tokens=90 elapsed=4.822s rate=28503.0 tok/s
+2026-08-29 12:49:37,377 - INFO - Decode progress: request=660ea6d80 generated_tokens=100 elapsed=5.166s rate=142857.1 tok/s
+2026-08-29 12:49:37,845 - INFO - Decode progress: request=660ea6d80 generated_tokens=110 elapsed=5.635s rate=8.6 tok/s
+2026-08-29 12:49:38,081 - INFO - Decode completed: request=660ea6d80 generated_tokens=116 elapsed=5.871s rate=19.6 tok/s finish_reason=stop
+2026-08-29 12:49:38,082 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=41511 generated_tokens=116 elapsed=104.923s prefill=419.3 tok/s decode=19.8 tok/s finish_reason=tool_calls in_flight=0
+2026-08-29 12:49:38,114 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50834 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:49:38,156 - INFO - Generation queued: request=660ea4350 prompt_tokens=57793 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:49:38,164 - INFO - Prefill started: request=660ea4350 backend=continuous_batching prompt_tokens=57793 images=0 audio=0 videos=0
+2026-08-29 12:49:44,169 - INFO - Prefill progress: request=660ea4350 tokens=43543/57793 (75.3%)
+2026-08-29 12:49:50,116 - INFO - Prefill progress: request=660ea4350 tokens=45591/57793 (78.9%)
+2026-08-29 12:49:56,149 - INFO - Prefill progress: request=660ea4350 tokens=47639/57793 (82.4%)
+2026-08-29 12:50:02,299 - INFO - Prefill progress: request=660ea4350 tokens=49687/57793 (86.0%)
+2026-08-29 12:50:08,542 - INFO - Prefill progress: request=660ea4350 tokens=51735/57793 (89.5%)
+2026-08-29 12:50:14,752 - INFO - Prefill progress: request=660ea4350 tokens=53783/57793 (93.1%)
+2026-08-29 12:50:21,141 - INFO - Prefill progress: request=660ea4350 tokens=55831/57793 (96.6%)
+2026-08-29 12:50:27,481 - INFO - Prefill progress: request=660ea4350 tokens=57777/57793 (100.0%)
+2026-08-29 12:50:27,988 - INFO - Prefill completed: request=660ea4350 prompt_tokens=57793 cached_tokens=41495 elapsed=49.690s rate=1163.1 tok/s
+2026-08-29 12:50:27,989 - INFO - Decode started: request=660ea4350 time_to_first_token=49.874s
+2026-08-29 12:50:28,551 - INFO - Decode progress: request=660ea4350 generated_tokens=10 elapsed=0.563s rate=7.8 tok/s
+2026-08-29 12:50:29,053 - INFO - Decode progress: request=660ea4350 generated_tokens=20 elapsed=1.064s rate=7.9 tok/s
+2026-08-29 12:50:29,557 - INFO - Decode progress: request=660ea4350 generated_tokens=30 elapsed=1.569s rate=7.8 tok/s
+2026-08-29 12:50:30,296 - INFO - Decode progress: request=660ea4350 generated_tokens=40 elapsed=2.308s rate=7.8 tok/s
+2026-08-29 12:50:30,803 - INFO - Decode progress: request=660ea4350 generated_tokens=50 elapsed=2.814s rate=7.9 tok/s
+2026-08-29 12:50:31,183 - INFO - Decode progress: request=660ea4350 generated_tokens=60 elapsed=3.194s rate=190476.3 tok/s
+2026-08-29 12:50:31,686 - INFO - Decode progress: request=660ea4350 generated_tokens=70 elapsed=3.698s rate=154822.8 tok/s
+2026-08-29 12:50:32,191 - INFO - Decode progress: request=660ea4350 generated_tokens=80 elapsed=4.202s rate=23010.7 tok/s
+2026-08-29 12:50:32,816 - INFO - Decode progress: request=660ea4350 generated_tokens=90 elapsed=4.827s rate=7.9 tok/s
+2026-08-29 12:50:33,197 - INFO - Decode progress: request=660ea4350 generated_tokens=100 elapsed=5.208s rate=25945.7 tok/s
+2026-08-29 12:50:33,582 - INFO - Decode completed: request=660ea4350 generated_tokens=110 elapsed=5.593s rate=19.5 tok/s finish_reason=stop
+2026-08-29 12:50:33,583 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=57793 generated_tokens=110 elapsed=55.470s prefill=1163.1 tok/s decode=19.7 tok/s finish_reason=stop in_flight=0
+INFO:     127.0.0.1:50846 - "GET /v1/cache/stats HTTP/1.1" 200 OK
+2026-08-29 12:50:39,539 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50850 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:50:39,583 - INFO - Generation queued: request=1171d56a0 prompt_tokens=57995 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:50:39,590 - INFO - Prefill started: request=1171d56a0 backend=continuous_batching prompt_tokens=57995 images=0 audio=0 videos=0
+2026-08-29 12:50:41,319 - INFO - Prefill progress: request=1171d56a0 tokens=57979/57995 (100.0%)
+2026-08-29 12:50:41,825 - INFO - Prefill completed: request=1171d56a0 prompt_tokens=57995 cached_tokens=57777 elapsed=1.803s rate=32161.8 tok/s
+2026-08-29 12:50:41,825 - INFO - Decode started: request=1171d56a0 time_to_first_token=2.285s
+2026-08-29 12:50:42,386 - INFO - Decode progress: request=1171d56a0 generated_tokens=10 elapsed=0.561s rate=7.7 tok/s
+2026-08-29 12:50:42,886 - INFO - Decode progress: request=1171d56a0 generated_tokens=20 elapsed=1.061s rate=8.1 tok/s
+2026-08-29 12:50:43,268 - INFO - Decode progress: request=1171d56a0 generated_tokens=30 elapsed=1.443s rate=62336.4 tok/s
+2026-08-29 12:50:44,007 - INFO - Decode progress: request=1171d56a0 generated_tokens=40 elapsed=2.182s rate=21447.7 tok/s
+2026-08-29 12:50:44,861 - INFO - Decode progress: request=1171d56a0 generated_tokens=50 elapsed=3.036s rate=8.4 tok/s
+2026-08-29 12:50:45,364 - INFO - Decode progress: request=1171d56a0 generated_tokens=60 elapsed=3.539s rate=137931.1 tok/s
+2026-08-29 12:50:45,620 - INFO - Decode completed: request=1171d56a0 generated_tokens=64 elapsed=3.795s rate=16.6 tok/s finish_reason=stop
+2026-08-29 12:50:45,621 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=57995 generated_tokens=64 elapsed=6.083s prefill=32161.8 tok/s decode=16.9 tok/s finish_reason=tool_calls in_flight=0
+2026-08-29 12:50:45,644 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50850 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:50:45,705 - INFO - Generation queued: request=660ea7a40 prompt_tokens=80625 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:50:45,712 - INFO - Prefill started: request=660ea7a40 backend=continuous_batching prompt_tokens=80625 images=0 audio=0 videos=0
+2026-08-29 12:50:49,663 - INFO - Prefill progress: request=660ea7a40 tokens=2048/80625 (2.5%)
+2026-08-29 12:50:53,704 - INFO - Prefill progress: request=660ea7a40 tokens=4096/80625 (5.1%)
+2026-08-29 12:50:57,815 - INFO - Prefill progress: request=660ea7a40 tokens=6144/80625 (7.6%)
+2026-08-29 12:51:02,008 - INFO - Prefill progress: request=660ea7a40 tokens=8192/80625 (10.2%)
+2026-08-29 12:51:06,284 - INFO - Prefill progress: request=660ea7a40 tokens=10240/80625 (12.7%)
+2026-08-29 12:51:10,629 - INFO - Prefill progress: request=660ea7a40 tokens=12288/80625 (15.2%)
+2026-08-29 12:51:15,056 - INFO - Prefill progress: request=660ea7a40 tokens=14336/80625 (17.8%)
+2026-08-29 12:51:19,564 - INFO - Prefill progress: request=660ea7a40 tokens=16384/80625 (20.3%)
+2026-08-29 12:51:24,160 - INFO - Prefill progress: request=660ea7a40 tokens=18432/80625 (22.9%)
+2026-08-29 12:51:28,828 - INFO - Prefill progress: request=660ea7a40 tokens=20480/80625 (25.4%)
+2026-08-29 12:51:33,576 - INFO - Prefill progress: request=660ea7a40 tokens=22528/80625 (27.9%)
+2026-08-29 12:51:38,408 - INFO - Prefill progress: request=660ea7a40 tokens=24576/80625 (30.5%)
+2026-08-29 12:51:43,331 - INFO - Prefill progress: request=660ea7a40 tokens=26624/80625 (33.0%)
+2026-08-29 12:51:48,346 - INFO - Prefill progress: request=660ea7a40 tokens=28672/80625 (35.6%)
+2026-08-29 12:51:53,458 - INFO - Prefill progress: request=660ea7a40 tokens=30720/80625 (38.1%)
+2026-08-29 12:51:58,622 - INFO - Prefill progress: request=660ea7a40 tokens=32768/80625 (40.6%)
+2026-08-29 12:52:03,942 - INFO - Prefill progress: request=660ea7a40 tokens=34816/80625 (43.2%)
+2026-08-29 12:52:09,276 - INFO - Prefill progress: request=660ea7a40 tokens=36864/80625 (45.7%)
+2026-08-29 12:52:14,669 - INFO - Prefill progress: request=660ea7a40 tokens=38912/80625 (48.3%)
+2026-08-29 12:52:20,157 - INFO - Prefill progress: request=660ea7a40 tokens=40960/80625 (50.8%)
+2026-08-29 12:52:25,769 - INFO - Prefill progress: request=660ea7a40 tokens=43008/80625 (53.3%)
+2026-08-29 12:52:31,432 - INFO - Prefill progress: request=660ea7a40 tokens=45056/80625 (55.9%)
+2026-08-29 12:52:37,194 - INFO - Prefill progress: request=660ea7a40 tokens=47104/80625 (58.4%)
+2026-08-29 12:52:43,166 - INFO - Prefill progress: request=660ea7a40 tokens=49152/80625 (61.0%)
+2026-08-29 12:52:49,255 - INFO - Prefill progress: request=660ea7a40 tokens=51200/80625 (63.5%)
+2026-08-29 12:52:55,369 - INFO - Prefill progress: request=660ea7a40 tokens=53248/80625 (66.0%)
+2026-08-29 12:53:01,622 - INFO - Prefill progress: request=660ea7a40 tokens=55296/80625 (68.6%)
+2026-08-29 12:53:07,910 - INFO - Prefill progress: request=660ea7a40 tokens=57344/80625 (71.1%)
+2026-08-29 12:53:14,295 - INFO - Prefill progress: request=660ea7a40 tokens=59392/80625 (73.7%)
+2026-08-29 12:53:20,652 - INFO - Prefill progress: request=660ea7a40 tokens=61440/80625 (76.2%)
+2026-08-29 12:53:27,048 - INFO - Prefill progress: request=660ea7a40 tokens=63488/80625 (78.7%)
+2026-08-29 12:53:33,504 - INFO - Prefill progress: request=660ea7a40 tokens=65536/80625 (81.3%)
+2026-08-29 12:53:40,055 - INFO - Prefill progress: request=660ea7a40 tokens=67584/80625 (83.8%)
+2026-08-29 12:53:46,664 - INFO - Prefill progress: request=660ea7a40 tokens=69632/80625 (86.4%)
+2026-08-29 12:53:53,353 - INFO - Prefill progress: request=660ea7a40 tokens=71680/80625 (88.9%)
+2026-08-29 12:54:00,122 - INFO - Prefill progress: request=660ea7a40 tokens=73728/80625 (91.4%)
+2026-08-29 12:54:07,051 - INFO - Prefill progress: request=660ea7a40 tokens=75776/80625 (94.0%)
+2026-08-29 12:54:14,036 - INFO - Prefill progress: request=660ea7a40 tokens=77824/80625 (96.5%)
+2026-08-29 12:54:21,092 - INFO - Prefill progress: request=660ea7a40 tokens=79872/80625 (99.1%)
+2026-08-29 12:54:24,903 - INFO - Prefill progress: request=660ea7a40 tokens=80609/80625 (100.0%)
+2026-08-29 12:54:25,552 - INFO - Prefill completed: request=660ea7a40 prompt_tokens=80625 cached_tokens=0 elapsed=219.806s rate=366.8 tok/s
+2026-08-29 12:54:25,552 - INFO - Decode started: request=660ea7a40 time_to_first_token=219.907s
+2026-08-29 12:54:25,553 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2737, in _next
+    generation_responses = self._generation_batch.next()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1561, in next
+    tok_list, round_meta = next(self._rounds_iter)
+                           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/utils.py", line 190, in run_speculative_server_rounds
+    yield from _mtp_rounds_batch(
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/mtp.py", line 904, in _mtp_rounds_batch
+    draft_tokens = sampler_rng.draft_tokens(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/common.py", line 89, in draft_tokens
+    mx.async_eval(*arrays)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:54:25,590 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 12:54:25,590 - ERROR - Chat completion stream generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1831, in stream_generator
+    token = await asyncio.to_thread(_next_token)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1826, in _next_token
+    return next(token_iter)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2737, in _next
+    generation_responses = self._generation_batch.next()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1561, in next
+    tok_list, round_meta = next(self._rounds_iter)
+                           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/utils.py", line 190, in run_speculative_server_rounds
+    yield from _mtp_rounds_batch(
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/mtp.py", line 904, in _mtp_rounds_batch
+    draft_tokens = sampler_rng.draft_tokens(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/speculative/common.py", line 89, in draft_tokens
+    mx.async_eval(*arrays)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:54:25,619 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50850 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:54:25,689 - INFO - Generation queued: request=1171d56d0 prompt_tokens=80648 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:54:25,695 - INFO - Prefill started: request=1171d56d0 backend=continuous_batching prompt_tokens=80648 images=0 audio=0 videos=0
+2026-08-29 12:54:26,549 - INFO - Prefill progress: request=1171d56d0 tokens=80632/80648 (100.0%)
+2026-08-29 12:54:27,190 - INFO - Prefill completed: request=1171d56d0 prompt_tokens=80648 cached_tokens=80609 elapsed=1.311s rate=61523.9 tok/s
+2026-08-29 12:54:27,190 - INFO - Decode started: request=1171d56d0 time_to_first_token=1.570s
+2026-08-29 12:54:27,847 - INFO - Decode progress: request=1171d56d0 generated_tokens=10 elapsed=0.657s rate=22966.3 tok/s
+2026-08-29 12:54:28,562 - INFO - Decode progress: request=1171d56d0 generated_tokens=20 elapsed=1.373s rate=16925.3 tok/s
+2026-08-29 12:54:29,143 - INFO - Decode progress: request=1171d56d0 generated_tokens=30 elapsed=1.954s rate=6.8 tok/s
+2026-08-29 12:54:29,590 - INFO - Decode progress: request=1171d56d0 generated_tokens=40 elapsed=2.401s rate=21739.1 tok/s
+2026-08-29 12:54:30,171 - INFO - Decode progress: request=1171d56d0 generated_tokens=50 elapsed=2.982s rate=6.9 tok/s
+2026-08-29 12:54:30,746 - INFO - Decode progress: request=1171d56d0 generated_tokens=60 elapsed=3.556s rate=7.1 tok/s
+2026-08-29 12:54:31,599 - INFO - Decode progress: request=1171d56d0 generated_tokens=70 elapsed=4.410s rate=7.1 tok/s
+2026-08-29 12:54:32,313 - INFO - Decode progress: request=1171d56d0 generated_tokens=80 elapsed=5.123s rate=25974.0 tok/s
+2026-08-29 12:54:32,896 - INFO - Decode progress: request=1171d56d0 generated_tokens=90 elapsed=5.707s rate=42553.2 tok/s
+2026-08-29 12:54:33,473 - INFO - Decode progress: request=1171d56d0 generated_tokens=100 elapsed=6.284s rate=125000.0 tok/s
+2026-08-29 12:54:34,195 - INFO - Decode progress: request=1171d56d0 generated_tokens=110 elapsed=7.005s rate=6.8 tok/s
+2026-08-29 12:54:35,063 - INFO - Decode progress: request=1171d56d0 generated_tokens=120 elapsed=7.874s rate=25806.5 tok/s
+2026-08-29 12:54:35,920 - INFO - Decode progress: request=1171d56d0 generated_tokens=130 elapsed=8.730s rate=6.9 tok/s
+2026-08-29 12:54:36,359 - INFO - Decode progress: request=1171d56d0 generated_tokens=140 elapsed=9.169s rate=24717.0 tok/s
+2026-08-29 12:54:36,799 - INFO - Decode progress: request=1171d56d0 generated_tokens=150 elapsed=9.610s rate=266666.7 tok/s
+2026-08-29 12:54:37,378 - INFO - Decode progress: request=1171d56d0 generated_tokens=160 elapsed=10.189s rate=127648.7 tok/s
+2026-08-29 12:54:37,819 - INFO - Decode completed: request=1171d56d0 generated_tokens=169 elapsed=10.629s rate=15.8 tok/s finish_reason=stop
+2026-08-29 12:54:37,820 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=80648 generated_tokens=169 elapsed=12.202s prefill=61523.9 tok/s decode=15.9 tok/s finish_reason=tool_calls in_flight=0
+2026-08-29 12:54:37,837 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50850 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:54:37,911 - INFO - Generation queued: request=66defb410 prompt_tokens=97052 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:54:37,918 - INFO - Prefill started: request=66defb410 backend=continuous_batching prompt_tokens=97052 images=0 audio=0 videos=0
+2026-08-29 12:54:45,660 - INFO - Prefill progress: request=66defb410 tokens=82680/97052 (85.2%)
+2026-08-29 12:54:53,253 - INFO - Prefill progress: request=66defb410 tokens=84728/97052 (87.3%)
+2026-08-29 12:55:00,948 - INFO - Prefill progress: request=66defb410 tokens=86776/97052 (89.4%)
+2026-08-29 12:55:08,699 - INFO - Prefill progress: request=66defb410 tokens=88824/97052 (91.5%)
+2026-08-29 12:55:16,635 - INFO - Prefill progress: request=66defb410 tokens=90872/97052 (93.6%)
+2026-08-29 12:55:24,657 - INFO - Prefill progress: request=66defb410 tokens=92920/97052 (95.7%)
+2026-08-29 12:55:32,752 - INFO - Prefill progress: request=66defb410 tokens=94968/97052 (97.9%)
+2026-08-29 12:55:40,983 - INFO - Prefill progress: request=66defb410 tokens=97016/97052 (100.0%)
+2026-08-29 12:55:41,833 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:55:41,855 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 12:55:41,855 - ERROR - Chat completion stream generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1831, in stream_generator
+    token = await asyncio.to_thread(_next_token)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1826, in _next_token
+    return next(token_iter)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:55:41,885 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50850 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:55:41,970 - INFO - Generation queued: request=660e94c20 prompt_tokens=97075 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:55:41,976 - INFO - Prefill started: request=660e94c20 backend=continuous_batching prompt_tokens=97075 images=0 audio=0 videos=0
+2026-08-29 12:55:47,262 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2809, in _next
+    nstep = self._prompt_batch.prompt_step()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:55:47,283 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 12:55:47,283 - ERROR - Chat completion stream generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1831, in stream_generator
+    token = await asyncio.to_thread(_next_token)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1826, in _next_token
+    return next(token_iter)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2809, in _next
+    nstep = self._prompt_batch.prompt_step()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50865 - "GET /v1/cache/stats HTTP/1.1" 200 OK
+2026-08-29 12:56:30,831 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50874 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:56:30,916 - INFO - Generation queued: request=11727d1f0 prompt_tokens=97178 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:56:30,922 - INFO - Prefill started: request=11727d1f0 backend=continuous_batching prompt_tokens=97178 images=0 audio=0 videos=0
+2026-08-29 12:56:38,881 - INFO - Prefill progress: request=11727d1f0 tokens=82680/97178 (85.1%)
+2026-08-29 12:56:46,428 - INFO - Prefill progress: request=11727d1f0 tokens=84728/97178 (87.2%)
+2026-08-29 12:56:54,007 - INFO - Prefill progress: request=11727d1f0 tokens=86776/97178 (89.3%)
+2026-08-29 12:57:01,848 - INFO - Prefill progress: request=11727d1f0 tokens=88824/97178 (91.4%)
+2026-08-29 12:57:09,755 - INFO - Prefill progress: request=11727d1f0 tokens=90872/97178 (93.5%)
+2026-08-29 12:57:17,687 - INFO - Prefill progress: request=11727d1f0 tokens=92920/97178 (95.6%)
+2026-08-29 12:57:25,821 - INFO - Prefill progress: request=11727d1f0 tokens=94968/97178 (97.7%)
+2026-08-29 12:57:34,014 - INFO - Prefill progress: request=11727d1f0 tokens=97016/97178 (99.8%)
+2026-08-29 12:57:35,572 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:57:35,594 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 12:57:35,596 - ERROR - Chat completion stream generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1831, in stream_generator
+    token = await asyncio.to_thread(_next_token)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1826, in _next_token
+    return next(token_iter)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:57:35,631 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50874 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:57:35,712 - INFO - Generation queued: request=11727c560 prompt_tokens=97197 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:57:35,718 - INFO - Prefill started: request=11727c560 backend=continuous_batching prompt_tokens=97197 images=0 audio=0 videos=0
+2026-08-29 12:57:36,048 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2802, in _next
+    mixed = self._build_mixed_prompt_batch(sequences)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2501, in _build_mixed_prompt_batch
+    warm_cache, _ = _apc.make_warm_batch_exact_cache_multi(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 3971, in make_warm_batch_exact_cache_multi
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:57:36,068 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 12:57:36,068 - ERROR - Chat completion stream generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1831, in stream_generator
+    token = await asyncio.to_thread(_next_token)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 1826, in _next_token
+    return next(token_iter)
+           ^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2802, in _next
+    mixed = self._build_mixed_prompt_batch(sequences)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2501, in _build_mixed_prompt_batch
+    warm_cache, _ = _apc.make_warm_batch_exact_cache_multi(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 3971, in make_warm_batch_exact_cache_multi
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50880 - "GET /v1/cache/stats HTTP/1.1" 200 OK
+2026-08-29 12:58:32,946 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50885 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:58:33,028 - INFO - Generation queued: request=660e960f0 prompt_tokens=97297 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:58:33,035 - INFO - Prefill started: request=660e960f0 backend=continuous_batching prompt_tokens=97297 images=0 audio=0 videos=0
+2026-08-29 12:58:41,134 - INFO - Prefill progress: request=660e960f0 tokens=82680/97297 (85.0%)
+2026-08-29 12:58:48,673 - INFO - Prefill progress: request=660e960f0 tokens=84728/97297 (87.1%)
+2026-08-29 12:58:56,370 - INFO - Prefill progress: request=660e960f0 tokens=86776/97297 (89.2%)
+2026-08-29 12:59:04,087 - INFO - Prefill progress: request=660e960f0 tokens=88824/97297 (91.3%)
+2026-08-29 12:59:12,064 - INFO - Prefill progress: request=660e960f0 tokens=90872/97297 (93.4%)
+2026-08-29 12:59:20,187 - INFO - Prefill progress: request=660e960f0 tokens=92920/97297 (95.5%)
+2026-08-29 12:59:28,361 - INFO - Prefill progress: request=660e960f0 tokens=94968/97297 (97.6%)
+2026-08-29 12:59:36,752 - INFO - Prefill progress: request=660e960f0 tokens=97016/97297 (99.7%)
+2026-08-29 12:59:38,820 - INFO - Prefill progress: request=660e960f0 tokens=97281/97297 (100.0%)
+2026-08-29 12:59:39,586 - WARNING - APC harvest failed during batched prefill: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 12:59:39,604 - INFO - Prefill completed: request=660e960f0 prompt_tokens=97297 cached_tokens=80632 elapsed=66.020s rate=1473.8 tok/s
+2026-08-29 12:59:39,604 - INFO - Decode started: request=660e960f0 time_to_first_token=66.657s
+2026-08-29 12:59:40,476 - INFO - Decode progress: request=660e960f0 generated_tokens=10 elapsed=0.872s rate=6.5 tok/s
+2026-08-29 12:59:41,276 - INFO - Decode progress: request=660e960f0 generated_tokens=20 elapsed=1.672s rate=134825.4 tok/s
+2026-08-29 12:59:42,231 - INFO - Decode progress: request=660e960f0 generated_tokens=30 elapsed=2.627s rate=24844.7 tok/s
+2026-08-29 12:59:43,057 - INFO - Decode progress: request=660e960f0 generated_tokens=40 elapsed=3.453s rate=35981.6 tok/s
+2026-08-29 12:59:43,699 - INFO - Decode progress: request=660e960f0 generated_tokens=50 elapsed=4.095s rate=6.2 tok/s
+2026-08-29 12:59:44,483 - INFO - Decode progress: request=660e960f0 generated_tokens=60 elapsed=4.878s rate=46242.8 tok/s
+2026-08-29 12:59:44,961 - INFO - Decode progress: request=660e960f0 generated_tokens=70 elapsed=5.357s rate=154822.8 tok/s
+2026-08-29 12:59:45,592 - INFO - Decode progress: request=660e960f0 generated_tokens=80 elapsed=5.988s rate=6.5 tok/s
+2026-08-29 12:59:45,752 - INFO - Decode completed: request=660e960f0 generated_tokens=81 elapsed=6.148s rate=13.0 tok/s finish_reason=stop
+2026-08-29 12:59:45,753 - INFO - Request completed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True backend=continuous_batching prompt_tokens=97297 generated_tokens=81 elapsed=72.807s prefill=1473.8 tok/s decode=13.2 tok/s finish_reason=tool_calls in_flight=0
+2026-08-29 12:59:45,795 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True in_flight=1
+INFO:     127.0.0.1:50885 - "POST /v1/chat/completions HTTP/1.1" 200 OK
+2026-08-29 12:59:45,889 - INFO - Generation queued: request=11727cf50 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 12:59:45,896 - INFO - Prefill started: request=11727cf50 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 12:59:49,962 - INFO - Prefill progress: request=11727cf50 tokens=2048/119848 (1.7%)
+2026-08-29 12:59:54,128 - INFO - Prefill progress: request=11727cf50 tokens=4096/119848 (3.4%)
+2026-08-29 12:59:58,342 - INFO - Prefill progress: request=11727cf50 tokens=6144/119848 (5.1%)
+2026-08-29 13:00:02,632 - INFO - Prefill progress: request=11727cf50 tokens=8192/119848 (6.8%)
+2026-08-29 13:00:06,987 - INFO - Prefill progress: request=11727cf50 tokens=10240/119848 (8.5%)
+2026-08-29 13:00:11,452 - INFO - Prefill progress: request=11727cf50 tokens=12288/119848 (10.3%)
+2026-08-29 13:00:15,943 - INFO - Prefill progress: request=11727cf50 tokens=14336/119848 (12.0%)
+2026-08-29 13:00:20,531 - INFO - Prefill progress: request=11727cf50 tokens=16384/119848 (13.7%)
+2026-08-29 13:00:25,213 - INFO - Prefill progress: request=11727cf50 tokens=18432/119848 (15.4%)
+2026-08-29 13:00:29,988 - INFO - Prefill progress: request=11727cf50 tokens=20480/119848 (17.1%)
+2026-08-29 13:00:34,856 - INFO - Prefill progress: request=11727cf50 tokens=22528/119848 (18.8%)
+2026-08-29 13:00:39,772 - INFO - Prefill progress: request=11727cf50 tokens=24576/119848 (20.5%)
+2026-08-29 13:00:44,823 - INFO - Prefill progress: request=11727cf50 tokens=26624/119848 (22.2%)
+2026-08-29 13:00:49,930 - INFO - Prefill progress: request=11727cf50 tokens=28672/119848 (23.9%)
+2026-08-29 13:00:55,173 - INFO - Prefill progress: request=11727cf50 tokens=30720/119848 (25.6%)
+2026-08-29 13:01:00,503 - INFO - Prefill progress: request=11727cf50 tokens=32768/119848 (27.3%)
+2026-08-29 13:01:05,884 - INFO - Prefill progress: request=11727cf50 tokens=34816/119848 (29.1%)
+2026-08-29 13:01:11,436 - INFO - Prefill progress: request=11727cf50 tokens=36864/119848 (30.8%)
+2026-08-29 13:01:17,106 - INFO - Prefill progress: request=11727cf50 tokens=38912/119848 (32.5%)
+2026-08-29 13:01:22,824 - INFO - Prefill progress: request=11727cf50 tokens=40960/119848 (34.2%)
+2026-08-29 13:01:28,646 - INFO - Prefill progress: request=11727cf50 tokens=43008/119848 (35.9%)
+2026-08-29 13:01:34,585 - INFO - Prefill progress: request=11727cf50 tokens=45056/119848 (37.6%)
+2026-08-29 13:01:40,655 - INFO - Prefill progress: request=11727cf50 tokens=47104/119848 (39.3%)
+2026-08-29 13:01:46,632 - INFO - Prefill progress: request=11727cf50 tokens=49152/119848 (41.0%)
+2026-08-29 13:01:52,810 - INFO - Prefill progress: request=11727cf50 tokens=51200/119848 (42.7%)
+2026-08-29 13:01:58,988 - INFO - Prefill progress: request=11727cf50 tokens=53248/119848 (44.4%)
+2026-08-29 13:02:05,217 - INFO - Prefill progress: request=11727cf50 tokens=55296/119848 (46.1%)
+2026-08-29 13:02:11,527 - INFO - Prefill progress: request=11727cf50 tokens=57344/119848 (47.8%)
+2026-08-29 13:02:17,909 - INFO - Prefill progress: request=11727cf50 tokens=59392/119848 (49.6%)
+2026-08-29 13:02:24,633 - INFO - Prefill progress: request=11727cf50 tokens=61440/119848 (51.3%)
+2026-08-29 13:02:31,403 - INFO - Prefill progress: request=11727cf50 tokens=63488/119848 (53.0%)
+2026-08-29 13:02:38,131 - INFO - Prefill progress: request=11727cf50 tokens=65536/119848 (54.7%)
+2026-08-29 13:02:44,872 - INFO - Prefill progress: request=11727cf50 tokens=67584/119848 (56.4%)
+2026-08-29 13:02:51,847 - INFO - Prefill progress: request=11727cf50 tokens=69632/119848 (58.1%)
+2026-08-29 13:02:58,836 - INFO - Prefill progress: request=11727cf50 tokens=71680/119848 (59.8%)
+2026-08-29 13:03:05,850 - INFO - Prefill progress: request=11727cf50 tokens=73728/119848 (61.5%)
+2026-08-29 13:03:12,961 - INFO - Prefill progress: request=11727cf50 tokens=75776/119848 (63.2%)
+2026-08-29 13:03:20,154 - INFO - Prefill progress: request=11727cf50 tokens=77824/119848 (64.9%)
+2026-08-29 13:03:27,442 - INFO - Prefill progress: request=11727cf50 tokens=79872/119848 (66.6%)
+2026-08-29 13:03:34,800 - INFO - Prefill progress: request=11727cf50 tokens=81920/119848 (68.4%)
+2026-08-29 13:03:42,262 - INFO - Prefill progress: request=11727cf50 tokens=83968/119848 (70.1%)
+2026-08-29 13:03:49,908 - INFO - Prefill progress: request=11727cf50 tokens=86016/119848 (71.8%)
+2026-08-29 13:03:57,738 - INFO - Prefill progress: request=11727cf50 tokens=88064/119848 (73.5%)
+2026-08-29 13:04:05,426 - INFO - Prefill progress: request=11727cf50 tokens=90112/119848 (75.2%)
+2026-08-29 13:04:13,185 - INFO - Prefill progress: request=11727cf50 tokens=92160/119848 (76.9%)
+2026-08-29 13:04:21,011 - INFO - Prefill progress: request=11727cf50 tokens=94208/119848 (78.6%)
+2026-08-29 13:04:29,006 - INFO - Prefill progress: request=11727cf50 tokens=96256/119848 (80.3%)
+2026-08-29 13:04:37,031 - INFO - Prefill progress: request=11727cf50 tokens=98304/119848 (82.0%)
+2026-08-29 13:04:45,116 - INFO - Prefill progress: request=11727cf50 tokens=100352/119848 (83.7%)
+2026-08-29 13:04:46,744 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=True error=stream_closed_before_completion in_flight=0
+2026-08-29 13:04:46,776 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=1
+2026-08-29 13:04:46,881 - INFO - Generation queued: request=660cd1d90 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:04:53,358 - INFO - Prefill progress: request=11727cf50 tokens=102400/119848 (85.4%)
+2026-08-29 13:04:53,358 - INFO - Generation cancelled: request=11727cf50 generated_tokens=0
+2026-08-29 13:04:53,413 - INFO - Prefill started: request=660cd1d90 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:04:57,736 - INFO - Prefill progress: request=660cd1d90 tokens=2048/119848 (1.7%)
+2026-08-29 13:05:02,111 - INFO - Prefill progress: request=660cd1d90 tokens=4096/119848 (3.4%)
+2026-08-29 13:05:06,591 - INFO - Prefill progress: request=660cd1d90 tokens=6144/119848 (5.1%)
+2026-08-29 13:05:11,163 - INFO - Prefill progress: request=660cd1d90 tokens=8192/119848 (6.8%)
+2026-08-29 13:05:15,758 - INFO - Prefill progress: request=660cd1d90 tokens=10240/119848 (8.5%)
+2026-08-29 13:05:20,486 - INFO - Prefill progress: request=660cd1d90 tokens=12288/119848 (10.3%)
+2026-08-29 13:05:25,303 - INFO - Prefill progress: request=660cd1d90 tokens=14336/119848 (12.0%)
+2026-08-29 13:05:30,229 - INFO - Prefill progress: request=660cd1d90 tokens=16384/119848 (13.7%)
+2026-08-29 13:05:35,114 - INFO - Prefill progress: request=660cd1d90 tokens=18432/119848 (15.4%)
+2026-08-29 13:05:40,086 - INFO - Prefill progress: request=660cd1d90 tokens=20480/119848 (17.1%)
+2026-08-29 13:05:45,133 - INFO - Prefill progress: request=660cd1d90 tokens=22528/119848 (18.8%)
+2026-08-29 13:05:50,268 - INFO - Prefill progress: request=660cd1d90 tokens=24576/119848 (20.5%)
+2026-08-29 13:05:55,482 - INFO - Prefill progress: request=660cd1d90 tokens=26624/119848 (22.2%)
+2026-08-29 13:06:00,792 - INFO - Prefill progress: request=660cd1d90 tokens=28672/119848 (23.9%)
+2026-08-29 13:06:06,177 - INFO - Prefill progress: request=660cd1d90 tokens=30720/119848 (25.6%)
+2026-08-29 13:06:11,716 - INFO - Prefill progress: request=660cd1d90 tokens=32768/119848 (27.3%)
+2026-08-29 13:06:17,310 - INFO - Prefill progress: request=660cd1d90 tokens=34816/119848 (29.1%)
+2026-08-29 13:06:23,024 - INFO - Prefill progress: request=660cd1d90 tokens=36864/119848 (30.8%)
+2026-08-29 13:06:28,836 - INFO - Prefill progress: request=660cd1d90 tokens=38912/119848 (32.5%)
+2026-08-29 13:06:34,605 - INFO - Prefill progress: request=660cd1d90 tokens=40960/119848 (34.2%)
+2026-08-29 13:06:40,454 - INFO - Prefill progress: request=660cd1d90 tokens=43008/119848 (35.9%)
+2026-08-29 13:06:46,528 - INFO - Prefill progress: request=660cd1d90 tokens=45056/119848 (37.6%)
+2026-08-29 13:06:52,563 - INFO - Prefill progress: request=660cd1d90 tokens=47104/119848 (39.3%)
+2026-08-29 13:06:58,881 - INFO - Prefill progress: request=660cd1d90 tokens=49152/119848 (41.0%)
+2026-08-29 13:07:05,502 - INFO - Prefill progress: request=660cd1d90 tokens=51200/119848 (42.7%)
+2026-08-29 13:07:12,607 - INFO - Prefill progress: request=660cd1d90 tokens=53248/119848 (44.4%)
+2026-08-29 13:07:19,601 - INFO - Prefill progress: request=660cd1d90 tokens=55296/119848 (46.1%)
+2026-08-29 13:07:26,593 - INFO - Prefill progress: request=660cd1d90 tokens=57344/119848 (47.8%)
+2026-08-29 13:07:33,712 - INFO - Prefill progress: request=660cd1d90 tokens=59392/119848 (49.6%)
+2026-08-29 13:07:40,864 - INFO - Prefill progress: request=660cd1d90 tokens=61440/119848 (51.3%)
+2026-08-29 13:07:47,847 - INFO - Prefill progress: request=660cd1d90 tokens=63488/119848 (53.0%)
+2026-08-29 13:07:54,928 - INFO - Prefill progress: request=660cd1d90 tokens=65536/119848 (54.7%)
+2026-08-29 13:08:02,016 - INFO - Prefill progress: request=660cd1d90 tokens=67584/119848 (56.4%)
+2026-08-29 13:08:09,161 - INFO - Prefill progress: request=660cd1d90 tokens=69632/119848 (58.1%)
+2026-08-29 13:08:16,447 - INFO - Prefill progress: request=660cd1d90 tokens=71680/119848 (59.8%)
+2026-08-29 13:08:24,101 - INFO - Prefill progress: request=660cd1d90 tokens=73728/119848 (61.5%)
+2026-08-29 13:08:31,592 - INFO - Prefill progress: request=660cd1d90 tokens=75776/119848 (63.2%)
+2026-08-29 13:08:38,902 - INFO - Prefill progress: request=660cd1d90 tokens=77824/119848 (64.9%)
+2026-08-29 13:08:46,827 - INFO - Prefill progress: request=660cd1d90 tokens=79872/119848 (66.6%)
+2026-08-29 13:08:54,470 - INFO - Prefill progress: request=660cd1d90 tokens=81920/119848 (68.4%)
+2026-08-29 13:09:01,929 - INFO - Prefill progress: request=660cd1d90 tokens=83968/119848 (70.1%)
+2026-08-29 13:09:09,416 - INFO - Prefill progress: request=660cd1d90 tokens=86016/119848 (71.8%)
+2026-08-29 13:09:16,980 - INFO - Prefill progress: request=660cd1d90 tokens=88064/119848 (73.5%)
+2026-08-29 13:09:24,602 - INFO - Prefill progress: request=660cd1d90 tokens=90112/119848 (75.2%)
+2026-08-29 13:09:32,323 - INFO - Prefill progress: request=660cd1d90 tokens=92160/119848 (76.9%)
+2026-08-29 13:09:40,087 - INFO - Prefill progress: request=660cd1d90 tokens=94208/119848 (78.6%)
+2026-08-29 13:09:47,977 - INFO - Prefill progress: request=660cd1d90 tokens=96256/119848 (80.3%)
+2026-08-29 13:09:48,352 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=2
+2026-08-29 13:09:48,453 - INFO - Generation queued: request=6654bf470 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:09:55,907 - INFO - Prefill progress: request=660cd1d90 tokens=98304/119848 (82.0%)
+2026-08-29 13:09:55,907 - INFO - Prefill started: request=6654bf470 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:10:03,922 - INFO - Prefill progress: request=660cd1d90 tokens=100352/119848 (83.7%)
+2026-08-29 13:10:11,836 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:10:11,867 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=1
+2026-08-29 13:10:11,867 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:10:11,904 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 13:10:11,904 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50908 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+2026-08-29 13:10:13,076 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=1
+2026-08-29 13:10:13,180 - INFO - Generation queued: request=660ea7020 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:10:13,187 - INFO - Prefill started: request=660ea7020 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:10:17,334 - INFO - Prefill progress: request=660ea7020 tokens=2048/119848 (1.7%)
+2026-08-29 13:10:21,532 - INFO - Prefill progress: request=660ea7020 tokens=4096/119848 (3.4%)
+2026-08-29 13:10:25,915 - INFO - Prefill progress: request=660ea7020 tokens=6144/119848 (5.1%)
+2026-08-29 13:10:30,362 - INFO - Prefill progress: request=660ea7020 tokens=8192/119848 (6.8%)
+2026-08-29 13:10:34,883 - INFO - Prefill progress: request=660ea7020 tokens=10240/119848 (8.5%)
+2026-08-29 13:10:39,477 - INFO - Prefill progress: request=660ea7020 tokens=12288/119848 (10.3%)
+2026-08-29 13:10:44,149 - INFO - Prefill progress: request=660ea7020 tokens=14336/119848 (12.0%)
+2026-08-29 13:10:48,892 - INFO - Prefill progress: request=660ea7020 tokens=16384/119848 (13.7%)
+2026-08-29 13:10:53,705 - INFO - Prefill progress: request=660ea7020 tokens=18432/119848 (15.4%)
+2026-08-29 13:10:58,591 - INFO - Prefill progress: request=660ea7020 tokens=20480/119848 (17.1%)
+2026-08-29 13:11:03,551 - INFO - Prefill progress: request=660ea7020 tokens=22528/119848 (18.8%)
+2026-08-29 13:11:08,584 - INFO - Prefill progress: request=660ea7020 tokens=24576/119848 (20.5%)
+2026-08-29 13:11:13,692 - INFO - Prefill progress: request=660ea7020 tokens=26624/119848 (22.2%)
+2026-08-29 13:11:18,891 - INFO - Prefill progress: request=660ea7020 tokens=28672/119848 (23.9%)
+2026-08-29 13:11:24,146 - INFO - Prefill progress: request=660ea7020 tokens=30720/119848 (25.6%)
+2026-08-29 13:11:29,473 - INFO - Prefill progress: request=660ea7020 tokens=32768/119848 (27.3%)
+2026-08-29 13:11:34,892 - INFO - Prefill progress: request=660ea7020 tokens=34816/119848 (29.1%)
+2026-08-29 13:11:40,374 - INFO - Prefill progress: request=660ea7020 tokens=36864/119848 (30.8%)
+2026-08-29 13:11:45,936 - INFO - Prefill progress: request=660ea7020 tokens=38912/119848 (32.5%)
+2026-08-29 13:11:51,570 - INFO - Prefill progress: request=660ea7020 tokens=40960/119848 (34.2%)
+2026-08-29 13:11:57,280 - INFO - Prefill progress: request=660ea7020 tokens=43008/119848 (35.9%)
+2026-08-29 13:12:03,058 - INFO - Prefill progress: request=660ea7020 tokens=45056/119848 (37.6%)
+2026-08-29 13:12:08,933 - INFO - Prefill progress: request=660ea7020 tokens=47104/119848 (39.3%)
+2026-08-29 13:12:14,866 - INFO - Prefill progress: request=660ea7020 tokens=49152/119848 (41.0%)
+2026-08-29 13:12:20,874 - INFO - Prefill progress: request=660ea7020 tokens=51200/119848 (42.7%)
+2026-08-29 13:12:26,957 - INFO - Prefill progress: request=660ea7020 tokens=53248/119848 (44.4%)
+2026-08-29 13:12:33,106 - INFO - Prefill progress: request=660ea7020 tokens=55296/119848 (46.1%)
+2026-08-29 13:12:39,333 - INFO - Prefill progress: request=660ea7020 tokens=57344/119848 (47.8%)
+2026-08-29 13:12:45,653 - INFO - Prefill progress: request=660ea7020 tokens=59392/119848 (49.6%)
+2026-08-29 13:12:52,041 - INFO - Prefill progress: request=660ea7020 tokens=61440/119848 (51.3%)
+2026-08-29 13:12:58,501 - INFO - Prefill progress: request=660ea7020 tokens=63488/119848 (53.0%)
+2026-08-29 13:13:05,044 - INFO - Prefill progress: request=660ea7020 tokens=65536/119848 (54.7%)
+2026-08-29 13:13:11,654 - INFO - Prefill progress: request=660ea7020 tokens=67584/119848 (56.4%)
+2026-08-29 13:13:18,347 - INFO - Prefill progress: request=660ea7020 tokens=69632/119848 (58.1%)
+2026-08-29 13:13:25,119 - INFO - Prefill progress: request=660ea7020 tokens=71680/119848 (59.8%)
+2026-08-29 13:13:31,971 - INFO - Prefill progress: request=660ea7020 tokens=73728/119848 (61.5%)
+2026-08-29 13:13:38,894 - INFO - Prefill progress: request=660ea7020 tokens=75776/119848 (63.2%)
+2026-08-29 13:13:45,882 - INFO - Prefill progress: request=660ea7020 tokens=77824/119848 (64.9%)
+2026-08-29 13:13:52,981 - INFO - Prefill progress: request=660ea7020 tokens=79872/119848 (66.6%)
+2026-08-29 13:14:00,146 - INFO - Prefill progress: request=660ea7020 tokens=81920/119848 (68.4%)
+2026-08-29 13:14:07,385 - INFO - Prefill progress: request=660ea7020 tokens=83968/119848 (70.1%)
+2026-08-29 13:14:14,691 - INFO - Prefill progress: request=660ea7020 tokens=86016/119848 (71.8%)
+2026-08-29 13:14:22,123 - INFO - Prefill progress: request=660ea7020 tokens=88064/119848 (73.5%)
+2026-08-29 13:14:29,630 - INFO - Prefill progress: request=660ea7020 tokens=90112/119848 (75.2%)
+2026-08-29 13:14:37,213 - INFO - Prefill progress: request=660ea7020 tokens=92160/119848 (76.9%)
+2026-08-29 13:14:44,849 - INFO - Prefill progress: request=660ea7020 tokens=94208/119848 (78.6%)
+2026-08-29 13:14:52,553 - INFO - Prefill progress: request=660ea7020 tokens=96256/119848 (80.3%)
+2026-08-29 13:15:00,415 - INFO - Prefill progress: request=660ea7020 tokens=98304/119848 (82.0%)
+2026-08-29 13:15:08,268 - INFO - Prefill progress: request=660ea7020 tokens=100352/119848 (83.7%)
+2026-08-29 13:15:16,209 - INFO - Prefill progress: request=660ea7020 tokens=102400/119848 (85.4%)
+2026-08-29 13:15:16,714 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=2
+2026-08-29 13:15:16,810 - INFO - Generation queued: request=65b3c11f0 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:15:24,228 - INFO - Prefill progress: request=660ea7020 tokens=104448/119848 (87.2%)
+2026-08-29 13:15:24,228 - INFO - Prefill started: request=65b3c11f0 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:15:32,325 - INFO - Prefill progress: request=660ea7020 tokens=106496/119848 (88.9%)
+2026-08-29 13:15:40,512 - INFO - Prefill progress: request=660ea7020 tokens=108544/119848 (90.6%)
+2026-08-29 13:15:48,784 - INFO - Prefill progress: request=660ea7020 tokens=110592/119848 (92.3%)
+2026-08-29 13:15:57,116 - INFO - Prefill progress: request=660ea7020 tokens=112640/119848 (94.0%)
+2026-08-29 13:16:05,556 - INFO - Prefill progress: request=660ea7020 tokens=114688/119848 (95.7%)
+2026-08-29 13:16:14,079 - INFO - Prefill progress: request=660ea7020 tokens=116736/119848 (97.4%)
+2026-08-29 13:16:22,671 - INFO - Prefill progress: request=660ea7020 tokens=118784/119848 (99.1%)
+2026-08-29 13:16:27,459 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4027, in snapshot_prompt_cache_row
+    row = extract_prompt_cache_from_batch(caches, batch_idx)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 3991, in extract_prompt_cache_from_batch
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:16:27,479 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=1
+2026-08-29 13:16:27,479 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4027, in snapshot_prompt_cache_row
+    row = extract_prompt_cache_from_batch(caches, batch_idx)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 3991, in extract_prompt_cache_from_batch
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:16:27,513 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 13:16:27,514 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4027, in snapshot_prompt_cache_row
+    row = extract_prompt_cache_from_batch(caches, batch_idx)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 3991, in extract_prompt_cache_from_batch
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50910 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+2026-08-29 13:16:31,585 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=1
+2026-08-29 13:16:31,686 - INFO - Generation queued: request=11727cb30 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:16:31,694 - INFO - Prefill started: request=11727cb30 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:16:35,876 - INFO - Prefill progress: request=11727cb30 tokens=2048/119848 (1.7%)
+2026-08-29 13:16:39,902 - INFO - Prefill progress: request=11727cb30 tokens=4096/119848 (3.4%)
+2026-08-29 13:16:43,995 - INFO - Prefill progress: request=11727cb30 tokens=6144/119848 (5.1%)
+2026-08-29 13:16:48,163 - INFO - Prefill progress: request=11727cb30 tokens=8192/119848 (6.8%)
+2026-08-29 13:16:52,516 - INFO - Prefill progress: request=11727cb30 tokens=10240/119848 (8.5%)
+2026-08-29 13:16:57,080 - INFO - Prefill progress: request=11727cb30 tokens=12288/119848 (10.3%)
+2026-08-29 13:17:01,720 - INFO - Prefill progress: request=11727cb30 tokens=14336/119848 (12.0%)
+2026-08-29 13:17:06,437 - INFO - Prefill progress: request=11727cb30 tokens=16384/119848 (13.7%)
+2026-08-29 13:17:11,234 - INFO - Prefill progress: request=11727cb30 tokens=18432/119848 (15.4%)
+2026-08-29 13:17:16,107 - INFO - Prefill progress: request=11727cb30 tokens=20480/119848 (17.1%)
+2026-08-29 13:17:21,063 - INFO - Prefill progress: request=11727cb30 tokens=22528/119848 (18.8%)
+2026-08-29 13:17:26,105 - INFO - Prefill progress: request=11727cb30 tokens=24576/119848 (20.5%)
+2026-08-29 13:17:31,223 - INFO - Prefill progress: request=11727cb30 tokens=26624/119848 (22.2%)
+2026-08-29 13:17:36,433 - INFO - Prefill progress: request=11727cb30 tokens=28672/119848 (23.9%)
+2026-08-29 13:17:41,719 - INFO - Prefill progress: request=11727cb30 tokens=30720/119848 (25.6%)
+2026-08-29 13:17:47,085 - INFO - Prefill progress: request=11727cb30 tokens=32768/119848 (27.3%)
+2026-08-29 13:17:52,531 - INFO - Prefill progress: request=11727cb30 tokens=34816/119848 (29.1%)
+2026-08-29 13:17:58,062 - INFO - Prefill progress: request=11727cb30 tokens=36864/119848 (30.8%)
+2026-08-29 13:18:03,672 - INFO - Prefill progress: request=11727cb30 tokens=38912/119848 (32.5%)
+2026-08-29 13:18:09,365 - INFO - Prefill progress: request=11727cb30 tokens=40960/119848 (34.2%)
+2026-08-29 13:18:15,133 - INFO - Prefill progress: request=11727cb30 tokens=43008/119848 (35.9%)
+2026-08-29 13:18:20,996 - INFO - Prefill progress: request=11727cb30 tokens=45056/119848 (37.6%)
+2026-08-29 13:18:26,934 - INFO - Prefill progress: request=11727cb30 tokens=47104/119848 (39.3%)
+2026-08-29 13:18:32,937 - INFO - Prefill progress: request=11727cb30 tokens=49152/119848 (41.0%)
+2026-08-29 13:18:39,033 - INFO - Prefill progress: request=11727cb30 tokens=51200/119848 (42.7%)
+2026-08-29 13:18:45,215 - INFO - Prefill progress: request=11727cb30 tokens=53248/119848 (44.4%)
+2026-08-29 13:18:51,467 - INFO - Prefill progress: request=11727cb30 tokens=55296/119848 (46.1%)
+2026-08-29 13:18:57,784 - INFO - Prefill progress: request=11727cb30 tokens=57344/119848 (47.8%)
+2026-08-29 13:19:04,184 - INFO - Prefill progress: request=11727cb30 tokens=59392/119848 (49.6%)
+2026-08-29 13:19:10,673 - INFO - Prefill progress: request=11727cb30 tokens=61440/119848 (51.3%)
+2026-08-29 13:19:17,232 - INFO - Prefill progress: request=11727cb30 tokens=63488/119848 (53.0%)
+2026-08-29 13:19:23,880 - INFO - Prefill progress: request=11727cb30 tokens=65536/119848 (54.7%)
+2026-08-29 13:19:30,596 - INFO - Prefill progress: request=11727cb30 tokens=67584/119848 (56.4%)
+2026-08-29 13:19:37,392 - INFO - Prefill progress: request=11727cb30 tokens=69632/119848 (58.1%)
+2026-08-29 13:19:44,264 - INFO - Prefill progress: request=11727cb30 tokens=71680/119848 (59.8%)
+2026-08-29 13:19:51,223 - INFO - Prefill progress: request=11727cb30 tokens=73728/119848 (61.5%)
+2026-08-29 13:19:58,261 - INFO - Prefill progress: request=11727cb30 tokens=75776/119848 (63.2%)
+2026-08-29 13:20:05,374 - INFO - Prefill progress: request=11727cb30 tokens=77824/119848 (64.9%)
+2026-08-29 13:20:12,602 - INFO - Prefill progress: request=11727cb30 tokens=79872/119848 (66.6%)
+2026-08-29 13:20:19,873 - INFO - Prefill progress: request=11727cb30 tokens=81920/119848 (68.4%)
+2026-08-29 13:20:27,219 - INFO - Prefill progress: request=11727cb30 tokens=83968/119848 (70.1%)
+2026-08-29 13:20:34,650 - INFO - Prefill progress: request=11727cb30 tokens=86016/119848 (71.8%)
+2026-08-29 13:20:42,154 - INFO - Prefill progress: request=11727cb30 tokens=88064/119848 (73.5%)
+2026-08-29 13:20:49,729 - INFO - Prefill progress: request=11727cb30 tokens=90112/119848 (75.2%)
+2026-08-29 13:20:49,855 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:20:49,876 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 13:20:49,876 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1913, in prompt_step
+    mx.async_eval([c.state for c in self.prompt_cache])
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50912 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+2026-08-29 13:20:59,293 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=1
+2026-08-29 13:20:59,392 - INFO - Generation queued: request=66def9d30 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:20:59,400 - INFO - Prefill started: request=66def9d30 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:21:03,721 - INFO - Prefill progress: request=66def9d30 tokens=2048/119848 (1.7%)
+2026-08-29 13:21:07,998 - INFO - Prefill progress: request=66def9d30 tokens=4096/119848 (3.4%)
+2026-08-29 13:21:12,334 - INFO - Prefill progress: request=66def9d30 tokens=6144/119848 (5.1%)
+2026-08-29 13:21:16,737 - INFO - Prefill progress: request=66def9d30 tokens=8192/119848 (6.8%)
+2026-08-29 13:21:21,211 - INFO - Prefill progress: request=66def9d30 tokens=10240/119848 (8.5%)
+2026-08-29 13:21:25,755 - INFO - Prefill progress: request=66def9d30 tokens=12288/119848 (10.3%)
+2026-08-29 13:21:30,369 - INFO - Prefill progress: request=66def9d30 tokens=14336/119848 (12.0%)
+2026-08-29 13:21:35,056 - INFO - Prefill progress: request=66def9d30 tokens=16384/119848 (13.7%)
+2026-08-29 13:21:39,816 - INFO - Prefill progress: request=66def9d30 tokens=18432/119848 (15.4%)
+2026-08-29 13:21:44,643 - INFO - Prefill progress: request=66def9d30 tokens=20480/119848 (17.1%)
+2026-08-29 13:21:49,544 - INFO - Prefill progress: request=66def9d30 tokens=22528/119848 (18.8%)
+2026-08-29 13:21:54,524 - INFO - Prefill progress: request=66def9d30 tokens=24576/119848 (20.5%)
+2026-08-29 13:21:59,587 - INFO - Prefill progress: request=66def9d30 tokens=26624/119848 (22.2%)
+2026-08-29 13:22:04,724 - INFO - Prefill progress: request=66def9d30 tokens=28672/119848 (23.9%)
+2026-08-29 13:22:09,933 - INFO - Prefill progress: request=66def9d30 tokens=30720/119848 (25.6%)
+2026-08-29 13:22:15,224 - INFO - Prefill progress: request=66def9d30 tokens=32768/119848 (27.3%)
+2026-08-29 13:22:20,592 - INFO - Prefill progress: request=66def9d30 tokens=34816/119848 (29.1%)
+2026-08-29 13:22:26,047 - INFO - Prefill progress: request=66def9d30 tokens=36864/119848 (30.8%)
+2026-08-29 13:22:31,577 - INFO - Prefill progress: request=66def9d30 tokens=38912/119848 (32.5%)
+2026-08-29 13:22:37,186 - INFO - Prefill progress: request=66def9d30 tokens=40960/119848 (34.2%)
+2026-08-29 13:22:42,876 - INFO - Prefill progress: request=66def9d30 tokens=43008/119848 (35.9%)
+2026-08-29 13:22:48,656 - INFO - Prefill progress: request=66def9d30 tokens=45056/119848 (37.6%)
+2026-08-29 13:22:54,515 - INFO - Prefill progress: request=66def9d30 tokens=47104/119848 (39.3%)
+2026-08-29 13:23:00,453 - INFO - Prefill progress: request=66def9d30 tokens=49152/119848 (41.0%)
+2026-08-29 13:23:06,479 - INFO - Prefill progress: request=66def9d30 tokens=51200/119848 (42.7%)
+2026-08-29 13:23:12,583 - INFO - Prefill progress: request=66def9d30 tokens=53248/119848 (44.4%)
+2026-08-29 13:23:18,774 - INFO - Prefill progress: request=66def9d30 tokens=55296/119848 (46.1%)
+2026-08-29 13:23:25,048 - INFO - Prefill progress: request=66def9d30 tokens=57344/119848 (47.8%)
+2026-08-29 13:23:31,385 - INFO - Prefill progress: request=66def9d30 tokens=59392/119848 (49.6%)
+2026-08-29 13:23:37,817 - INFO - Prefill progress: request=66def9d30 tokens=61440/119848 (51.3%)
+2026-08-29 13:23:44,326 - INFO - Prefill progress: request=66def9d30 tokens=63488/119848 (53.0%)
+2026-08-29 13:23:50,921 - INFO - Prefill progress: request=66def9d30 tokens=65536/119848 (54.7%)
+2026-08-29 13:23:57,620 - INFO - Prefill progress: request=66def9d30 tokens=67584/119848 (56.4%)
+2026-08-29 13:24:04,388 - INFO - Prefill progress: request=66def9d30 tokens=69632/119848 (58.1%)
+2026-08-29 13:24:11,230 - INFO - Prefill progress: request=66def9d30 tokens=71680/119848 (59.8%)
+2026-08-29 13:24:18,163 - INFO - Prefill progress: request=66def9d30 tokens=73728/119848 (61.5%)
+2026-08-29 13:24:25,176 - INFO - Prefill progress: request=66def9d30 tokens=75776/119848 (63.2%)
+2026-08-29 13:24:32,268 - INFO - Prefill progress: request=66def9d30 tokens=77824/119848 (64.9%)
+2026-08-29 13:24:39,485 - INFO - Prefill progress: request=66def9d30 tokens=79872/119848 (66.6%)
+2026-08-29 13:24:46,744 - INFO - Prefill progress: request=66def9d30 tokens=81920/119848 (68.4%)
+2026-08-29 13:24:54,100 - INFO - Prefill progress: request=66def9d30 tokens=83968/119848 (70.1%)
+2026-08-29 13:25:01,501 - INFO - Prefill progress: request=66def9d30 tokens=86016/119848 (71.8%)
+2026-08-29 13:25:08,993 - INFO - Prefill progress: request=66def9d30 tokens=88064/119848 (73.5%)
+2026-08-29 13:25:16,548 - INFO - Prefill progress: request=66def9d30 tokens=90112/119848 (75.2%)
+2026-08-29 13:25:24,204 - INFO - Prefill progress: request=66def9d30 tokens=92160/119848 (76.9%)
+2026-08-29 13:25:31,966 - INFO - Prefill progress: request=66def9d30 tokens=94208/119848 (78.6%)
+2026-08-29 13:25:39,757 - INFO - Prefill progress: request=66def9d30 tokens=96256/119848 (80.3%)
+2026-08-29 13:25:47,679 - INFO - Prefill progress: request=66def9d30 tokens=98304/119848 (82.0%)
+2026-08-29 13:25:55,695 - INFO - Prefill progress: request=66def9d30 tokens=100352/119848 (83.7%)
+2026-08-29 13:26:03,781 - INFO - Prefill progress: request=66def9d30 tokens=102400/119848 (85.4%)
+2026-08-29 13:26:11,933 - INFO - Prefill progress: request=66def9d30 tokens=104448/119848 (87.2%)
+2026-08-29 13:26:18,183 - INFO - Request started: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False in_flight=2
+2026-08-29 13:26:18,279 - INFO - Generation queued: request=6654bfd70 prompt_tokens=119848 max_tokens=32000 images=0 audio=0 videos=0
+2026-08-29 13:26:20,161 - INFO - Prefill progress: request=66def9d30 tokens=106496/119848 (88.9%)
+2026-08-29 13:26:20,162 - INFO - Prefill started: request=6654bfd70 backend=continuous_batching prompt_tokens=119848 images=0 audio=0 videos=0
+2026-08-29 13:26:28,479 - INFO - Prefill progress: request=66def9d30 tokens=108544/119848 (90.6%)
+2026-08-29 13:26:36,877 - INFO - Prefill progress: request=66def9d30 tokens=110592/119848 (92.3%)
+2026-08-29 13:26:45,366 - INFO - Prefill progress: request=66def9d30 tokens=112640/119848 (94.0%)
+2026-08-29 13:26:53,952 - INFO - Prefill progress: request=66def9d30 tokens=114688/119848 (95.7%)
+2026-08-29 13:27:02,620 - INFO - Prefill progress: request=66def9d30 tokens=116736/119848 (97.4%)
+2026-08-29 13:27:11,337 - INFO - Prefill progress: request=66def9d30 tokens=118784/119848 (99.1%)
+2026-08-29 13:27:16,248 - ERROR - Error in generation thread
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:27:16,270 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=1
+2026-08-29 13:27:16,270 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+2026-08-29 13:27:16,299 - WARNING - Request failed: endpoint=/chat/completions model=/Users/yash/Models/qwen3.8-27b-mlx-4bit stream=False error=[METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory). in_flight=0
+2026-08-29 13:27:16,300 - ERROR - Chat completion generation failed: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+Traceback (most recent call last):
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2179, in chat_completions_endpoint
+    ) = await asyncio.to_thread(_blocking_generate)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/opt/homebrew/Cellar/python@3.12/3.12.13/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/openai.py", line 2155, in _blocking_generate
+    for token in token_iter:
+                 ^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1051, in __next__
+    raise item
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 1933, in _run_impl
+    self._step(batch_gen, active)
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/server/generation.py", line 2415, in _step
+    prompt_responses, responses = batch_gen.next(**kwargs)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2908, in next
+    return self._next(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 2765, in _next
+    self._prompt_batch.prompt_step()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1915, in prompt_step
+    self._store_apc_exact_checkpoints()
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1872, in _store_apc_exact_checkpoints
+    prompt_cache = self._apc_prompt_cache_for_store(batch_idx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/generate/ar.py", line 1859, in _apc_prompt_cache_for_store
+    return _apc.snapshot_prompt_cache_row(self.prompt_cache, batch_idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 4031, in snapshot_prompt_cache_row
+    return _clone_prompt_cache_for_apc(source, min_capacity_tokens=min_capacity_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yash/Desktop/Programming/local_llm_bench/.mlxenv-0617/lib/python3.12/site-packages/mlx_vlm/apc.py", line 321, in _clone_prompt_cache_for_apc
+    mx.eval(eval_targets)
+RuntimeError: [METAL] Command buffer execution failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory).
+INFO:     127.0.0.1:50925 - "POST /v1/chat/completions HTTP/1.1" 500 Internal Server Error
+INFO:     127.0.0.1:50927 - "GET /v1/cache/stats HTTP/1.1" 200 OK
