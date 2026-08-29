@@ -198,3 +198,18 @@ ValueError: DSpark hidden_size must equal attention heads * head_dim.
   8-bit/6-bit preference is overruled by the panic evidence, not by speed alone.
 - Remaining: low-ctx quality grading (quant cost curve, APC off), verification session,
   docs, commits.
+
+## 2026-08-29 12:30–12:40 — SINGLE-CLONE PATCH ADOPTED (post-campaign follow-up)
+- SNAPSHOT_RESEARCH.md finding: exact-mode stores cloned the cache TWICE on the
+  continuous-batching path (~8.7 GB transient @45k, ~1/3 redundant). New
+  local-setup/scripts/apply-single-clone-patch adds take_ownership to
+  store_exact_cache and passes it at the two ar.py sites that already own a clone
+  (upstream PR #2072 has the same idea, unmerged). dispatch.py sites untouched
+  (they pass the live cache).
+- Retest, real Claude Code session on mlx4: 4 turns rc=0, trivial warm turn 2 s,
+  warm prefill 0.9–1.0 s, token_hit_rate 1.0 (6/6), zero Metal OOMs, answers correct.
+- qwen-code ctx cap raised 65536 → 81920 estimated (expected OOM onset now ~55-70k real).
+- Also verified today: 35B GGUF warm cache works fine (2 s follow-ups, checkpoint
+  restores in log) — the "35b broke" suspicion was unfounded. And Trial A's GGUF-27B
+  verdict is stale: build 9620 predates the hybrid checkpoint fixes; llama.cpp PR
+  #25592 (open) is the one to watch for warm 6/8-bit GGUF.
