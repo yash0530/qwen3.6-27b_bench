@@ -1,0 +1,31 @@
+[llm-proxy] listening on http://127.0.0.1:8093  ->  http://127.0.0.1:8091/v1  (model: qwen38-local)
+[llm-proxy] point a harness at it:  ANTHROPIC_BASE_URL=http://127.0.0.1:8093
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787394882263-690344fe.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787394962768-3086c646.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395303334-77c45f00.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395317697-3ab34092.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395326485-d5e402b5.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395346590-4d5a5284.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395365293-7dd55da0.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395375218-0c4d1dde.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395389552-081aa6ee.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395479305-667c6ed1.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395487087-1900a8be.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395500293-e606ab16.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395506855-9c278ae2.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395528542-c1110004.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395548244-23c64a11.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395658923-bdf79556.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395686065-cc473183.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395695066-8485ee00.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395714435-2c6cfb32.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395721027-8e0ba7f6.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395746506-b49a14f9.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395847513-9b190cf5.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787395862876-70193260.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396330409-9c77fe2d.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396384033-8394c48c.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396397890-edd62d1d.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396412626-7cd2de3d.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396556256-23c2d009.json
+[llm-proxy] dumped request -> /Users/yash/.local/state/local-llm/dump-triala/req-1787396583261-cf4d818c.json

@@ -1,0 +1,33 @@
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:36] turn 1 wall=147s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:39] turn 2 wall=3s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:42] turn 3 wall=3s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:45] turn 4 wall=3s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:49] turn 5 wall=4s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:52] turn 6 wall=3s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:55] turn 7 wall=3s rc=0
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen-local","query_source":"sdk"}
+
+[06:43:58] turn 8 wall=3s rc=0
+[06:43:58] turns done: stagek

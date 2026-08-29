@@ -1,0 +1,15 @@
+Create fib.py implementing an iterative fibonacci(n) function. Reply with just "done".
+Run python3 fib.py 30 and tell me the resulting value, nothing else.
+Add argparse so fib.py takes n as a positional argument. Reply with just "done".
+Create test_fib.py with pytest cases for fib(0), fib(1), fib(10) and run the tests. Report pass/fail counts only.
+Refactor the fibonacci logic into fib_module.py exposing fib(n), keeping fib.py working as a CLI wrapper that imports it. Reply with just "done".
+Update test_fib.py imports to use fib_module and rerun the tests. Report pass/fail counts only.
+Add a memoized recursive variant fib_memo(n) to fib_module.py, then verify in a throwaway script that it agrees with fib(n) for n in 0..20. Reply with just "done".
+Write README.md documenting usage of the CLI and the module functions. Reply with just "done".
+Add type hints throughout fib_module.py. Reply with just "done".
+Run the full test suite again and fix anything failing. Report what you changed in one line.
+Create bench.py that times fib(35) and fib_memo(35) and prints both timings, then run it once. Report the two numbers only.
+Make test_fib.py parametrize cases over n in [10, 20, 30] comparing fib and fib_memo, and rerun. Report pass/fail counts only.
+Review fib_module.py for correctness bugs and report findings in at most three bullet points.
+Update README.md with a short example output section showing real numbers from bench.py. Reply with just "done".
+Final check: run the whole suite and give me a one-line summary of project state.

@@ -1,0 +1,136 @@
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:29] turn 1 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:29] turn 2 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:30] turn 3 wall=1s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:30] turn 4 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:30] turn 5 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:31] turn 6 wall=1s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:31] turn 7 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:32] turn 8 wall=1s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:32] turn 9 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:32] turn 10 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:33] turn 11 wall=1s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:33] turn 12 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:33] turn 13 wall=0s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:34] turn 14 wall=1s rc=1
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+[claude-code:unrecognized_model] {"model":"qwen38-local","query_source":"sdk"}
+API Error: 400 Unable to generate parser for this template. Automatic parser generation failed: 
+------------
+While executing CallExpression at line 110, column 28 in source:
+...eveloper" %}↵        {{- raise_exception('System message must be at the beginnin...
+                                           ^
+Error: Jinja Exception: System message must be at the beginning.
+[03:28:34] turn 15 wall=0s rc=1
+[03:28:34] turns done: triala-llamacpp

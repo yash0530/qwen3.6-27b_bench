@@ -1,0 +1,2 @@
+[llm-proxy] listening on http://127.0.0.1:8791  ->  http://127.0.0.1:8093/v1  (model: /Users/yash/Models/qwen3.8-27b-mlx-4bit)
+[llm-proxy] point a harness at it:  ANTHROPIC_BASE_URL=http://127.0.0.1:8791
