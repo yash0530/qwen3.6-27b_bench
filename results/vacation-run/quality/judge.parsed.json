@@ -1,0 +1,137 @@
+{
+  "1": {
+    "A": {
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 8,
+      "practicality": 9,
+      "overall": 8.8,
+      "rationale": "Answer A provides an exceptionally detailed and accurate analysis with correct hardware specs, precise KV cache math, and highly practical code implementations. It only cuts off at the very end of the tool-use section due to the token limit."
+    },
+    "B": {
+      "correctness": 7,
+      "depth": 3,
+      "instruction_following": 3,
+      "practicality": 2,
+      "overall": 4.2,
+      "rationale": "Answer B suffers from severe planning and budget management issues, cutting off early in the head-to-head table and failing to address the model selection, hosting configuration, or engine integration."
+    },
+    "C": {
+      "correctness": 5,
+      "depth": 5,
+      "instruction_following": 5,
+      "practicality": 4,
+      "overall": 4.8,
+      "rationale": "Answer C contains notable factual errors, understating the M4 Pro memory bandwidth (120 GB/s vs 273 GB/s) and hallucinating non-existent models ('Mistral Large 2-48B' and 'Command A-34B'), while omitting all integration code."
+    },
+    "comparison": "As quantization decreases, quality drops sharply: the 8-bit reference (A) is factually accurate and includes concrete working code, while the 6-bit version (B) fails to manage its token budget and cuts off extremely early, and the 4-bit version (C) hallucinates model sizes and specifications while omitting all code implementations."
+  },
+  "2": {
+    "A": {
+      "correctness": 2,
+      "depth": 6,
+      "instruction_following": 7,
+      "practicality": 2,
+      "overall": 4.0,
+      "rationale": "A contains a fatal early-return bug in the worker loop that terminates workers upon their first successful job, meaning it will never process more jobs than the initial concurrency limit. Additionally, the abortableSleep helper is left unfinished and contains comments admitting it is not fully implemented."
+    },
+    "B": {
+      "correctness": 4,
+      "depth": 5,
+      "instruction_following": 6,
+      "practicality": 4,
+      "overall": 4.7,
+      "rationale": "B will crash on cancellation because aborting during semaphore acquisition or retry backoff throws an unhandled rejection, causing Promise.all to reject and bypass the result aggregation entirely. It also incorrectly uses the current epoch timestamp instead of elapsed duration for onItemSettled."
+    },
+    "C": {
+      "correctness": 7,
+      "depth": 7,
+      "instruction_following": 7,
+      "practicality": 8,
+      "overall": 7.2,
+      "rationale": "C uses a clean worker pool structure and runs successfully, but it leaves a messy, unused sleepMs function in the source code and leaks timers in TokenBucket.sleep on abort due to clearing the wrong timeout ID. The success result array also fails to include the item or original index, making it impossible to correlate successful outputs to their inputs."
+    },
+    "comparison": "B and C do not give up quality compared to A; rather, they are significantly more functional because A contains a fatal loop-termination bug that prevents it from processing more than the initial concurrency batch. While B offers a better result schema with input-output mapping, it crashes on cancellation, whereas C runs reliably and uses a clean worker pool but suffers from a timer leak and lacks output correlation."
+  },
+  "3": {
+    "A": {
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 10,
+      "practicality": 9,
+      "overall": 9.2,
+      "rationale": "Highly complete and structured, with syntactically valid SQL schemas, detailed Python logic, and full coverage of all prompt requirements including trade-offs and failure modes, all within the token budget."
+    },
+    "B": {
+      "correctness": 8,
+      "depth": 6,
+      "instruction_following": 6,
+      "practicality": 6,
+      "overall": 6.7,
+      "rationale": "Degrades from A by using a text-based schema outline rather than runnable SQL, and squanders the token budget on verbose explanations, leading to truncation that completely omits the required failure modes and operational checklist."
+    },
+    "C": {
+      "correctness": 7,
+      "depth": 7,
+      "instruction_following": 6,
+      "practicality": 6,
+      "overall": 6.6,
+      "rationale": "Suffers from forward-reference dependency errors in its SQL schema and leaves key LLM validation logic stubbed out. Like B, it squanders budget on verbose code blocks, causing truncation that omits the failure modes section."
+    },
+    "comparison": "B and C degrade significantly relative to A because they squander the token budget on verbose explanations and boilerplate code, resulting in truncation that completely omits the required failure modes and operational checklist. Additionally, B lacks runnable SQL schemas while C stubs out key validation logic and has forward-reference syntax errors in its schema, making A the only production-ready option."
+  },
+  "4": {
+    "A": {
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 9,
+      "practicality": 10,
+      "overall": 9.2,
+      "rationale": "Strong absolute merit with structured order of effects and diagrams, but has a typo in Together AI and omits hyperscaler capex from the sector risk/benefit matrix."
+    },
+    "B": {
+      "correctness": 9,
+      "depth": 10,
+      "instruction_following": 10,
+      "practicality": 10,
+      "overall": 9.7,
+      "rationale": "Superb depth of scenario analysis and perfect instruction following by explicitly covering all 12 sectors, though it uses counter-intuitive logic regarding edge silicon economics."
+    },
+    "C": {
+      "correctness": 10,
+      "depth": 8,
+      "instruction_following": 9,
+      "practicality": 8,
+      "overall": 8.9,
+      "rationale": "Excellent technical accuracy on packaging technology, GPU BOM details, and edge AI economics, but omits hyperscaler capex from the matrix and lacks actionable stock tickers."
+    },
+    "comparison": "B does not give up quality relative to A; it improves on it by providing complete sector coverage and superior scenario decomposition of key events. C gives up some quality in practicality and depth by omitting specific stock names and having a less detailed action plan, despite having superior technical accuracy."
+  },
+  "5": {
+    "A": {
+      "correctness": 9,
+      "depth": 9,
+      "instruction_following": 10,
+      "practicality": 9,
+      "overall": 9.2,
+      "rationale": "Answer A provides a clean, accurate bug analysis and a correct basic implementation, but relegates handling of synchronous throws and cache-invalidation races to its optional production section."
+    },
+    "B": {
+      "correctness": 6,
+      "depth": 7,
+      "instruction_following": 10,
+      "practicality": 6,
+      "overall": 7.1,
+      "rationale": "Answer B over-engineers the solution with custom class logic that introduces an O(N) performance bottleneck, a memory leak in negative caching, and a race condition on deletion."
+    },
+    "C": {
+      "correctness": 10,
+      "depth": 10,
+      "instruction_following": 10,
+      "practicality": 10,
+      "overall": 10.0,
+      "rationale": "Answer C is exceptionally precise, noting that the original code does not actually cache rejections, and delivers a robust solution handling synchronous throws and deletion races out-of-the-box."
+    },
+    "comparison": "Answer B gives up significant quality compared to A by introducing performance degradation, memory leaks, and a deletion race in its cache logic. Answer C gives up no quality and improves upon A by natively integrating race safety and synchronous error handling in its primary code."
+  }
+}

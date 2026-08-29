@@ -1,0 +1,19 @@
+[23:39:20] mlx8 q1 q1_model_selection ...
+  {'q': 1, 'id': 'q1_model_selection', 'wall_s': 845.6, 'decode_tps': '9.7', 'prefill_tps': '278.0', 'gen_tokens': '8192', 'prompt_tokens': '260', 'finish_reason': 'length', 'think_chars': 7318, 'answer_chars': 18697}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q1.md
+[23:53:25] mlx8 q2 q2_coding ...
+  {'q': 2, 'id': 'q2_coding', 'wall_s': 705.4, 'decode_tps': '9.7', 'prefill_tps': '360.1', 'gen_tokens': '6851', 'prompt_tokens': '185', 'finish_reason': 'stop', 'think_chars': 8561, 'answer_chars': 18330}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q2.md
+[00:05:11] mlx8 q3 q3_architecture ...
+  {'q': 3, 'id': 'q3_architecture', 'wall_s': 845.2, 'decode_tps': '9.7', 'prefill_tps': '367.9', 'gen_tokens': '8192', 'prompt_tokens': '224', 'finish_reason': 'length', 'think_chars': 3520, 'answer_chars': 26272}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q3.md
+[00:19:16] mlx8 q4 q4_finance_reasoning ...
+  {'q': 4, 'id': 'q4_finance_reasoning', 'wall_s': 561.0, 'decode_tps': '9.7', 'prefill_tps': '359.4', 'gen_tokens': '5433', 'prompt_tokens': '266', 'finish_reason': 'stop', 'think_chars': 7759, 'answer_chars': 15324}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q4.md
+[00:28:37] mlx8 q5 q5_debugging ...
+  {'q': 5, 'id': 'q5_debugging', 'wall_s': 506.3, 'decode_tps': '9.7', 'prefill_tps': '345.3', 'gen_tokens': '4908', 'prompt_tokens': '216', 'finish_reason': 'stop', 'think_chars': 13857, 'answer_chars': 5933}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q5.md
+[00:37:03] mlx8 q6 q6_instructions ...
+  {'q': 6, 'id': 'q6_instructions', 'wall_s': 269.4, 'decode_tps': '9.7', 'prefill_tps': '379.1', 'gen_tokens': '2611', 'prompt_tokens': '334', 'finish_reason': 'stop', 'think_chars': 6287, 'answer_chars': 1589}
+  -> /Users/yash/Desktop/Programming/local_llm_bench/results/vacation-run/quality/mlx8.q6.md
+DONE

@@ -1,0 +1,180 @@
+{
+  "scores": {
+    "mlx8": {
+      "1": 8.8,
+      "2": 4.0,
+      "3": 9.2,
+      "4": 9.2,
+      "5": 9.2,
+      "6": 9.2
+    },
+    "mlx6": {
+      "1": 4.2,
+      "2": 4.7,
+      "3": 6.7,
+      "4": 9.7,
+      "5": 7.1,
+      "6": 8.4
+    },
+    "mlx4": {
+      "1": 4.8,
+      "2": 7.2,
+      "3": 6.6,
+      "4": 8.9,
+      "5": 10.0,
+      "6": 9.2
+    }
+  },
+  "detail": {
+    "mlx8": {
+      "1": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 8,
+        "practicality": 9,
+        "overall": 8.8,
+        "rationale": "Answer A provides an exceptionally detailed and accurate analysis with correct hardware specs, precise KV cache math, and highly practical code implementations. It only cuts off at the very end of the tool-use section due to the token limit."
+      },
+      "2": {
+        "correctness": 2,
+        "depth": 6,
+        "instruction_following": 7,
+        "practicality": 2,
+        "overall": 4.0,
+        "rationale": "A contains a fatal early-return bug in the worker loop that terminates workers upon their first successful job, meaning it will never process more jobs than the initial concurrency limit. Additionally, the abortableSleep helper is left unfinished and contains comments admitting it is not fully implemented."
+      },
+      "3": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 10,
+        "practicality": 9,
+        "overall": 9.2,
+        "rationale": "Highly complete and structured, with syntactically valid SQL schemas, detailed Python logic, and full coverage of all prompt requirements including trade-offs and failure modes, all within the token budget."
+      },
+      "4": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 9,
+        "practicality": 10,
+        "overall": 9.2,
+        "rationale": "Strong absolute merit with structured order of effects and diagrams, but has a typo in Together AI and omits hyperscaler capex from the sector risk/benefit matrix."
+      },
+      "5": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 10,
+        "practicality": 9,
+        "overall": 9.2,
+        "rationale": "Answer A provides a clean, accurate bug analysis and a correct basic implementation, but relegates handling of synchronous throws and cache-invalidation races to its optional production section."
+      },
+      "6": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 10,
+        "practicality": 9,
+        "overall": 9.2,
+        "rationale": "A is highly correct and practical, using a logical database-backed registry design, explicit file paths, and a robust rollback strategy that disables the specific registry row to prevent dual execution."
+      }
+    },
+    "mlx6": {
+      "1": {
+        "correctness": 7,
+        "depth": 3,
+        "instruction_following": 3,
+        "practicality": 2,
+        "overall": 4.2,
+        "rationale": "Answer B suffers from severe planning and budget management issues, cutting off early in the head-to-head table and failing to address the model selection, hosting configuration, or engine integration."
+      },
+      "2": {
+        "correctness": 4,
+        "depth": 5,
+        "instruction_following": 6,
+        "practicality": 4,
+        "overall": 4.7,
+        "rationale": "B will crash on cancellation because aborting during semaphore acquisition or retry backoff throws an unhandled rejection, causing Promise.all to reject and bypass the result aggregation entirely. It also incorrectly uses the current epoch timestamp instead of elapsed duration for onItemSettled."
+      },
+      "3": {
+        "correctness": 8,
+        "depth": 6,
+        "instruction_following": 6,
+        "practicality": 6,
+        "overall": 6.7,
+        "rationale": "Degrades from A by using a text-based schema outline rather than runnable SQL, and squanders the token budget on verbose explanations, leading to truncation that completely omits the required failure modes and operational checklist."
+      },
+      "4": {
+        "correctness": 9,
+        "depth": 10,
+        "instruction_following": 10,
+        "practicality": 10,
+        "overall": 9.7,
+        "rationale": "Superb depth of scenario analysis and perfect instruction following by explicitly covering all 12 sectors, though it uses counter-intuitive logic regarding edge silicon economics."
+      },
+      "5": {
+        "correctness": 6,
+        "depth": 7,
+        "instruction_following": 10,
+        "practicality": 6,
+        "overall": 7.1,
+        "rationale": "Answer B over-engineers the solution with custom class logic that introduces an O(N) performance bottleneck, a memory leak in negative caching, and a race condition on deletion."
+      },
+      "6": {
+        "correctness": 8,
+        "depth": 8,
+        "instruction_following": 10,
+        "practicality": 8,
+        "overall": 8.4,
+        "rationale": "B introduces risk by validating failure handling with test-injected bad inputs directly in production and uses a brute-force rollback method of stopping the entire runner service rather than the specific job."
+      }
+    },
+    "mlx4": {
+      "1": {
+        "correctness": 5,
+        "depth": 5,
+        "instruction_following": 5,
+        "practicality": 4,
+        "overall": 4.8,
+        "rationale": "Answer C contains notable factual errors, understating the M4 Pro memory bandwidth (120 GB/s vs 273 GB/s) and hallucinating non-existent models ('Mistral Large 2-48B' and 'Command A-34B'), while omitting all integration code."
+      },
+      "2": {
+        "correctness": 7,
+        "depth": 7,
+        "instruction_following": 7,
+        "practicality": 8,
+        "overall": 7.2,
+        "rationale": "C uses a clean worker pool structure and runs successfully, but it leaves a messy, unused sleepMs function in the source code and leaks timers in TokenBucket.sleep on abort due to clearing the wrong timeout ID. The success result array also fails to include the item or original index, making it impossible to correlate successful outputs to their inputs."
+      },
+      "3": {
+        "correctness": 7,
+        "depth": 7,
+        "instruction_following": 6,
+        "practicality": 6,
+        "overall": 6.6,
+        "rationale": "Suffers from forward-reference dependency errors in its SQL schema and leaves key LLM validation logic stubbed out. Like B, it squanders budget on verbose code blocks, causing truncation that omits the failure modes section."
+      },
+      "4": {
+        "correctness": 10,
+        "depth": 8,
+        "instruction_following": 9,
+        "practicality": 8,
+        "overall": 8.9,
+        "rationale": "Excellent technical accuracy on packaging technology, GPU BOM details, and edge AI economics, but omits hyperscaler capex from the matrix and lacks actionable stock tickers."
+      },
+      "5": {
+        "correctness": 10,
+        "depth": 10,
+        "instruction_following": 10,
+        "practicality": 10,
+        "overall": 10.0,
+        "rationale": "Answer C is exceptionally precise, noting that the original code does not actually cache rejections, and delivers a robust solution handling synchronous throws and deletion races out-of-the-box."
+      },
+      "6": {
+        "correctness": 9,
+        "depth": 9,
+        "instruction_following": 10,
+        "practicality": 9,
+        "overall": 9.2,
+        "rationale": "C is operationally deep, introducing a staging dry-run shadow execution mode for parity checks, though its configuration via global environment variables in .env is slightly less clean than job-level configurations."
+      }
+    }
+  }
+}

@@ -1,0 +1,618 @@
+You are grading three answers produced by THE SAME 27B model served at three different quantization levels (8-bit, 6-bit, 4-bit). Your job is to detect quality loss from quantization.
+# Rubric
+# Judging rubric (v1)
+
+The judge is **Claude/Opus** (this Claude Code session, a future session, or any pluggable
+grader). Quality is scored per **(quant × question)** — MTP draft depth only affects speed,
+so the canonical MTP-off pass-1 answer represents each quant×question.
+
+## Criteria (score each 1–10)
+
+| Criterion | Weight | What it measures |
+|---|---|---|
+| `correctness` | 0.35 | Technical accuracy; **no hallucinated facts/APIs/numbers**. Penalize confidently wrong claims hard. |
+| `depth` | 0.25 | Insight and completeness — does it go beyond the obvious, cover edge cases / trade-offs? |
+| `instruction_following` | 0.20 | Did it address **every** part of the multi-part prompt in the requested form? |
+| `practicality` | 0.20 | Concrete, actionable, runnable — not hand-wavy. |
+
+`overall = 0.35*correctness + 0.25*depth + 0.20*instruction_following + 0.20*practicality`
+(If `overall` is omitted, `apply_scores.py` computes it from the weights.)
+
+
+# Grading instructions
+- Score EACH of the three answers on all four criteria (1-10 integers) and compute `overall` with the weights above (one decimal).
+- ANSWER A is the 8-bit reference. Grade it on absolute merit. Then grade B and C on absolute merit too, but explicitly note any degradation relative to A: dropped requirements, weaker reasoning, hallucinated APIs/numbers, broken code, format violations, repetition, truncation.
+- Be strict and discriminating. Do NOT give all three the same score unless they are genuinely equivalent. Penalize confidently wrong claims hard.
+- IMPORTANT: all three answers were generated with the SAME 8192-token budget, and some were cut off mid-sentence when they hit that cap. Do NOT penalize the raw fact of a trailing cutoff. DO penalize an answer that squandered the shared budget on padding, repetition or restatement and therefore covered less of the question.
+- Output ONLY a JSON object, no markdown fence, no commentary, in this exact shape:
+{"A": {"correctness":N,"depth":N,"instruction_following":N,"practicality":N,"overall":N.N,"rationale":"one or two sentences"},"B": {...same keys...}, "C": {...same keys...}, "comparison":"2-3 sentences on how much quality B and C give up vs A"}
+
+# The question that was asked
+
+It is a Monday morning. Across 12 AI-infrastructure sectors (compute/GPUs, memory/HBM, networking, foundry, power & cooling, hyperscaler capex, model labs, inference providers, edge silicon, optical, storage, and EDA), these tripwires fired overnight: (a) an HBM supplier guided down on yields; (b) a hyperscaler cut next-quarter capex guidance by 8%; (c) a foundry raised leading-node prices; (d) two inference providers cut API prices ~30%; (e) a power-utility serving data centers had a transmission outage. Reason step by step about the second-order effects, which sectors are most at risk vs. positioned to benefit, what is signal vs. noise, and how you would adjust research focus and risk attention this week. Show your chain of reasoning, then a concise prioritized summary.
+
+
+=================== ANSWER A ===================
+
+# AI-Infrastructure Overnight Tripwire Analysis
+
+## Step-by-Step Reasoning
+
+---
+
+### 1. Event-by-Event: First- and Second-Order Effects
+
+#### (a) HBM Supplier Yield Guidance Cut
+
+| Order | Effect |
+|-------|--------|
+| 1st | Effective HBM3E/HBM4 supply tightens; ASPs may rise as the other two suppliers (of the oligopoly) capture displaced volume |
+| 2nd | GPU shipment schedules (NVIDIA B-series, AMD MI400) face HBM attach-rate risk. CoWoS/SoIC packaging throughput is co-limited by HBM die availability, not just logic die |
+| 3rd | If the constraint persists >1 quarter, the bottleneck migrates from "logic capacity" to "memory supply." Data-center buildout timing slips. Model labs with long-term HBM pre-allocations are insulated; spot-market buyers are not |
+
+**Key ambiguity:** Is this one supplier's yield issue (likely Samsung or a second-tier player) or an industry-wide process transition problem (HBM4 stacking, new die size)? The answer changes the severity by an order of magnitude.
+
+---
+
+#### (b) Hyperscaler Capex Cut – 8%
+
+| Order | Effect |
+|-------|--------|
+| 1st | Direct demand reduction across GPUs, switches, optical transceivers, power equipment, cooling, and storage for that customer's footprint |
+| 2nd | The *signal* matters more than the *size*. An 8% cut from a top-3 hyperscaler is the first quantitative crack in the "infinite AI capex" narrative. It invites analysts and other hyperscalers to re-examine their own pipelines |
+| 3rd | Feeds a recursive loop: if two more hyperscalers follow in the same quarter, the story shifts from "timing" to "cycle top." Downstream (inference providers, model labs) feel it first in reduced compute availability; upstream (GPU, networking, power) feel it in order books 2–3 quarters later |
+
+**Key ambiguity:** Stated rationale. "We shifted $X from Q2 to Q3" is timing. "We are re-evaluating AI infrastructure ROI" is structural. The earnings call language is the single most important piece of information this week.
+
+---
+
+#### (c) Foundry Leading-Node Price Increase
+
+| Order | Effect |
+|-------|--------|
+| 1st | COGS increase for every chip on the affected node (3nm/2nm). Margin compression for NVIDIA, AMD, Apple, Qualcomm, and custom ASIC teams (Google TPU, AWS Trainium, Meta MTIA) unless passed through |
+| 2nd | Accelerates the "cost-per-FLOP" arithmetic that model labs and inference providers use to justify (or not) new capacity builds. Raises the breakeven utilization for AI inference clusters |
+| 3rd | Creates a wedge between leading-edge and mature-node economics. Some inference workloads may migrate to 7nm/5nm or even 12nm for cost reasons, shifting volume to TSMC's mature nodes or Samsung's 8nm-class. This is a *positive* for mature-node foundry capacity but a *negative* for leading-node utilization |
+
+**Context:** TSMC has raised prices before (2022, 2024). This is less of a "shock" and more of a "trend confirmation." The marginal signal is weaker than (a) or (b).
+
+---
+
+#### (d) Two Inference Providers Cut API Prices ~30%
+
+| Order | Effect |
+|-------|--------|
+| 1st | Gross margin compression for the cutting providers. If their cost of compute is fixed (contracted GPU capacity), a 30% price cut at, say, 40% gross margin → near-zero or negative margin on those tokens |
+| 2nd | **Bullish reading:** Price cuts drive adoption → more tokens consumed → more revenue at scale → better unit economics over time. This is the "razor-and-blade" model. |
+| 2nd | **Bearish reading:** Price cuts are a sign of overcapacity or a race to the bottom where no one can sustain it. Combined with (b), this suggests the demand side isn't growing fast enough to absorb the supply that was built |
+| 3rd | Model labs (the customers) benefit from lower inference costs, which improves *their* margins and may accelerate their own product iterations. End users (developers, enterprises) benefit from lower cost → higher usage volumes. The net effect on total token volume is the critical variable |
+
+**Key ambiguity:** Which two providers? If it's the top-2 by volume, it's a market-defining event. If it's mid-tier players, it's competitive noise. Also: are they cutting prices across all model sizes or just small/medium models (where commoditization is easier)?
+
+---
+
+#### (e) Power Utility Transmission Outage
+
+| Order | Effect |
+|-------|--------|
+| 1st | Potential downtime or load-shedding for data centers in the affected zone. SLA penalties, customer trust issues for the affected hyperscaler |
+| 2nd | Reinforces the structural narrative: **power is the hard constraint on AI data center expansion.** Grid interconnection queues are 3–5 years in many US markets. A single outage in a key AI hub (NOVA, Texas, Oregon) gets disproportionate attention because it validates the bottleneck thesis |
+| 3rd | Accelerates three investment themes: (1) on-site generation (gas turbines, diesel backup, SMRs), (2) grid modernization (transformers, HVDC, switching gear), (3) energy-efficient silicon (improved WAT – watts per token – as a competitive moat) |
+
+**Key ambiguity:** Duration and scope. A 4-hour regional outage is noise. A multi-day event affecting multiple data centers in a key AI corridor is a signal.
+
+---
+
+### 2. Cross-Event Interactions (Where the Real Signal Lives)
+
+The five events don't exist in isolation. The critical **interaction clusters** are:
+
+**Cluster 1: Rising costs + falling revenue (the bearish feedback loop)**
+```
+Foundry price ↑ (c) + HBM supply ↓ (a)  →  GPU/ASIC COGS ↑
+                                              ↓
+                              Inference provider COGS ↑
+                                              ↓
+                              But they're cutting prices (d)
+                                              ↓
+                              Margin compression accelerates
+                                              ↓
+                              Less incentive to build new capacity
+                                              ↓
+                              Hyperscaler sees weak ROI → cuts capex (b)
+                                              ↓
+                              Upstream demand drops → cycle decelerates
+```
+
+**Cluster 2: Structural bottlenecks persist (the bullish counter-narrative)**
+```
+Power outage (e) → confirms power is the binding constraint
+Foundry capacity (c) → confirms manufacturing is still tight
+HBM yield (a) → confirms memory is a bottleneck
+                                              ↓
+Even if capex pauses, the *structural* constraints remain
+                                              ↓
+When capex resumes (post-correction), the queue is even longer
+                                              ↓
+Power, cooling, and grid companies are "pick-and-shovel" plays
+```
+
+**The core question this week:** Are we seeing the *beginning of a capex correction* (Cluster 1) or *normal volatility within an upcycle where structural constraints dominate* (Cluster 2)? The answer determines the entire portfolio posture.
+
+---
+
+### 3. Signal vs. Noise Classification
+
+| Event | Signal Quality | Confidence | Why |
+|-------|---------------|------------|-----|
+| (b) Capex cut | **High** – 8/10 | Medium (pending earnings call) | Directly measures demand intent. Size is meaningful. Rationale is the missing variable |
+| (d) Inference price cuts | **High** – 7/10 | Medium (direction ambiguous) | Price is a revealed preference. But bull/bear interpretation depends on volume response |
+| (a) HBM yield cut | **Medium** – 6/10 | Low (scope unknown) | Could be single-quarter noise or multi-quarter structural. Need to confirm if industry-wide |
+| (c) Foundry price increase | **Low-Medium** – 4/10 | High (it's a trend) | Directional but not new information. TSMC does this periodically |
+| (e) Power outage | **Low** – 3/10 | High (it's an event) | Individual outages are normal. The *narrative reinforcement* is the value, not the event itself |
+
+---
+
+### 4. Sector Risk/Benefit Matrix
+
+| Sector | Net Direction | Magnitude | Key Driver |
+|--------|--------------|-----------|------------|
+| **Inference Providers** | 🔴 HIGH RISK | ●●●●● | Price cuts + capex cut = revenue and margin both under pressure |
+| **Networking (switches, transceivers)** | 🔴 ELEVATED RISK | ●●●●● | Capex cut directly reduces order pipeline. 2-3 quarter lag means pain arrives next quarter |
+| **GPU Vendors (NVIDIA, AMD)** | 🔴 ELEVATED RISK | ●●●●○ | HBM constraint + foundry cost + capex cut = triple squeeze. But long-term demand still strong |
+| **HBM Suppliers** | 🟡 MIXED | ●●●○○ | Yield issue hurts near-term revenue, but price increases and oligopoly pricing power provide partial offset |
+| **Storage** | 🟡 MODERATE RISK | ●●●○○ | Capex cut reduces near-term demand. AI-specific storage (NVMe, CXL) less affected than general-purpose |
+| **Model Labs** | 🟢 MODERATE BENEFIT | ●●●○○ | Lower inference costs improve their margins. But reduced compute availability could constrain training |
+| **Power & Cooling** | 🟢 BENEFIT | ●●●●● | Outage (e) + structural narrative = sustained demand regardless of capex timing. "Pick-and-shovel" of the AI buildout |
+| **Optical** | 🟡 MIXED | ●●●○○ | Near-term: capex cut hurts. Medium-term: if inference demand grows (cheaper prices → more usage), east-west traffic in inference clusters sustives demand. Net: less risk than switching |
+| **Foundry (leading-node)** | 🟡 NEUTRAL-POSITIVE | ●●●○○ | Price increase = margin positive. Volume may be flat. Mature nodes benefit from workload migration |
+| **EDA** | 🟢 LONG-TERM POSITIVE | ●●○○○ | Less sensitive to quarterly capex. Benefits from process complexity, more PDK engineering, 2.5D/3D packaging growth |
+| **Edge Silicon** | 🟢 MODERATE BENEFIT | ●●○○○ | If cloud inference gets expensive (margin pressure), some workloads shift to edge. Lower power draw is also a hedge against the (e) power narrative |
+| **Energy/Nuclear (cross-sector)** | 🟢 BENEFIT | ●●●●● | Power bottleneck narrative accelerates. GE Vernova, NuScale, Constellation Energy, gas turbine OEMs all benefit from the "power is the constraint" story |
+
+---
+
+### 5. This Week's Research Priorities
+
+**Priority 1 (Urgent – within 24-48 hours):**
+- **Dissect the capex cut rationale.** Find the exact language from the earnings call or press release. Distinguish "timing shift" from "structural re-evaluation." Check if the cut is absolute or relative (i.e., did they still grow YoY but at a slower rate?).
+- **Check other hyperscaler pipelines.** If Microsoft or Google have events this week, watch for follow-on commentary. If this is a one-hyperscaler event, it's less serious. If it's a pattern, it's a cycle signal.
+
+**Priority 2 (High – within 3-5 days):**
+- **Scope the HBM yield issue.** Is it SK Hynix, Samsung, or Micron? Is it HBM3E (current) or HBM4 (next-gen)? Check for any secondary supply chain commentary (e.g., from CoWoS capacity updates, GPU shipment data from TrendForce, etc.).
+- **Analyze the inference price cut in detail.** Which providers? Which model tiers? What's the implied margin at the new price point? Are they cutting prices to gain market share (aggressive) or because they have excess capacity (defensive)?
+
+**Priority 3 (Medium – within the week):**
+- **Map the power outage to specific deployments.** Which data centers are in the affected zone? Is this in a known AI corridor (Ashburn, Dallas, Portland)? Was it a planned maintenance or an unexpected failure?
+- **Monitor foundry commentary.** Is the price increase across all leading nodes or specific ones? Is there any commentary on capacity expansion timing?
+
+**Priority 4 (Ongoing/structural):**
+- **Track the "cost-per-token" trend.** Combine (c) + (a) + (d) to model whether the total cost of serving a token is rising or falling. If it's rising AND prices are falling, the margin gap is closing fast.
+- **Watch for the "inference shift" narrative.** If capex is shifting from training to inference, the sector mix changes. Inference clusters are smaller, more distributed, and power-constrained in different ways than training clusters.
+
+---
+
+### 6. Concise Prioritized Summary
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    THIS WEEK'S RISK MAP (Mon → Fri)                     │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  HIGHEST RISK (downgrade / hedge):                                      │
+│   1. Inference Providers (Togetheer, Fireworks, Replicate)              │
+│      → Price war + demand uncertainty = existential margin risk         │
+│   2. Networking (Arista, Cisco, Celestica)                             │
+│      → Capex cut hits order books in 4-8 weeks. Earnings calls this    │
+│        week are the test.                                               │
+│   3. GPU Vendors (NVIDIA, AMD) – near-term, not structural             │
+│      → Triple squeeze (HBM + foundry + capex) but TAM still growing.   │
+│        Watch for any "supply constrained" language in guidance.         │
+│                                                                         │
+│  HIGHEST OPPORTUNITY (upgrade / accumulate):                            │
+│   1. Power & Cooling (Vertiv, Eaton, GE Vernova, nVent)                │
+│      → Power outage + structural bottleneck = sustained demand.        │
+│        Less cyclical than GPU/networking. "Sells water in a gold rush." │
+│   2. Nuclear/On-site Energy (Constellation, NuScale, Oklo)             │
+│      → The 5-year grid queue is the real constraint. Power is the      │
+│        moat.                                                            │
+│   3. EDA (Synopsys, Cadence, Siemens EDA)                              │
+│      → Process complexity + 2.5D/3D packaging = structural growth.     │
+│        Least sensitive to quarterly capex noise.                        │
+│                                                                         │
+│  MONITOR / AWAIT CLARIFICATION:                                         │
+│   • HBM suppliers – wait for scope confirmation (1 supplier vs. 3)     │
+│   • Optical – depends on whether inference volume offsets capex cut    │
+│   • Foundry – price increase is margin-positive but volume-neutral     │
+│                                                                         │
+│  KEY DECISION GATE (by Thursday):                                       │
+│   "Is the capex cut a timing shift or a structural re-evaluation?"     │
+│   → If timing: maintain current positions, rotate into power/EDA       │
+│   → If structural: reduce networking/GPU exposure, add power/energy    │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+**Bottom line:** The overnight events are *more consistent with a capex cycle maturing* than with a demand collapse. The 8% cut is meaningful but not catastrophic. The inference price cuts are the more ambiguous signal. The power and HBM events reinforce that **physical constraints, not demand, are the binding limit** on AI infrastructure growth. The highest-conviction trade this week is **long power/cooling, short or neutral on networking**, pending clarification of the capex cut's rationale.
+
+=================== ANSWER B ===================
+
+# Monday Morning AI-Infrastructure Tripwire Analysis
+
+## 1. Catalog & Immediate Implications
+
+| Tripwire | Immediate Read | Signal vs. Noise |
+|----------|---------------|-----------------|
+| (a) HBM yield guidance down | Supply tightens, potential delivery delays, cost pass-through | **Signal** (sector-level) if it implies a structural yield wall; **noise** if one-time fab event |
+| (b) Hyperscaler capex −8% | Demand-side shock to compute, networking, storage, power | **High-signal** — the single most important event; cause determines everything |
+| (c) Foundry raises leading-node prices | Structural COGS increase for all leading-node silicon | **Pure signal** — one-directional ratchet, not a cycle |
+| (d) Two inference providers cut API prices ~30% | Inference commoditization; margin compression or efficiency pass-through | **High-signal** — the strategic inflection point for the stack |
+| (e) Power-utility transmission outage | Operational disruption; validates power-as-bottleneck thesis | **Noise** as event, **signal** as structural validation |
+
+---
+
+## 2. Step-by-Step Second-Order Reasoning
+
+### Chain A: The Capex Cut (b) — Root Cause Determination
+
+This is the linchpin. An 8% cut has three mutually non-exclusive causes, and each implies a different sector map:
+
+**Cause 1 — Cost discipline / demand digestion.**
+The hyperscaler is ahead of the curve and is pulling in spend. This implies *demand is still there but the buildout is being paced*. Second-order: foundries see order softness at leading nodes (volume risk offsets the price hike in (c)); GPU makers see fewer orders but pricing power holds because the cut is pacing, not cancellation; networking and storage decelerate in growth rate but don't contract.
+
+**Cause 2 — Power-constrained (linked to (e)).**
+The hyperscaler *can't* build as fast as it wants because power delivery is the binding constraint. The capex "cut" is actually a *deferral*, not a cancellation. Second-order: this is **bullish for power infrastructure** (nuclear, gas turbines, transformers, transmission equipment, battery storage) and **neutral-to-bullish for compute** (the demand is deferred, not destroyed). The capex resumes when power arrives. This reframes the event from a demand bearish signal to a *supply-side constraint* signal.
+
+**Cause 3 — Inference is cheap enough to rent (linked to (d)).**
+If inference prices drop 30%, the cost-benefit of *owning* inference compute vs. *renting* it shifts. The hyperscaler is rationally reallocating: less owned inference capacity, more rented. Second-order: this is **bearish for GPU/ASIC makers** (the largest inference buyers), **bullish for inference providers** (they capture the margin by owning the fleet), and **bullish for model labs** (their inference costs drop 30% as a direct tailwind).
+
+**Most likely synthesis:** A mix of Cause 2 and Cause 3. The power constraint limits *total* buildout, and the inference price drop makes some of the *marginal* compute no longer worth owning. The capex cut is therefore **structurally benign** for the AI buildout thesis (power will unlock more later) but **margin-negative** for the hardware layer in the near term.
+
+---
+
+### Chain B: The Inference Price Cut (d) — Why Simultaneously?
+
+Two providers cutting by ~30% at the same time is unlikely to be a pure price war (wars are typically asymmetric and sequential). The most parsimonious explanation:
+
+1. **A step-function in inference efficiency** — new model architectures (e.g., MoE with better routing, speculative decoding at scale, 4-bit/8-bit quantization improvements) have reduced cost-per-token by ~30-40%. Both providers have access to similar efficiency gains and are passing through the savings to win developer mindshare.
+
+2. **Strategic developer lock-in** — cheap inference is a loss-leader to capture the application layer. The real money is in the platform, data, and workflow lock-in. This is the "AWS Free Tier" play for inference.
+
+**Second-order effects:**
+- **Model labs** (OpenAI, Anthropic, Meta, etc.): Direct 30% reduction in serving costs. Margin expansion or capacity expansion at flat cost. **Bullish.**
+- **Inference providers**: If efficiency-driven, margins hold or expand. If competitive, margins compress. The simultaneous timing suggests the former. **Mildly bullish** on unit economics, **bearish** on the "scarcity premium" narrative that supported their valuations.
+- **GPU/ASIC vendors**: Inference workloads are more *batch-heavy* and *latency-tolerant* than training. The optimal hardware shifts from peak-FLOP (H100 for training) to *throughput-per-watt* (H100 for inference, or custom ASICs, or even older-generation GPUs). This is **mildly bearish for premium GPU pricing** and **bullish for inference-optimized silicon** (including custom ASICs from hyperscalers, and AMD's MI300X which is well-positioned for inference).
+- **Edge silicon**: Paradoxically **bullish**. Cheap cloud inference makes edge inference *more* economically viable. The TCO calculation for running inference on-device (phone, PC, car, sensor) becomes favorable when the cloud alternative is cheap. You don't need edge inference to *replace* cloud; you need it to *complement* cloud for latency, privacy, and bandwidth reasons. The cloud price floor makes the edge premium justifiable.
+
+---
+
+### Chain C: The HBM Yield Issue (a) — Structural or Cyclical?
+
+**If one-time (new fab ramp, equipment issue, contamination event):**
+- Short-term supply tightness → HBM prices rise → GPU makers pass through to customers → mild margin compression at GPU layer
+- Accelerates qualification of second-source HBM supplier → **bullish for the alternative supplier** (if the issue is at Samsung, SK Hynix benefits; if at SK Hynix, Samsung/Micron benefit)
+- Noise that resolves in 1-2 quarters
+
+**If structural (yield wall at HBM3E or HBM4 node):**
+- HBM supply growth is capped for 2-3 years
+- HBM becomes a *bottleneck input* for GPU production → GPU supply is constrained by HBM, not by wafer capacity
+- This **decouples GPU supply from foundry capacity** — the constraint shifts from silicon to memory
+- **Bullish for HBM supplier** (pricing power, scarcity premium)
+- **Bearish for GPU makers** (they can't produce as many units even if they have the wafers)
+- **Bearish for the buildout timeline** (fewer GPUs = fewer data centers = less power demand = less networking demand)
+
+**Action:** Determine which case this is. Look at the magnitude of the guidance cut, the supplier's commentary on root cause, and whether it affects a specific product generation or the entire portfolio.
+
+---
+
+### Chain D: Foundry Price Hike (c) — The Structural Ratchet
+
+Foundry price hikes at leading nodes are **one-directional**. TSMC has never meaningfully cut leading-node prices in a cycle. This is a structural margin expansion for the foundry.
+
+**Second-order effects:**
+- All leading-node customers (NVIDIA, AMD, Apple, Qualcomm, hyperscaler custom silicon) face higher COGS
+- **GPU makers**: If they can pass through (they can — they have pricing power), it's a non-event. If they can't (if the inference price war pressures them), margins compress. Given (d), there's now *more* pressure to pass through, making this more painful.
+- **Custom silicon**: At high volumes (billions of inference tokens), the amortized foundry cost per token is small. The price hike is less impactful for custom silicon at scale. This **accelerates the business case for custom silicon** vs. buying GPUs, because the GPU maker is now adding a foundry markup *on top of* their own margin.
+- **Inference economics**: Higher foundry costs → higher silicon costs → higher inference costs *if* passed through. But (d) shows prices are *falling*, which means the efficiency gains from (d) are *absorbing* the foundry cost increase. This is a positive for end users but a negative for the hardware layer's margins.
+
+**Net:** Bullish for foundry margins. Neutral-to-bearish for downstream margins. Accelerates custom silicon adoption.
+
+---
+
+### Chain E: The Power Outage (e) — Low-Probability Event, High-Signal Validation
+
+The outage itself is a single event that will be resolved. But it **validates the single most important structural thesis** in the AI infrastructure stack: **power is the binding constraint on buildout.**
+
+Second-order effects:
+- **Sentiment shock** to data center REITs and hyperscaler stock (fear of more outages)
+- **Regulatory attention** — grid operators and regulators will scrutinize data center interconnections more closely
+- **Accelerates investment** in:
+  - Nuclear (SMRs, existing plant repowering)
+  - Gas turbines (for bridge capacity)
+  - Grid infrastructure (transformers, switchgear, HVDC)
+  - Battery/energy storage (for peak shaving and backup)
+  - On-site generation (diesel backup, natural gas)
+- **The capex cut in (b) may be partially a power response.** If the hyperscaler's data center in the affected region had to curtail, they may be deferring buildout until power is resolved. This reinforces the "deferred, not cancelled" interpretation.
+
+**Net:** The outage is **noise as an event** but **signal as a thesis validator**. Position for power infrastructure exposure.
+
+---
+
+## 3. Cross-Sector Risk/Benefit Matrix
+
+| Sector | Direction | Confidence | Key Driver |
+|--------|-----------|------------|------------|
+| **Compute / GPUs** | ⚠️ Mixed → Mildly Bearish (near-term) | Medium | Capex cut + inference shift away from peak-FLOP; offset by volume elasticity and NVIDIA's pricing power |
+| **Memory / HBM** | ⚠️ Mixed | Medium | Yield issue = supply tightness (bullish for price) but inference shift = slower HBM-per-FLOP demand (bearish for volume). Net: price up, growth slower |
+| **Networking** | ⚠️ Mildly Bearish | Low-Medium | Inference is less communication-intensive than training. Mix shift reduces networking demand per FLOP. Total volume growth partially offsets |
+| **Foundry** | ✅ Bullish (margins) / ⚠️ Volume risk | High on margins, Medium on volume | Price hikes are structural. One customer's 8% cut is immaterial to TSMC's diversified base. Margins expand |
+| **Power & Cooling** | ✅ Bullish | High | Transmission outage validates the bottleneck. Capex cut may be partially power-driven. Investment in power infrastructure is the *most durable* allocation in this stack |
+| **Hyperscaler Capex** | ⚠️ Deferral, not cancellation | Medium | Power constraint + inference economics shift. Capex resumes when power is available. This is a *timing* issue, not a *level* issue |
+| **Model Labs** | ✅ Bullish | High | 30% inference cost reduction is a direct margin tailwind. Can serve more users, iterate faster, expand capacity at flat cost |
+| **Inference Providers** | ✅ Mildly Bullish (if efficiency-driven) | Medium | Simultaneous cuts suggest efficiency, not war. Margins hold or expand. Developer lock-in is the long-term moat |
+| **Edge Silicon** | ✅ Bullish | Medium-High | Cheap cloud inference makes edge inference economically viable. Latency, privacy, and bandwidth create a structural edge use case |
+| **Optical** | ⚠️ Neutral to Mildly Bearish | Low | Mix shift from training to inference reduces optical demand per FLOP. 800G→1.6T transition continues. Volume growth offsets mix |
+| **Storage** | ⚠️ Mildly Bearish | Medium | Inference is less storage-intensive than training (no massive checkpointing, no parameter-server datasets). RAG and vector DBs partially offset |
+| **EDA** | ⚠️ Mildly Bearish (short-term) | Low | Leading indicator of design activity. Capex cut + foundry price hike = fewer new designs near-term. Custom silicon shift partially offsets |
+
+---
+
+## 4. Signal vs. Noise — Final Classification
+
+**High-signal (act on these):**
+- Capex cut cause determination (power vs. demand vs. inference economics) — **most important**
+- Inference price cut driver (efficiency vs. competition) — **second most important**
+- Foundry price hike is structural — update all downstream margin models
+- Power constraint is the binding constraint — re-weight toward power infrastructure
+
+**Medium-signal (monitor, don't overreact):**
+- HBM yield issue — determine structural vs. one-time
+- Mix shift from training to inference — real but gradual, not a cliff
+
+**Noise (ignore as events, extract the thesis):**
+- The power outage itself (will be fixed; the signal is what it validates)
+- Single-supplier HBM yield dip (if one-time)
+- One hyperscaler's 8% cut (if company-specific and power-driven, it's not a sector signal)
+
+---
+
+## 5. Research Focus & Risk Adjustments for This Week
+
+### Priority 1 (Today)
+- **Determine the capex cut cause.** Read the 8-K/earnings call transcript. Look for language about "power availability," "site readiness," "inference economics," or "demand pacing." This single determination changes the entire sector map.
+- **Call 2-3 hyperscaler IR contacts** (or read sell-side notes that have) to get color on whether this is idiosyncratic or a leading indicator.
+
+### Priority 2 (Today-Tomorrow)
+- **Assess inference price cut driver.** Look at the providers' disclosed unit economics. Are they cutting prices while expanding EBITDA margins (efficiency) or compressing them (competition)? If they have recent model releases or hardware upgrades, it's likely efficiency-driven.
+- **Check if the two providers are in direct competition** (same customer segment, same geography) or if they're in different tiers (enterprise vs. consumer). Different tiers = efficiency play. Same tier = competitive.
+
+### Priority 3 (Tomorrow)
+- **HBM yield: structural or one-time?** Look at the magnitude of the guidance cut, the supplier's root-cause commentary, and whether it affects a specific HBM generation (HBM3E) or the entire portfolio. Check if the alternative supplier is ramping qualification.
+- **Update margin models** for GPU makers and custom silicon to reflect the foundry price hike. Quantify the COGS impact on per-GPU and per-ASIC economics.
+
+### Priority 4 (This Week)
+- **Power sector positioning.** Ensure adequate exposure to:
+  - SMR/nuclear (Oklo, NuScale, Cameco, Westinghouse)
+  - Gas turbines (GE Vernova, Siemens Energy, Mitsubishi Power)
+  - Grid equipment (Eaton, Schneider Electric, Hitachi Energy)
+  - Battery storage (Tesla Energy, Fluence, ESS makers)
+- **Edge silicon.** Review positioning in:
+  - Qualcomm (Snapdragon X, on-device AI)
+  - Apple (M-series, on-device inference)
+  - Mobile/edge NPU vendors (NVIDIA Jetson, Intel Gaudi at the edge)
+  - Smartphone/PC SoC makers
+
+### Risk Adjustments
+- **Reduce conviction** on "compute buildout accelerates" as a thesis. The capex cut, even if deferred, introduces a 2-4 quarter timing risk. Don't be a victim of momentum in GPU names if the near-term demand picture is softer.
+- **Increase conviction** on power infrastructure as the *most durable* allocation in the AI stack. Power constraints don't resolve with a product cycle. They resolve with multi-year infrastructure buildout.
+- **Add a "inference economics" overlay** to all model lab and inference provider research. The 30% price cut changes the cost structure of the entire application layer. Model labs get cheaper; inference providers get more competitive pressure; GPU makers get a mix shift.
+- **Flag the HBM yield issue** as a potential *second-order supply constraint* on GPU production. If it's structural, GPU supply is now constrained by memory, not wafers. This changes the bottleneck analysis for the entire compute layer.
+
+---
+
+## 6. Concise Prioritized Summary
+
+1. **The capex cut is a deferral, not a cancellation** — most likely power-constrained (linked to (e)) plus inference-economics-driven (linked to (d)). The buildout resumes when power is available. **Do not overreact to the headline number.**
+
+2. **Inference is commoditizing** — the 30% price cut is the single most important strategic signal. It shifts value from the hardware layer (GPUs, HBM, networking) to the *service layer* (inference providers, model labs) and the *efficiency layer* (custom silicon, edge silicon, power). **Re-weight your sector allocations accordingly.**
+
+3. **Power is the binding constraint** — the transmission outage is a low-probability event that validates the highest-conviction structural thesis in the stack. **Increase exposure to power infrastructure (nuclear, gas, grid, storage) as the most durable allocation.**
+
+4. **HBM yield is a potential second-order GPU supply constraint** — if structural, it shifts the bottleneck from foundry wafers to memory. **Determine the root cause this week.**
+
+5. **Foundry price hikes are structural and one-directional** — update all downstream margin models. This is a permanent cost increase, not a cyclical spike. **Accelerates the custom silicon thesis** (higher volume = lower amortized foundry cost per token).
+
+6. **Noise to ignore:** the power outage as an event, one hyperscaler's 8% cut as a sector signal (if power-driven), and one-time HBM yield dips. **Extract the thesis, not the event.**
+
+**Net portfolio tilt for the week:** Overweight power/energy infrastructure, edge silicon, and model labs. Neutral on foundry and inference providers. Underweight peak-FLOP GPU exposure, HBM (if yield is structural), and training-optimized networking. Add a "timing risk" flag to the compute buildout thesis — the direction is still up, but the near-term slope is flatter than the consensus expects.
+
+=================== ANSWER C ===================
+
+# Overnight Tripwire Analysis: Second-Order Effects & Weekly Research Prioritization
+
+## Step 1: Decode Each Signal (Direct Effects)
+
+| # | Signal | Direct Hit |
+|---|--------|-----------|
+| a | HBM yield guide-down | Memory makers: lower bits/wafer → revenue & margin compression |
+| b | Hyperscaler capex −8% | All downstream compute/network/power demand |
+| c | Foundry leading-node price hike | All leading-node ASIC/GPU BOMs up |
+| d | Two inference providers cut API prices ~30% | Inference provider gross margins compress; competitive signal |
+| e | Power utility transmission outage | Short-term ops disruption to specific DCs |
+
+---
+
+## Step 2: Second-Order & Cross-Sector Chain of Reasoning
+
+### The Critical Synthesis: (b) × (e) = Reinterpretation
+
+The single most important analytical move this week is to **test whether (b) is a demand signal or a supply-side constraint signal**.
+
+- If the hyperscaler cut capex because of **power availability** (i.e., they have GPUs on order but no watts to deploy them), then (b) is *not* bearish for AI compute demand — it's a **deployment velocity** issue. The GPUs exist; the bottleneck has shifted from silicon to electrons.
+- If (b) is driven by **questioned AI ROI / demand softness**, the entire stack gets repriced lower.
+
+The outage in (e) provides a *data point* for the power-constraint hypothesis but, in isolation, is **noise** — a single transmission event is not a structural signal. However, it raises the probability that power is the binding constraint, which *changes the interpretation* of (b).
+
+**Working hypothesis for the week:** (b) is partially or primarily a power-constraint signal, not a demand signal. I will treat the base case as "deployment bottleneck at the grid layer" until disproven.
+
+### The (a) + (b) + (c) Triangle — GPU Margin Squeeze
+
+These three signals interact multiplicatively on GPU/accelerator makers:
+
+```
+(a) HBM yield ↓  →  fewer HBM bits available  →  GPU units per wafer ↓
+(b) Capex cut    →  fewer GPU orders placed    →  volume ↓
+(c) Foundry price ↑ →  logic die cost ↑        →  COGS per unit ↑
+```
+
+Net effect on GPU makers: **volume down, COGS up = margin compression on both axes.** This is the most dangerous combination in the stack. The binding constraint analysis matters:
+
+- If **HBM is binding** (a is the tightest link), then (b) is less relevant for *near-term* GPU shipments — you can't make more GPUs without the memory anyway. The capex cut is absorbed by a slower draw-down of existing inventory.
+- If **capex is binding** (b is the tightest link), then the HBM yield issue is a future supply problem that will bite next quarter when capex normalizes.
+
+Either way, GPU makers face a **1–2 quarter margin headwind**.
+
+### (d) Inference Price Cuts — The Counterweight and the Trap
+
+Two simultaneous ~30% cuts is a **coordinated or competitive response** (unlikely to be coincidental if they're top-2 players). Second-order effects:
+
+1. **More inference volume** (price elasticity of AI usage is high at these price points) → *positive* for GPU consumption at inference providers' own fleets.
+2. **Cheaper cloud inference erodes the edge AI economic case** → negative for edge silicon near-term.
+3. **Hyperscalers may defer on-prem inference builds** ("I can just call the API") → amplifies (b) for inference-specific hardware.
+4. **Model labs benefit** if they monetize per-use or if cheaper inference drives user growth (more tokens = more revenue even at lower $/token).
+5. **If a third major player follows within 10 business days**, this becomes a structural industry repricing, not a tactical move. Watch for that.
+
+### (c) Foundry Price Hikes — The Persistent Ratchet
+
+Leading-node ASP increases are a **multi-quarter trend** (TSMC has been doing this since 2022, with annual hikes of 3–8%). This week's news is likely an *incremental* step in that trend, not a regime change. The second-order effect is:
+
+- AI chip makers (NVIDIA, AMD, custom ASICs) face **structurally rising BOM floors**.
+- If they can't fully pass through (because hyperscalers are already cutting capex in (b)), **margin compression is structural, not cyclical**.
+- For the foundry itself: price up, and if volume is only slightly down (one hyperscaler's 8% cut), **revenue and margin both expand**. Foundry is the clear winner in (c).
+
+### (e) Power Outage — Noise with a Structural Shadow
+
+In isolation: **noise**. A single transmission outage is an operational event.
+
+In context: it's a *confirming data point* for the power-constraint hypothesis that reframes (b). The research question becomes: "Is the hyperscaler's 8% cut a timing shift (capex deferred to when power is available) or a true reduction?"
+
+If the answer is "timing shift," then **power & cooling sectors are the beneficiaries** — the capex doesn't disappear, it *relocates* to the constraint layer.
+
+---
+
+## Step 3: Signal vs. Noise Triage
+
+| Signal | Signal Strength | Horizon | Why |
+|--------|:-:|:-:|-----|
+| (b) Capex cut | **HIGH** | 1–2 quarters | Multi-billion dollar, public, market-moving. But cause matters. |
+| (c) Foundry price | **MEDIUM** | 3+ quarters | Incremental in a multi-year ratchet. Important for modeling but not a *new* signal. |
+| (d) Inference price cuts | **MEDIUM-HIGH** | 1–2 quarters | Two players simultaneously is meaningful. Will become structural if followed. |
+| (a) HBM yield | **MEDIUM** | 1–2 quarters | Could be normal new-node ramp noise or a real process issue. Need root cause. |
+| (e) Power outage | **LOW** | Days | Single event. Relevant only as a *contextual data point* for (b). |
+
+**Most likely noise:** (e) in isolation, and possibly (a) if it's a known new-node transition (e.g., HBM4 on a new DRAM process).
+
+**Most likely signal:** (b), (c), and (d). These are the three that should drive position sizing and research allocation.
+
+---
+
+## Step 4: Sector Risk/Benefit Matrix
+
+### Most At Risk (Bearish Second-Order)
+
+| Sector | Mechanism | Severity |
+|--------|-----------|----------|
+| **Compute / GPUs** | (a)×(b)×(c) triple squeeze: volume ↓, COGS ↑, HBM supply ↓ | **HIGH** |
+| **HBM / Memory** | (a) direct: yield down = bits down = revenue down. If HBM is the binding constraint, memory makers *are* the bottleneck but don't capture the value — GPU makers or the system integrator does. | **HIGH** |
+| **Networking** | (b) fewer GPUs deployed → fewer scale-up links (NVLink, Infinity Fabric) and scale-out (InfiniBand, Ethernet). Optical transceivers hit as well. | **MEDIUM-HIGH** |
+| **Inference Providers** | (d) direct margin hit. If industry-wide follow-through, sustained 2+ quarter compression. | **MEDIUM-HIGH** |
+| **Edge Silicon** | (d) makes cloud inference cheap enough that edge AI TCO is harder to justify. (b) slows overall AI deployment. | **MEDIUM** |
+
+### Most Positioned to Benefit (Bullish Second-Order)
+
+| Sector | Mechanism | Severity |
+|--------|-----------|----------|
+| **Power & Cooling** | If (b) is power-constrained, capex *relocates* here. On-site generation, liquid cooling, nuclear-adjacent plays benefit from the bottleneck shift. (e) adds urgency. | **HIGH** |
+| **Foundry** | (c) direct: price up. Volume impact from (b) is one hyperscaler's 8% — easily offset by other customers. Margin expansion is nearly certain. | **MEDIUM-HIGH** |
+| **Model Labs** | (d) cheaper inference → more usage → more tokens consumed → revenue up if monetized per-use. Also, commoditized inference raises the value of *model quality/differentiation*, favoring well-capitalized frontier labs. | **MEDIUM** |
+| **Storage** | Least directly affected. AI data gravity (training data, checkpoints, inference KV-cache) continues to grow regardless of deployment velocity. | **LOW-MEDIUM (mildly positive)** |
+
+### Ambiguous / Requires More Data
+
+| Sector | Tension |
+|--------|---------|
+| **Optical** | (b) reduces scale-up demand; (d) increases inference data movement. Net likely slightly negative 1Q, but could flip positive if inference volume growth outpaces GPU deployment slowdown. |
+| **EDA** | If new chip designs are delayed (a+b), tool revenue lags by 2–3 quarters. Very long-duration business — one quarter is noise. |
+
+---
+
+## Step 5: Weekly Research Focus — Prioritized
+
+### 🔴 Priority 1: Disambiguate the Cause of (b)
+**Question:** Is the 8% capex cut a *demand* signal or a *power/supply* constraint?
+
+**Actions:**
+- Call/seek the hyperscaler's earnings commentary or 10-Q language. Look for words like "power availability," "site readiness," "grid interconnection" vs. "demand," "ROI," "deferral."
+- Check if other hyperscalers (the other 1–2 mega-caps) commented on power constraints in recent weeks. If 2+ of the big 3 mention power, the constraint hypothesis is strongly supported.
+- If confirmed as power-driven: **rotate research attention from compute to power/cooling.** The "AI trade" becomes a power trade.
+
+### 🟠 Priority 2: Root-Cause the HBM Yield Issue (a)
+**Question:** Is this a new-node transition (noise) or a process regression (signal)?
+
+**Actions:**
+- Determine which HBM generation is affected. If HBM3E (mature), it's more concerning than if HBM4 (new ramp, expected).
+- Check if the foundry (c) is involved in the TSV/interposer step. If the yield issue is in the DRAM die stage, it's the memory maker's problem. If it's in the stacking/TSV, it could implicate the foundry.
+- Estimate: what % of next quarter's GPU BOM is HBM? (For H100-class, ~25–30%; for B200-class, ~35–40%.) A yield issue that reduces bits by 10–15% could constrain GPU output by a similar magnitude.
+
+### 🟡 Priority 3: Monitor for Inference Price War Follow-Through (d)
+**Question:** Does a third major player follow within 5–10 business days?
+
+**Actions:**
+- Set alerts for API pricing changes from the top 3–5 inference providers (OpenAI, Anthropic, Google, AWS Bedrock, Azure).
+- If a third follows: treat as **structural industry repricing**. Model the new equilibrium: what $/token makes inference providers' GPU fleet economics work? This determines the floor.
+- If no follow-through: treat as **tactical** (perhaps tied to a specific model launch or competitive response to a new entrant). Lower urgency.
+
+### 🟢 Priority 4: Quantify the Power Constraint (e + context)
+**Question:** Is grid capacity actually the binding constraint for new DC deployment?
+
+**Actions:**
+- Check if the specific utility/region of the outage is a known hyperscaler build area.
+- Look for on-site generation announcements (gas turbines, nuclear PPAs, solar+storage) from hyperscalers in the last 2 weeks.
+- If the capex cut (b) is power-driven, the *net* AI capex isn't down — it's **reallocated**. Quantify: what % of the 8% cut is power vs. compute vs. networking?
+
+### ⚪ Priority 5 (Lower): Foundry Price Hike (c)
+- This is a known trend. Model the ASP increase into GPU/ASIC BOM for the next 2 quarters.
+- Check if the price hike applies to *all* leading-node customers or is targeted at AI-specific workloads. If targeted, it's a more aggressive signal of foundry pricing power.
+
+---
+
+## Concise Prioritized Summary
+
+```
+RISK (act to de-risk or short):
+  1. GPU/Compute — triple squeeze (a×b×c). Margin compression 1-2Q.
+  2. HBM/Memory — direct yield hit. If HBM is binding, GPU output constrained.
+  3. Networking — demand follows GPU deployment. (b) is the lead indicator.
+  4. Inference Providers — (d) margin hit; watch for industry-wide follow.
+  5. Edge Silicon — (d) erodes economic case for on-device inference.
+
+BENEFIT (act to add or overweight):
+  1. Power & Cooling — if (b) is power-constrained, this IS the new AI trade.
+  2. Foundry — (c) price up, volume impact minimal. Margin expansion.
+  3. Model Labs — (d) is a volume driver; commoditized inference rewards
+     the model layer, not the infra layer.
+  4. Storage — quiet beneficiary of continued data gravity.
+
+SIGNAL vs NOISE:
+  • Strong signal: (b), (c), (d) — drive position sizing.
+  • Conditional signal: (a) — depends on root cause.
+  • Noise: (e) in isolation — relevant only as context for (b).
+
+THIS WEEK'S SINGLE MOST IMPORTANT QUESTION:
+  "Why did the hyperscaler cut capex?"
+  → If power: rotate to power/cooling. AI trade = electrons trade.
+  → If demand: de-risk the entire compute stack. AI trade = de-rating trade.
+  → If timing: no action needed; it's a phasing artifact.
+```
+
+The entire analysis pivots on that one question. Everything else is second-order consequence. Get the answer on (b)'s cause, and the rest of the matrix resolves itself.

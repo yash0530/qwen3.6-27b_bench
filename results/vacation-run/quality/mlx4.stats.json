@@ -1,0 +1,74 @@
+[
+  {
+    "q": 1,
+    "id": "q1_model_selection",
+    "wall_s": 469.7,
+    "decode_tps": "17.5",
+    "prefill_tps": "370.9",
+    "gen_tokens": "8192",
+    "prompt_tokens": "260",
+    "finish_reason": "length",
+    "think_chars": 12216,
+    "answer_chars": 12412
+  },
+  {
+    "q": 2,
+    "id": "q2_coding",
+    "wall_s": 368.0,
+    "decode_tps": "17.6",
+    "prefill_tps": "415.5",
+    "gen_tokens": "6451",
+    "prompt_tokens": "185",
+    "finish_reason": "stop",
+    "think_chars": 6093,
+    "answer_chars": 18884
+  },
+  {
+    "q": 3,
+    "id": "q3_architecture",
+    "wall_s": 469.3,
+    "decode_tps": "17.5",
+    "prefill_tps": "405.1",
+    "gen_tokens": "8192",
+    "prompt_tokens": "224",
+    "finish_reason": "length",
+    "think_chars": 5579,
+    "answer_chars": 26385
+  },
+  {
+    "q": 4,
+    "id": "q4_finance_reasoning",
+    "wall_s": 332.0,
+    "decode_tps": "17.6",
+    "prefill_tps": "391.0",
+    "gen_tokens": "5824",
+    "prompt_tokens": "266",
+    "finish_reason": "stop",
+    "think_chars": 10774,
+    "answer_chars": 12473
+  },
+  {
+    "q": 5,
+    "id": "q5_debugging",
+    "wall_s": 291.3,
+    "decode_tps": "17.6",
+    "prefill_tps": "384.5",
+    "gen_tokens": "5120",
+    "prompt_tokens": "216",
+    "finish_reason": "stop",
+    "think_chars": 13272,
+    "answer_chars": 7079
+  },
+  {
+    "q": 6,
+    "id": "q6_instructions",
+    "wall_s": 124.1,
+    "decode_tps": "17.8",
+    "prefill_tps": "412.4",
+    "gen_tokens": "2188",
+    "prompt_tokens": "334",
+    "finish_reason": "stop",
+    "think_chars": 6315,
+    "answer_chars": 1713
+  }
+]

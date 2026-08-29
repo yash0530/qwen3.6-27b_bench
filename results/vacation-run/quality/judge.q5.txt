@@ -1,0 +1,659 @@
+You are grading three answers produced by THE SAME 27B model served at three different quantization levels (8-bit, 6-bit, 4-bit). Your job is to detect quality loss from quantization.
+# Rubric
+# Judging rubric (v1)
+
+The judge is **Claude/Opus** (this Claude Code session, a future session, or any pluggable
+grader). Quality is scored per **(quant × question)** — MTP draft depth only affects speed,
+so the canonical MTP-off pass-1 answer represents each quant×question.
+
+## Criteria (score each 1–10)
+
+| Criterion | Weight | What it measures |
+|---|---|---|
+| `correctness` | 0.35 | Technical accuracy; **no hallucinated facts/APIs/numbers**. Penalize confidently wrong claims hard. |
+| `depth` | 0.25 | Insight and completeness — does it go beyond the obvious, cover edge cases / trade-offs? |
+| `instruction_following` | 0.20 | Did it address **every** part of the multi-part prompt in the requested form? |
+| `practicality` | 0.20 | Concrete, actionable, runnable — not hand-wavy. |
+
+`overall = 0.35*correctness + 0.25*depth + 0.20*instruction_following + 0.20*practicality`
+(If `overall` is omitted, `apply_scores.py` computes it from the weights.)
+
+
+# Grading instructions
+- Score EACH of the three answers on all four criteria (1-10 integers) and compute `overall` with the weights above (one decimal).
+- ANSWER A is the 8-bit reference. Grade it on absolute merit. Then grade B and C on absolute merit too, but explicitly note any degradation relative to A: dropped requirements, weaker reasoning, hallucinated APIs/numbers, broken code, format violations, repetition, truncation.
+- Be strict and discriminating. Do NOT give all three the same score unless they are genuinely equivalent. Penalize confidently wrong claims hard.
+- IMPORTANT: all three answers were generated with the SAME 8192-token budget, and some were cut off mid-sentence when they hit that cap. Do NOT penalize the raw fact of a trailing cutoff. DO penalize an answer that squandered the shared budget on padding, repetition or restatement and therefore covered less of the question.
+- Output ONLY a JSON object, no markdown fence, no commentary, in this exact shape:
+{"A": {"correctness":N,"depth":N,"instruction_following":N,"practicality":N,"overall":N.N,"rationale":"one or two sentences"},"B": {...same keys...}, "C": {...same keys...}, "comparison":"2-3 sentences on how much quality B and C give up vs A"}
+
+# The question that was asked
+
+The following TypeScript is meant to cache the result of an async loader so concurrent callers share one in-flight request, but under load it sometimes makes duplicate network calls and occasionally caches a rejected promise forever. Find every bug, explain the race conditions precisely, and provide a corrected, production-quality version.
+
+```ts
+const cache = new Map<string, Promise<Data>>();
+async function load(key: string): Promise<Data> {
+  if (cache.has(key)) return cache.get(key)!;
+  const data = await fetchData(key);
+  const p = Promise.resolve(data);
+  cache.set(key, p);
+  return data;
+}
+```
+
+
+=================== ANSWER A ===================
+
+## Bug Analysis
+
+### Bug 1 — No In-Flight Deduplication (Thundering Herd)
+
+```ts
+if (cache.has(key)) return cache.get(key)!;   // ← check
+const data = await fetchData(key);            // ← YIELD: control returns to event loop
+const p = Promise.resolve(data);
+cache.set(key, p);                            // ← set (too late)
+```
+
+The `await` suspends the function and returns control to the event loop. Any other caller that invokes `load(sameKey)` during that suspension hits `cache.has(key)` → `false` (the entry hasn't been written yet) and fires a second `fetchData`. Under N concurrent callers you get N network calls instead of 1.
+
+**Precise race:**
+
+```
+Timeline (single-threaded event loop):
+
+tick 0  Caller A: cache.has("k") → false
+tick 0  Caller A: fetchData("k") → returns Promise P_A
+tick 0  Caller A: await → SUSPENDS (yields to loop)
+
+tick 0  Caller B: cache.has("k") → false   ← P_A not yet in cache
+tick 0  Caller B: fetchData("k") → returns Promise P_B  ← DUPLICATE CALL
+tick 0  Caller B: await → SUSPENDS
+
+... both P_A and P_B resolve, two network calls were made ...
+```
+
+### Bug 2 — Rejected Promises Cached Forever
+
+This manifests the moment you naively fix Bug 1 by storing the promise *before* the `await`:
+
+```ts
+// Naive "fix" for Bug 1:
+const promise = fetchData(key);
+cache.set(key, promise);       // stored before we know the outcome
+return promise;
+```
+
+If `fetchData` rejects, the rejected promise is permanently pinned in the `Map`. Every subsequent caller gets the same stale rejection. There is no retry path and no way to evict it.
+
+### Bug 3 — Unnecessary `Promise.resolve` Wrapper
+
+```ts
+const data = await fetchData(key);  // `data` is a plain value, already unwrapped
+const p = Promise.resolve(data);    // no-op: wraps a non-thenable in a resolved promise
+```
+
+This is not a correctness bug, but it signals a misunderstanding: the author stored the *resolved value* rather than the *in-flight promise*, which is the root cause of Bug 1.
+
+### Bug 4 — `async` Wrapper Adds a Spurious Microtask
+
+The function is `async` but never `await`s internally. The `return promise` inside an `async` function is equivalent to `return Promise.resolve(promise)`, introducing an extra microtask hop before the caller's `.then` fires. Negligible in most cases, but in a hot cache path it's avoidable latency.
+
+---
+
+## Corrected Implementation
+
+```ts
+const cache = new Map<string, Promise<Data>>();
+
+/**
+ * Deduplicates concurrent calls to fetchData for the same key.
+ * - The in-flight promise is cached synchronously (before any await),
+ *   so concurrent callers share one network request.
+ * - On rejection the entry is evicted so the next caller can retry.
+ * - No extra microtask is introduced (non-async function).
+ */
+function load(key: string): Promise<Data> {
+  const existing = cache.get(key);
+  if (existing !== undefined) return existing;
+
+  // Attach rejection handler synchronously so:
+  //   1. The source promise never goes unhandled.
+  //   2. We evict the cache entry on failure (allowing retry).
+  //   3. We re-throw so all callers still observe the rejection.
+  const promise: Promise<Data> = fetchData(key).catch((err) => {
+    cache.delete(key);
+    throw err;
+  });
+
+  cache.set(key, promise);
+  return promise;
+}
+```
+
+### Why this is correct
+
+| Concern | How it's handled |
+|---|---|
+| **Deduplication** | `cache.set(key, promise)` executes synchronously in the same microtask as `cache.get`. No `await` intervenes, so a concurrent caller in the same tick sees the entry. |
+| **Rejection eviction** | The `.catch` handler deletes the key *before* re-throwing. The derived promise still rejects to all callers, but the cache is clean for the next attempt. |
+| **Unhandled rejection safety** | `.catch` is attached to `fetchData(key)`'s return value *synchronously*, so the source promise always has a handler. The derived `promise` is returned to the caller who is contractually responsible for handling it. |
+| **No extra microtask** | The function is not `async`; it returns the promise directly. Callers' `.then` callbacks fire one tick earlier than with an `async` wrapper. |
+| **Synchronous throw in fetchData** | If `fetchData` throws synchronously, the `async`-less function would propagate it as a thrown error. Wrap in try/catch if that's a concern, or keep `async` for uniform rejection semantics. |
+
+---
+
+## Production Hardening (Optional Extensions)
+
+```ts
+interface CacheEntry {
+  promise: Promise<Data>;
+  createdAt: number;
+}
+
+const cache = new Map<string, CacheEntry>();
+const TTL = 60_000; // 60 s
+
+function load(key: string): Promise<Data> {
+  const existing = cache.get(key);
+  if (existing !== undefined) {
+    // Lazy TTL check (avoids timers, works with frozen clocks)
+    if (Date.now() - existing.createdAt < TTL) {
+      return existing.promise;
+    }
+    cache.delete(key); // expired → fall through to reload
+  }
+
+  const promise: Promise<Data> = fetchData(key).catch((err) => {
+    // Evict only if this is still the current entry (avoid deleting a
+    // newer entry that was set after a retry)
+    const entry = cache.get(key);
+    if (entry?.promise === promise) {
+      cache.delete(key);
+    }
+    throw err;
+  });
+
+  cache.set(key, { promise, createdAt: Date.now() });
+  return promise;
+}
+```
+
+The guard `entry?.promise === promise` in the eviction path handles the (rare) race where a new `load(key)` has already overwritten the cache entry by the time the old promise rejects—preventing the new entry from being incorrectly evicted.
+
+---
+
+## Summary of Root Causes
+
+1. **Temporal gap between check and set** straddles an `await`, breaking the check-then-act invariant.
+2. **Storing the promise before knowing its outcome** without a rejection-eviction handler creates a poisoned-cache scenario.
+3. The fix is to **close the temporal gap** (no `await` between check and set) **and** **attach a self-cleaning rejection handler** to the cached promise.
+
+=================== ANSWER B ===================
+
+# Bug Analysis: Async Cache with In-Flight Deduplication
+
+## The Code Under Scrutiny
+
+```ts
+const cache = new Map<string, Promise<Data>>();
+async function load(key: string): Promise<Data> {
+  if (cache.has(key)) return cache.get(key)!;
+  const data = await fetchData(key);
+  const p = Promise.resolve(data);
+  cache.set(key, p);
+  return data;
+}
+```
+
+---
+
+## Bug 1 — No In-Flight Deduplication (Duplicate Network Calls)
+
+**Root cause:** `cache.set(key, p)` executes *after* the `await`, so the in-flight request is invisible to concurrent callers.
+
+**Precise race timeline** (single-threaded event loop, two concurrent callers):
+
+```
+─────────────────────────────────────────────────────────────────────
+  Caller A                              Caller B
+─────────────────────────────────────────────────────────────────────
+load("x") called
+  cache.has("x") → false
+  fetchData("x") → returns P₁
+  await P₁ ──────────── suspends ──┐
+                                    │  P₁ in flight (network)
+                                   │
+                    load("x") called
+                      cache.has("x") → false  ← P₁ not stored yet
+                      fetchData("x") → returns P₂   ← DUPLICATE CALL
+                      await P₂ ────── suspends ──┐
+                                                  │  P₁ and P₂ both in flight
+─────────────────────────────────────────────────────────────────────
+P₁ resolves with data₁
+  resume Caller A
+  cache.set("x", resolve(data₁))
+  return data₁
+─────────────────────────────────────────────────────────────────────
+P₂ resolves with data₂
+  resume Caller B
+  cache.set("x", resolve(data₂))   ← overwrites entry
+  return data₂
+─────────────────────────────────────────────────────────────────────
+```
+
+**Consequences:**
+- N concurrent callers → N network calls (thundering herd).
+- Under bursty load this can cascade: the N responses arrive, N−1 are discarded, but the N requests already consumed bandwidth, hit rate limits, or mutated server state.
+
+---
+
+## Bug 2 — The "Obvious Fix" Caches Rejections Forever
+
+The natural fix for Bug 1 is to store the promise *before* awaiting:
+
+```ts
+// Naive "fix" — introduces Bug 2
+const p = fetchData(key);
+cache.set(key, p);   // in-flight promise is now visible ✓
+return p;             // but if p rejects, it's cached as a tombstone ✗
+```
+
+Once `fetchData(key)` rejects, the rejected promise sits in the `Map` permanently. Every subsequent `load(key)` call returns the same rejected promise, making the failure **perpetual** until the process is restarted.
+
+**Why this is severe:**
+- Transient failures (503, timeout, DNS blip) become permanent.
+- No retry path exists; the cache is now a poison pill.
+- If the rejection is an unhandled-rejection in some code path, it can crash the Node.js process.
+
+---
+
+## Bug 3 — Unbounded Memory Growth
+
+The `Map` has no eviction policy. If `key` is drawn from an unbounded domain (URLs, user-supplied identifiers, composite query strings), the cache grows without limit → OOM.
+
+---
+
+## Bug 4 — No TTL / Staleness Control
+
+Even for successful results, the cached value is immortal. A backend data change is invisible to all callers until process restart.
+
+---
+
+## Bug 5 — No Negative-Cache / Circuit-Breaker Strategy
+
+There is no way to express "remember this failure for 5 seconds to prevent hammering a dead backend." The binary choice is either *never* cache failures (retry storms) or *forever* cache them (Bug 2).
+
+---
+
+## Corrected, Production-Quality Implementation
+
+```ts
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface CacheEntry<T> {
+  promise: Promise<T>;
+  /** Epoch ms when the entry was created (for TTL + LRU eviction). */
+  createdAt: number;
+}
+
+interface DataLoaderOptions {
+  /** Max age of a successful entry before it's considered stale. Default: 60 s. */
+  ttlMs?: number;
+  /** Max number of entries before LRU eviction kicks in. Default: 10 000. */
+  maxEntries?: number;
+  /**
+   * After a rejection, how long to suppress retries (ms).
+   * 0 = retry immediately on next call. Default: 5 000.
+   */
+  negativeCacheMs?: number;
+}
+
+// ─── Implementation ──────────────────────────────────────────────────────────
+
+class DataLoader<T> {
+  private readonly cache = new Map<string, CacheEntry<T>>();
+  /** Keys currently in a negative (post-failure) cooldown. */
+  private readonly negativeCache = new Map<string, number>(); // key → expiryMs
+
+  private readonly ttlMs: number;
+  private readonly maxEntries: number;
+  private readonly negativeCacheMs: number;
+
+  constructor(
+    private readonly fetcher: (key: string) => Promise<T>,
+    opts: DataLoaderOptions = {},
+  ) {
+    this.ttlMs = opts.ttlMs ?? 60_000;
+    this.maxEntries = opts.maxEntries ?? 10_000;
+    this.negativeCacheMs = opts.negativeCacheMs ?? 5_000;
+  }
+
+  /**
+   * Load data for `key`, sharing a single in-flight request among
+   * all concurrent callers.
+   */
+  load(key: string): Promise<T> {
+    // 1. Fast path: hit a live, non-expired positive cache entry.
+    const entry = this.cache.get(key);
+    if (entry && !this.isExpired(entry)) {
+      return entry.promise;
+    }
+
+    // 2. If entry exists but is expired, remove it.
+    if (entry) {
+      this.cache.delete(key);
+    }
+
+    // 3. Negative cache: suppress retries during cooldown after a failure.
+    const negExpiry = this.negativeCache.get(key);
+    if (negExpiry && Date.now() < negExpiry) {
+      // Return the stored rejection (or a fresh one — design choice).
+      // Here we throw immediately to signal "still cooling down."
+      return Promise.reject(new DataLoaderError(
+        `Key "${key}" is in negative-cache cooldown until ${new Date(negExpiry).toISOString()}`,
+      ));
+    }
+    // Clean up stale negative entries.
+    if (negExpiry) this.negativeCache.delete(key);
+
+    // 4. Evict to make room if at capacity.
+    if (this.cache.size >= this.maxEntries) {
+      this.evictOldest();
+    }
+
+    // 5. ★ Single-flight: store the promise BEFORE any await.
+    //    All concurrent callers will see this same in-flight promise.
+    const promise = this.fetchWithCleanup(key);
+    const newEntry: CacheEntry<T> = { promise, createdAt: Date.now() };
+    this.cache.set(key, newEntry);
+
+    return promise;
+  }
+
+  // ─── Private helpers ──────────────────────────────────────────────────────
+
+  /**
+   * Wraps the raw fetcher so that on rejection we:
+     a) evict the entry from the positive cache (allowing future retry),
+     b) record a negative-cache cooldown.
+   *
+   * The returned promise is what gets stored in the cache and returned
+   * to all concurrent callers.
+   */
+  private fetchWithCleanup(key: string): Promise<T> {
+    return this.fetcher(key).then(
+      (data) => {
+        // Success: the entry stays in the cache with its TTL.
+        // (Nothing to do — entry was already stored by the caller.)
+        return data;
+      },
+      (err) => {
+        // Failure: evict + set negative cooldown.
+        this.cache.delete(key);
+        this.negativeCache.set(key, Date.now() + this.negativeCacheMs);
+        throw err; // re-throw so every concurrent caller sees the rejection
+      },
+    );
+  }
+
+  private isExpired(entry: CacheEntry<T>): boolean {
+    return Date.now() - entry.createdAt >= this.ttlMs;
+  }
+
+  /**
+   * Remove the oldest entry (by `createdAt`).
+   * O(n) scan — acceptable for maxEntries ≈ 10k.
+   * For larger caches, use a doubly-linked list or a secondary LRU structure.
+   */
+  private evictOldest(): void {
+    let oldestKey: string | null = null;
+    let oldestTime = Infinity;
+    for (const [k, v] of this.cache) {
+      if (v.createdAt < oldestTime) {
+        oldestTime = v.createdAt;
+        oldestKey = k;
+      }
+    }
+    if (oldestKey !== null) {
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  /** Invalidate a single key (e.g., on a known mutation). */
+  invalidate(key: string): void {
+    this.cache.delete(key);
+    this.negativeCache.delete(key);
+  }
+
+  /** Invalidate all keys. */
+  clear(): void {
+    this.cache.clear();
+    this.negativeCache.clear();
+  }
+}
+
+// ─── Error type ──────────────────────────────────────────────────────────────
+
+class DataLoaderError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DataLoaderError";
+  }
+}
+
+// ─── Usage ───────────────────────────────────────────────────────────────────
+
+const loader = new DataLoader<string>(
+  (key) => fetch(`/api/${key}`).then((r) => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.text();
+  }),
+  { ttlMs: 30_000, maxEntries: 5_000, negativeCacheMs: 10_000 },
+);
+
+// All three concurrent calls share ONE network request:
+const [a, b, c] = await Promise.all([
+  loader.load("users/42"),
+  loader.load("users/42"),
+  loader.load("users/42"),
+]);
+```
+
+---
+
+## Why Each Design Decision Matters
+
+| Decision | Problem it solves |
+|---|---|
+| **Store promise before `await`** (step 5) | Single-flight dedup — all concurrent callers attach to the same in-flight promise. |
+| **Evict on rejection + negative cooldown** | Prevents both the "poison pill" (Bug 2) *and* the "retry storm" on a dead backend. |
+| **TTL on positive entries** | Bounds staleness (Bug 4). |
+| **Max-entries LRU eviction** | Bounds memory (Bug 3). |
+| **`then(onFulfilled, onRejected)` instead of `try/catch` around `await`** | The stored promise in the cache *is* the one with the cleanup handler attached. No intermediate `await` means the cleanup is guaranteed to run exactly once, even if zero external callers ever `await` the promise (prevents unhandled-rejection edge cases). |
+| **`invalidate()` / `clear()`** | Lets the application layer react to known mutations without waiting for TTL expiry. |
+
+---
+
+## Edge-Case Notes
+
+1. **Unhandled rejections:** Because the stored promise has a `.then(_, onRejected)` handler attached, Node's unhandled-rejection detection is satisfied even if no external caller ever awaits the promise. The `throw err` inside `onRejected` creates a *new* rejected promise that is the one callers receive—each caller must handle it, which is correct.
+
+2. **Idempotency assumption:** This pattern is safe only when `fetcher(key)` is idempotent (GET-like). For mutating operations, you would want a different concurrency model (mutex, queue).
+
+3. **Scalability beyond single process:** The `Map` is per-process. For a multi-instance deployment, replace with a shared store (Redis, in-memory pub/sub) or accept that each process makes its own in-flight request (usually fine because the N+1 problem is per-process).
+
+4. **`maxEntries` eviction is O(n):** For caches > ~100k entries, swap the `Map` for a proper LRU (doubly-linked list + Map) or use a library like `lru-cache` with a custom `fetchMethod`.
+
+=================== ANSWER C ===================
+
+# Bug Analysis
+
+## Bug 1 — The Check-Then-Act Race (Duplicate Network Calls)
+
+```ts
+if (cache.has(key)) return cache.get(key)!;   // ① check
+const data = await fetchData(key);            // ② SUSPEND
+const p = Promise.resolve(data);
+cache.set(key, p);                           // ③ populate
+```
+
+The `await` at ② is a **suspension point**. Control returns to the event loop, and any other microtask or macrotask that calls `load(key)` *before* ② resolves will also pass the `cache.has(key)` check at ① (the cache was never populated because ③ hasn't executed yet). Both callers then each invoke `fetchData(key)`.
+
+**Concrete interleaving:**
+
+```
+Time ──────────────────────────────────────────────────────►
+
+Caller A:  has(key)? → false ──► fetchData(key) ──[suspends]──► set(key, pA)
+Caller B:              has(key)? → false ──► fetchData(key) ──[suspends]──► set(key, pB)
+                                                   │
+                                          second network call fires
+```
+
+Both A and B fire independent network requests. The second `cache.set` overwrites the first, so one in-flight promise is orphaned (its result is lost, but the HTTP request still completed).
+
+---
+
+## Bug 2 — Rejected Promises Never Cached *or* the Naive Fix Caches Them Forever
+
+In the code as written, if `fetchData(key)` rejects, the `await` throws and execution **never reaches** `cache.set`. So the rejection is *not* cached — the next caller retries. That's arguably correct, but it means you get no single-flight deduplication on retries after a failure (every failed call fans out).
+
+The **naive fix** for Bug 1 — moving `cache.set` before the `await`:
+
+```ts
+const p = fetchData(key);
+cache.set(key, p);       // now set before suspension ✓
+return p;                // but if p rejects, it stays in the Map forever ✗
+```
+
+— introduces the second symptom you described: the **rejected promise is permanently cached**. Every subsequent caller receives the same stale rejection and the key is never re-fetched. In a long-lived process this is a silent data-staleness / permanent-failure bug.
+
+---
+
+## Bug 3 — Redundant / Unsafe Double Lookup
+
+```ts
+if (cache.has(key)) return cache.get(key)!;
+```
+
+Two map lookups where one suffices, plus a non-null assertion that papers over the type system. In a single-threaded runtime there's no *race* between `has` and `get`, but the pattern is fragile (e.g., if someone later inserts a `setTimeout` or `await` between them for logging) and the `!` suppresses the compiler's ability to catch a future `undefined` value.
+
+---
+
+## Bug 4 — Unbounded Cache Growth (Design Flaw)
+
+The `Map` is never pruned. Every distinct key that ever loads accumulates a promise (and therefore its resolved `Data`) forever. In a long-running service with high-cardinality keys this is a **slow memory leak**.
+
+---
+
+## Bug 5 — `async` Wrapper Adds an Unnecessary Microtask
+
+Declaring `load` as `async` means `return p` (where `p` is already a `Promise`) causes the engine to internally `await p`, inserting an extra microtask hop before the caller's `.then` fires. For a hot path this is measurable latency for zero benefit.
+
+---
+
+# Corrected Production-Quality Version
+
+```ts
+type Data = { /* your shape */ };
+
+const inflight = new Map<string, Promise<Data>>();
+
+/**
+ * Single-flight loader with rejection-aware caching.
+ *
+ * Guarantees:
+ *  - At most ONE in-flight `fetchData(key)` per key at any time.
+ *  - Rejected results are NOT cached; the next call retries.
+ *  - Resolved results remain cached (add TTL below if needed).
+ *  - No `async` wrapper → no extra microtask hop.
+ */
+export function load(key: string): Promise<Data> {
+  // Single lookup; a Promise is always an object, so `!== undefined`
+  // is the precise "not present" test (no false negatives if Data is nullish).
+  const existing = inflight.get(key);
+  if (existing !== undefined) return existing;
+
+  // Kick off the request synchronously; we hold the promise handle
+  // BEFORE any suspension point, making check→set atomic in the
+  // single-threaded event loop.
+  let p: Promise<Data>;
+  try {
+    p = fetchData(key);
+  } catch (err) {
+    // fetchData threw synchronously (only possible if it's not `async`).
+    // Nothing was cached, so just propagate.
+    return Promise.reject(err);
+  }
+
+  // Attach a side-effect handler for cleanup on rejection.
+  // `void` signals intentional discard of the derived promise,
+  // suppressing "floating promise" lints and unhandled-rejection warnings.
+  void p.catch(() => {
+    // Only delete if this is still the current entry (a newer call
+    // for the same key may have already replaced it).
+    if (inflight.get(key) === p) {
+      inflight.delete(key);
+    }
+  });
+
+  inflight.set(key, p);
+  return p;
+}
+```
+
+### Why this is race-free
+
+The critical invariant: **between `inflight.get(key)` and `inflight.set(key, p)` there is no `await`, no `.then`, and no other suspension point.** JavaScript's event loop guarantees that no other task (microtask or macrotask) can execute in that interval. Therefore:
+
+| Caller | Sees `get(key)` | Sees `set(key, p)` |
+|--------|-----------------|---------------------|
+| A (first) | `undefined` → proceeds | populates Map |
+| B (concurrent, arrives after A's `set`) | `p` → returns it | — |
+| C (concurrent, arrives *during* A's `fetchData` pending) | `p` (already set synchronously) → returns it | — |
+
+C is the case that the original code got wrong: C arrives after A's `await` suspends but before it resolves. In the corrected code, A has *already* called `inflight.set` before suspending, so C sees the in-flight promise and shares it.
+
+### Rejection handling
+
+The `.catch` handler deletes the entry **only if the stored promise is still `p`** (identity check). This handles the edge case where a rapid sequence of failures and retries causes a newer promise to have already overwritten the slot — we don't want to delete the *newer* entry.
+
+---
+
+## Optional Production Hardening
+
+```ts
+import { LRUCache } from "lru-cache";
+
+// TTL + max-size eviction for resolved entries
+const cache = new LRUCache<string, Promise<Data>>({
+  max: 10_000,
+  ttl: 5 * 60 * 1000, // 5 minutes
+});
+
+function load(key: string): Promise<Data> {
+  const existing = cache.get(key);
+  if (existing !== undefined) return existing;
+
+  let p: Promise<Data>;
+  try {
+    p = fetchData(key);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+
+  void p.catch(() => cache.delete(key)); // reject → evict immediately
+
+  cache.set(key, p);
+  return p;
+}
+```
+
+The LRU cache handles:
+- **Unbounded growth** (`max` evicts least-recently-used entries).
+- **Stale data** (`ttl` expires resolved promises; on access after TTL the entry is treated as absent, triggering a fresh fetch).
+- **Rejection cleanup** still works identically.
+
+> **Note on TTL + single-flight interaction:** Once a TTL'd entry expires, `cache.get` returns `undefined`, the next caller creates a *new* promise and `cache.set` replaces the old one. Because `set` is synchronous, the single-flight guarantee still holds for that new in-flight request.

@@ -1,0 +1,1884 @@
+You are grading three answers produced by THE SAME 27B model served at three different quantization levels (8-bit, 6-bit, 4-bit). Your job is to detect quality loss from quantization.
+# Rubric
+# Judging rubric (v1)
+
+The judge is **Claude/Opus** (this Claude Code session, a future session, or any pluggable
+grader). Quality is scored per **(quant × question)** — MTP draft depth only affects speed,
+so the canonical MTP-off pass-1 answer represents each quant×question.
+
+## Criteria (score each 1–10)
+
+| Criterion | Weight | What it measures |
+|---|---|---|
+| `correctness` | 0.35 | Technical accuracy; **no hallucinated facts/APIs/numbers**. Penalize confidently wrong claims hard. |
+| `depth` | 0.25 | Insight and completeness — does it go beyond the obvious, cover edge cases / trade-offs? |
+| `instruction_following` | 0.20 | Did it address **every** part of the multi-part prompt in the requested form? |
+| `practicality` | 0.20 | Concrete, actionable, runnable — not hand-wavy. |
+
+`overall = 0.35*correctness + 0.25*depth + 0.20*instruction_following + 0.20*practicality`
+(If `overall` is omitted, `apply_scores.py` computes it from the weights.)
+
+
+# Grading instructions
+- Score EACH of the three answers on all four criteria (1-10 integers) and compute `overall` with the weights above (one decimal).
+- ANSWER A is the 8-bit reference. Grade it on absolute merit. Then grade B and C on absolute merit too, but explicitly note any degradation relative to A: dropped requirements, weaker reasoning, hallucinated APIs/numbers, broken code, format violations, repetition, truncation.
+- Be strict and discriminating. Do NOT give all three the same score unless they are genuinely equivalent. Penalize confidently wrong claims hard.
+- IMPORTANT: all three answers were generated with the SAME 8192-token budget, and some were cut off mid-sentence when they hit that cap. Do NOT penalize the raw fact of a trailing cutoff. DO penalize an answer that squandered the shared budget on padding, repetition or restatement and therefore covered less of the question.
+- Output ONLY a JSON object, no markdown fence, no commentary, in this exact shape:
+{"A": {"correctness":N,"depth":N,"instruction_following":N,"practicality":N,"overall":N.N,"rationale":"one or two sentences"},"B": {...same keys...}, "C": {...same keys...}, "comparison":"2-3 sentences on how much quality B and C give up vs A"}
+
+# The question that was asked
+
+Design the architecture of an overnight research pipeline for an AI-infrastructure investing workstation. It must: ingest prices, news and earnings for ~12 sectors; evaluate deterministic tripwire risk signals; synthesize a ranked, evidence-backed morning digest where every insight traces to a computed number or a dated source; optionally have an LLM narrate (never fabricate) the already-true digest; and run on a cron scheduler. Cover the data model, the job registry + failure isolation (a failed step must never abort the chain), idempotency, scheduling, where the LLM brain plugs in safely, and how you keep the digest accurate and auditable. Discuss the key trade-offs and failure modes.
+
+
+=================== ANSWER A ===================
+
+# Overnight AI-Infrastructure Research Pipeline — Architecture
+
+## 1. Guiding Principles
+
+| Principle | Consequence |
+|-----------|-------------|
+| **Compute is truth; narration is decoration.** | The LLM never produces a number, a signal, or a conclusion. It only re-words what the deterministic layer already proved. |
+| **Everything is append-only and content-addressed.** | Idempotency and auditability fall out for free. No UPDATE, no DELETE. |
+| **A job failure degrades, never aborts.** | The 7 AM digest ships with a "degraded" badge if a sector's price feed was late. It never ships empty. |
+| **Determinism is the contract.** | Any job, given the same inputs and the same version of its code, must produce byte-identical outputs. The LLM is the one exception, and it is fenced in. |
+
+---
+
+## 2. Data Model
+
+All tables are **append-only**. Primary keys are natural (business) keys; no auto-increment IDs are exposed to the user. A `row_hash` column (SHA-256 of all business columns) enables content-addressing and idempotent upserts.
+
+### 2.1 Reference / Dimension Tables
+
+```sql
+-- The ~12 sectors you track. Stable, rarely changes.
+CREATE TABLE sector (
+    sector_id        TEXT PRIMARY KEY,   -- 'ai_compute', 'cooling', 'power_infra' …
+    display_name     TEXT NOT NULL,
+    universe_tickers TEXT[] NOT NULL,   -- tickers that define this sector
+    benchmarks       TEXT[] NOT NULL,   -- e.g. ['SMH', 'SOXX', 'NVIDIA']
+    version          INT NOT NULL,
+    effective_from   TIMESTAMPTZ NOT NULL,
+    row_hash         TEXT NOT NULL
+);
+
+CREATE TABLE instrument (
+    ticker           TEXT PRIMARY KEY,
+    name             TEXT NOT NULL,
+    sector_id        TEXT REFERENCES sector(sector_id),
+    currency         TEXT NOT NULL,
+    row_hash         TEXT NOT NULL
+);
+```
+
+### 2.2 Raw Observations (the "leaf" facts)
+
+```sql
+-- One row per (ticker, timestamp). Ingested from a price provider.
+CREATE TABLE price_observation (
+    ticker           TEXT NOT NULL,
+    ts               TIMESTAMPTZ NOT NULL,   -- exchange close timestamp
+    open             NUMERIC(18,6),
+    high             NUMERIC(18,6),
+    low              NUMERIC(18,6),
+    close            NUMERIC(18,6) NOT NULL,
+    volume           BIGINT,
+    adj_close        NUMERIC(18,6),
+    source           TEXT NOT NULL,          -- 'nasdaq', 'yahoo', 'vendor_X'
+    ingested_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (ticker, ts, source),
+    row_hash         TEXT NOT NULL
+);
+
+-- One row per news article. Ingested from news APIs / RSS.
+CREATE TABLE news_item (
+    news_id          TEXT NOT NULL,          -- provider-assigned or content hash
+    ts_published     TIMESTAMPTZ NOT NULL,
+    source           TEXT NOT NULL,          -- 'reuters', 'bloomberg', 'sec_edgar'
+    url              TEXT NOT NULL,
+    headline         TEXT NOT NULL,
+    body             TEXT,
+    sector_id        TEXT,                   -- linked by classifier job (nullable)
+    tickers_mentioned TEXT[],
+    sentiment_score  NUMERIC(5,4),           -- from a *deterministic* lexicon, not an LLM
+    ingested_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (news_id, source),
+    row_hash         TEXT NOT NULL
+);
+
+-- One row per earnings report (10-K, 10-Q, 8-K earnings item).
+CREATE TABLE earnings_report (
+    ticker           TEXT NOT NULL,
+    fiscal_period    TEXT NOT NULL,          -- '2024-Q4'
+    reported_date    DATE NOT NULL,
+    revenue          NUMERIC(20,2),
+    gross_margin     NUMERIC(8,4),
+    operating_margin NUMERIC(8,4),
+    eps_actual       NUMERIC(10,4),
+    eps_consensus    NUMERIC(10,4),         -- from provider snapshot
+    guidance_rev_lo  NUMERIC(20,2),
+    guidance_rev_hi  NUMERIC(20,2),
+    source           TEXT NOT NULL,
+    ingested_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (ticker, fiscal_period, source),
+    row_hash         TEXT NOT NULL
+);
+```
+
+### 2.3 Computed Signals (deterministic, versioned)
+
+```sql
+-- Each signal is a pure function of prior tables + a signal version.
+-- Example: "AI compute sector down >3σ from 20-day mean in a single session."
+CREATE TABLE risk_signal (
+    signal_id        TEXT NOT NULL,          -- ULID, deterministic if we want
+    signal_type      TEXT NOT NULL,          -- 'volatility_breach', 'earnings_miss', 'news_spike'
+    sector_id        TEXT,
+    ticker           TEXT,
+    ts_observed      TIMESTAMPTZ NOT NULL,   -- when the condition was TRUE
+    severity         SMALLINT NOT NULL,      -- 1..5
+    value            NUMERIC(18,6) NOT NULL, -- the computed number that triggered it
+    threshold        NUMERIC(18,6) NOT NULL, -- the threshold that was crossed
+    window_params    JSONB NOT NULL,         -- {'lookback_days': 20, 'sigma': 3.0}
+    code_version     TEXT NOT NULL,          -- git SHA of the signal function
+    input_hash       TEXT NOT NULL,          -- hash of all input rows consumed
+    computed_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (signal_id),
+    UNIQUE (signal_type, sector_id, ticker, ts_observed, code_version)
+    -- ↑ This unique constraint IS the idempotency key.
+);
+
+-- Materialised sector-level aggregates (optional, for fast digest assembly)
+CREATE TABLE sector_snapshot (
+    sector_id        TEXT NOT NULL,
+    ts               TIMESTAMPTZ NOT NULL,
+    median_pct_chg   NUMERIC(8,4),
+    median_volatility NUMERIC(8,4),
+    active_signal_count INT,
+    input_hash       TEXT NOT NULL,
+    PRIMARY KEY (sector_id, ts),
+    row_hash         TEXT NOT NULL
+);
+```
+
+### 2.4 Digest Layer
+
+```sql
+-- The digest is a versioned document. Each version is immutable.
+CREATE TABLE digest (
+    digest_id        TEXT NOT NULL,          -- ULID
+    ts_generated     TIMESTAMPTZ NOT NULL,
+    ts_for           DATE NOT NULL,          -- "morning of" date
+    status           TEXT NOT NULL,          -- 'complete' | 'degraded' | 'failed'
+    degraded_reasons TEXT[],                 -- which inputs were missing
+    entry_count      INT NOT NULL,
+    input_hash       TEXT NOT NULL,          -- hash of all upstream rows consumed
+    PRIMARY KEY (digest_id)
+);
+
+-- One row per insight in the digest. This is the AUDIT UNIT.
+CREATE TABLE digest_entry (
+    entry_id         TEXT NOT NULL,          -- 'E-2025-01-15-003'
+    digest_id        TEXT NOT NULL REFERENCES digest(digest_id),
+    rank             INT NOT NULL,           -- 1 = most important
+    sector_id        TEXT,
+    headline         TEXT NOT NULL,          -- deterministic template, NOT LLM
+    body             TEXT NOT NULL,          -- deterministic template with numbers filled in
+    severity         SMALLINT NOT NULL,
+    evidence_refs    JSONB NOT NULL,
+    -- evidence_refs example:
+    -- [
+    --   {"table":"risk_signal","pk":{"signal_id":"01H..."}}
+    --   ,{"table":"price_observation","pk":{"ticker":"NVDA","ts":"2025-01-14T20:00:00Z","source":"nasdaq"}}
+    --   ,{"table":"news_item","pk":{"news_id":"REU-20250114-4471","source":"reuters"}}
+    -- ]
+    computed_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (entry_id)
+);
+
+-- LLM narration: a SEPARATE document that references digest entries.
+CREATE TABLE llm_narration (
+    narration_id     TEXT NOT NULL,
+    digest_id        TEXT NOT NULL REFERENCES digest(digest_id),
+    model            TEXT NOT NULL,          -- 'claude-sonnet-4-20250514'
+    prompt_version   TEXT NOT NULL,          -- git SHA of the prompt template
+    output_text      TEXT NOT NULL,          -- the narrated prose
+    validation_status TEXT NOT NULL,         -- 'pass' | 'fail_hallucination' | 'fail_ref'
+    failed_refs      JSONB,                  -- entry_ids that the LLM referenced but don't exist
+    generated_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (narration_id)
+);
+```
+
+### 2.5 Job Execution Log (the "who did what, when, with what inputs" audit trail)
+
+```sql
+CREATE TABLE job_run (
+    run_id           TEXT NOT NULL,          -- ULID
+    job_name         TEXT NOT NULL,
+    dag_trigger_id   TEXT,                   -- which cron invocation started this
+    status           TEXT NOT NULL,          -- 'success' | 'failed' | 'skipped' | 'timeout'
+    started_at       TIMESTAMPTZ,
+    finished_at      TIMESTAMPTZ,
+    input_hash       TEXT,                   -- what data it consumed
+    output_hash      TEXT,                   -- what it produced
+    error_message    TEXT,
+    retry_count      INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (run_id)
+);
+```
+
+---
+
+## 3. Job Registry and DAG
+
+### 3.1 Job Inventory
+
+```
+ingest_prices          →  price_observation
+ingest_news            →  news_item
+ingest_earnings        →  earnings_report
+classify_news_sectors  →  updates news_item.sector_id (INSERT new version)
+compute_risk_signals   →  risk_signal
+build_sector_snapshots →  sector_snapshot
+rank_and_template      →  digest, digest_entry       ← THE CORE JOB
+llm_narrate            →  llm_narration
+validate_narration     →  updates llm_narration.validation_status
+deliver                →  email / Slack / filesystem write
+```
+
+### 3.2 DAG (topological order)
+
+```
+                    ┌─────────────────┐
+                    │  ingest_prices  │
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    │  ingest_news    │
+                    └────────┬────────┘
+                             │
+                    ┌────────┴────────┐
+                    │  ingest_earnings│
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+     ┌────────┴──────┐  ┌───┴────────┐  ┌──┴───────────────┐
+     │classify_news_  │  │compute_    │  │build_sector_     │
+     │sectors         │  │risk_signals│  │snapshots         │
+     └────────┬──────┘  └───┬────────┘  └──┬───────────────┘
+              │              │              │
+              └──────────────┼──────────────┘
+                             │
+                    ┌────────┴────────┐
+                    │rank_and_template│  ← deterministic, pure
+                    └────────┬────────┘
+                             │
+              ┌──────────────┴──────────────┐
+              │                             │
+     ┌────────┴────────┐           ┌────────┴────────┐
+     │  llm_narrate    │           │  deliver        │
+     └────────┬────────┘           └─────────────────┘
+              │
+     ┌────────┴────────┐
+     │validate_        │
+     │narration        │
+     └────────┬────────┘
+              │
+     ┌────────┴────────┐
+     │  deliver_final  │  (serves LLM if valid, else raw digest)
+     └─────────────────┘
+```
+
+### 3.3 Failure Isolation Protocol
+
+The orchestrator (a lightweight Python process or a single Node.js script) walks the DAG in topological order:
+
+```python
+def execute_dag(trigger_id):
+    results = {}
+    for job in topo_sort(ALL_JOBS):
+        # 1. Check dependencies
+        missing_deps = [
+            d for d in job.dependencies
+            if results.get(d) in ("failed", "skipped", "timeout")
+        ]
+        if missing_deps and job.critical_deps:  # e.g., ingest_prices is critical
+            results[job.name] = "skipped"
+            log_job_run(job, "skipped", f"deps failed: {missing_deps}")
+            continue
+
+        # 2. Check idempotency: has this exact (job, input_hash) already succeeded?
+        input_hash = compute_input_hash(job)
+        if job_already_succeeded(job.name, input_hash):
+            results[job.name] = "success_cached"
+            continue
+
+        # 3. Execute with timeout and retry
+        try:
+            with timeout(job.timeout_s):
+                for attempt in range(job.max_retries + 1):
+                    output = job.run(input_hash)
+                    write_output(job, output)
+                    log_job_run(job, "success", output_hash=hash(output))
+                    break
+                else:
+                    raise JobExhausted(job.name)
+            results[job.name] = "success"
+
+        except Exception as e:
+            log_job_run(job, "failed", error=str(e))
+            results[job.name] = "failed"
+            # CRITICAL: we do NOT raise. The loop continues.
+            # Downstream jobs see this as "skipped" or run in degraded mode.
+
+    # 4. The digest job (rank_and_template) is designed to accept
+    #    partial inputs. It checks which sectors have data and
+    #    marks the digest as 'degraded' with reasons.
+    return results
+```
+
+**Key design decision:** `rank_and_template` does NOT require all 12 sectors to have complete data. It accepts a `degraded_input` flag per sector and produces a digest with:
+- Full entries for sectors that have complete data
+- A "DATA UNAVAILABLE" placeholder for sectors whose ingest failed
+- A `degraded_reasons` array on the digest row
+
+This means **a single vendor API being down never prevents you from getting your morning brief**.
+
+---
+
+## 4. Idempotency
+
+Idempotency is achieved through **three layers**:
+
+### Layer 1: Content-Addressed Inputs
+
+Every job computes an `input_hash` = SHA-256 of all rows it reads (identified by their `row_hash` values). Before executing, it checks:
+
+```sql
+SELECT 1 FROM job_run
+WHERE job_name = :name
+  AND input_hash = :hash
+  AND status = 'success'
+LIMIT 1;
+```
+
+If a row exists → skip. This makes re-running the entire DAG at any time a no-op.
+
+### Layer 2: Natural-Key Uniqueness
+
+All fact tables have `PRIMARY KEY` or `UNIQUE` constraints on natural keys. Ingest uses `INSERT ... ON CONFLICT DO NOTHING`. If the same price bar arrives twice (e.g., a retry from the provider), the second write is silently ignored.
+
+### Layer 3: Deterministic Signal Generation
+
+Signal functions are **pure**: `(input_rows, code_version) → output_row`. The `UNIQUE (signal_type, sector_id, ticker, ts_observed, code_version)` constraint means re-computing a signal that already exists is a no-op. If you bump `code_version` (e.g., change the σ threshold from 3.0 to 2.5), you get NEW signal rows alongside the old ones. The old rows are never deleted.
+
+**What idempotency does NOT give you:** the LLM step. The LLM is non-deterministic. This is handled in §6.
+
+---
+
+## 5. Scheduling
+
+### 5.1 Cron Topology
+
+```
+# /etc/cron.d/research-pipeline  (or systemd timer, or a single cron entry)
+
+# 06:00 UTC — trigger the full DAG (after US market close data is available)
+0 6 * * 1-5   /usr/local/bin/pipeline/trigger.sh --dag=morning --tz=UTC
+
+# 06:05 UTC — SLA watchdog: if the DAG hasn't finished in 5 minutes, alert
+5 6 * * 1-5   /usr/local/bin/pipeline/sla_check.sh --dag=morning --timeout=300
+
+# 09:00 UTC — optional: pre-market data refresh (futures, overnight Asia)
+0 9 * * 1-5   /usr/local/bin/pipeline/trigger.sh --dag=premarket
+
+# Sunday 03:00 UTC — weekly: recompute historical signal baselines
+0 3 * * 0     /usr/local/bin/pipeline/trigger.sh --dag=weekly_rebase
+```
+
+### 5.2 Trigger Script
+
+`trigger.sh` does:
+1. Creates a `dag_trigger` row (ID, timestamp, dag name, status='running')
+2. Spawns the Python orchestrator as a subprocess (or via `systemd-run` for isolation)
+3. The orchestrator writes its final status back to `dag_trigger`
+
+### 5.3 Backfill and Catch-Up
+
+If the 06:00 run fails entirely (host was down), the **next** day's 06:00 run detects the missing digest and can:
+- Re-run the full DAG (idempotency makes this safe)
+- Or, more surgically, run only the failed steps (the orchestrator queries `job_run` for gaps)
+
+A `backfill` CLI command makes this manual:
+```bash
+pipeline backfill --from 2025-01-10 --to 2025-01-12 --dag morning
+```
+
+### 5.4 Scheduling Trade-offs
+
+| Option | Pro | Con |
+|--------|-----|-----|
+| Bare `cron` + shell script | Zero dependencies, trivially debuggable | No built-in retry, no DAG awareness |
+| Airflow / Prefect | DAG, retries, UI, backfill built-in | Heavy (Postgres + workers), overkill for 10 jobs |
+| **Custom lightweight orchestrator (chosen)** | Full control, ~200 LOC, no infra tax | You own the retry/SLA logic |
+
+For a single-user workstation with ~10 jobs, the custom orchestrator is the right call. You get failure isolation and idempotency without the operational weight of Airflow.
+
+---
+
+## 6. LLM Integration — The Safety Fence
+
+### 6.1 Position in the Pipeline
+
+The LLM is the **last optional step** before delivery. It operates on the `digest_entry` rows that `rank_and_template` has already produced. It has **no access** to raw prices, news, or signals. It sees only:
+
+```json
+{
+  "digest_id": "d-2025-01-15",
+  "entries": [
+    {
+      "entry_id": "E-2025-01-15-001",
+      "sector": "ai_compute",
+      "severity": 4,
+      "headline": "NVDA 1-day return -5.2% breaches -3σ threshold",
+      "body": "NVIDIA closed at $1,847.30, a -5.2% move. The 20-day trailing σ is 2.1%, so the move is -2.47σ. The 20-day mean is $1,922.80. Volume was 182M shares vs. 20-day average of 114M (+59%).",
+      "evidence_refs": [
+        {"table": "risk_signal", "pk": {"signal_id": "01H..."}},
+        {"table": "price_observation", "pk": {"ticker": "NVDA", "ts": "2025-01-14T20:00:00Z", "source": "nasdaq"}}
+      ]
+    },
+    { "entry_id": "E-2025-01-15-002", "...": "..." }
+  ]
+}
+```
+
+### 6.2 Prompt Design (simplified)
+
+```
+You are a financial brief narrator. You will receive a set of pre-computed
+digest entries. Your job is to write a 300-word morning brief that:
+
+1. Opens with the single most important development.
+2. Groups related entries by theme (e.g., "compute hardware", "power").
+3. Closes with a one-line "watchlist" for the day.
+
+HARD CONSTRAINTS:
+- You may ONLY reference facts present in the provided entries.
+- You must cite entries inline as [E-XXXX].
+- You must NOT introduce any number, ticker, company name, or claim
+  that is not already in the provided text.
+- If you are uncertain whether a fact is supported, omit it.
+
+Output plain text. No markdown.
+```
+
+### 6.3 Post-Generation Validation (the `validate_narration` job)
+
+This is a **deterministic** job. It runs a rule-based check on the LLM output:
+
+```python
+def validate_narration(narration_text, entries):
+    failures = []
+    entry_ids = {e.entry_id for e in entries}
+
+    # Check 1: Every [E-XXXX] reference in the text must exist
+    cited = re.findall(r'\[E-(\d{4}-\d{2}-\d{2}-\d{3})\]', narration_text)
+    for ref in cited:
+        full_id = f"E-{ref}"
+        if full_id not in entry_ids:
+            failures.append({"type": "dangling_ref", "ref": full_id})
+
+    # Check 2: No dollar amounts, percentages, or tickers in the narration
+    #           that don't appear in the source entries.
+    source_text = " ".join(e.body for e in entries)
+    source_numbers = extract_numbers(source_text)
+    narration_numbers = extract_numbers(narration_text)
+    for n in narration_numbers - source_numbers:
+        failures.append({"type": "fabricated_number", "value": n})
+
+    # Check 3: No ticker symbols in narration that aren't in source
+    source_tickers = extract_tickers(source_text)
+    narration_tickers = extract_tickers(narration_text)
+    for t in narration_tickers - source_tickers:
+        failures.append({"type": "fabricated_ticker", "value": t})
+
+    if failures:
+        return "fail", failures
+    return "pass", []
+```
+
+If validation **fails**, the narration is discarded (`validation_status = 'fail_hallucination'`) and the `deliver_final` job serves the **raw deterministic digest** instead. The user never sees a hallucinated sentence.
+
+### 6.4 Why This Architecture Is Safe
+
+| Attack / Failure | Mitigation |
+|-----------------|-----------|
+| LLM invents a number | Check 2 catches it; narration discarded |
+| LLM references a non-existent entry | Check 1 catches it |
+| LLM introduces a new ticker | Check 3 catches it |
+| LLM model is down / times out | `llm_narrate` job fails → `deliver_final` serves raw digest |
+| LLM model produces garbage (format) | Regex checks fail → raw digest served |
+| Prompt injection via news body | The LLM never sees raw news bodies; it only sees pre-templated `digest_entry.body` strings that were produced by deterministic code |
+
+The last point is critical: **the LLM's input is a closed, pre-validated set of strings.** A malicious or anomalous news headline cannot reach the LLM because the deterministic layer must first parse it, compute a signal, and template it into a `digest_entry` with evidence refs. The news body is in `news_item.body`, which the LLM never reads.
+
+---
+
+## 7. Auditability — The "Click Any Claim" Invariant
+
+The system guarantees: **any sentence in the delivered digest can be traced to a row in a fact table within two hops.**
+
+```
+User reads: "NVDA closed at $1,847.30, a -5.2% move [E-2025-01-15-001]"
+                │
+                ▼  (Hop 1: look up entry)
+digest_entry E-2025-01-15-001
+  evidence_refs → risk_signal 01H..., price_observation (NVDA, 2025-01-14T20:00Z, nasdaq)
+                │
+                ▼  (Hop 2: look up evidence)
+price_observation row:
+  close = 1847.30, source = 'nasdaq', ingested_at = 2025-01-14T23:45:01Z
+```
+
+A simple CLI or web endpoint makes this trivial:
+
+```bash
+$ pipeline prove E-2025-01-15-001
+[1/2] digest_entry E-2025-01-15-001
+      headline: "NVDA 1-day return -5.2% breaches -3σ threshold"
+      evidence: 2 refs
+[2/2] Evidence row 1: risk_signal 01H...
+      type: volatility_breach, value: -5.2%, threshold: -3.0σ
+      input_hash: a3f2...
+      code_version: 4b7c91d (signals/volatility_breach.py @ main)
+[2/2] Evidence row 2: price_observation (NVDA, 2025-01-14T20:00:00Z, nasdaq)
+      close: 1847.30, volume: 182_400_000
+      ingested_at: 2025-01-14T23:45:01Z
+```
+
+Because every table is append-only and hash-chained, **you can replay the entire pipeline from any point in time** and verify that the digest you received on a given morning was the only possible output given the inputs that existed at that time.
+
+---
+
+## 8. Key Trade-offs
+
+| Decision | Chose | Alternative | Why |
+|----------|-------|-------------|-----|
+| **Orchestration** | Custom ~200 LOC Python | Airflow / Prefect | 10 jobs on one box; Airflow's Postgres + worker + web UI is 10× the ops cost for zero benefit |
+| **LLM position** | Post-digest narration only | LLM as an analyst (generates insights) | The moment the LLM can generate insights, you lose the auditability guarantee. The fence in §6 is necessary but not sufficient; the architectural choice to make the LLM a formatter is the real safety |
+| **Storage** | Single Postgres instance | Parquet files + DuckDB | You need ACID for the `job_run` table and for the `INSERT ON CONFLICT` idempotency. At this scale (~100K rows/year), Postgres is simpler and the performance is irrelevant |
+| **Signal computation** | In-process Python functions | Separate microservices / Kafka streams | Determinism and simplicity matter more than throughput. The signals are computed once per day, not per tick |
+| **News classification** | Deterministic keyword/regex rules | LLM-based classification | The classifier's output feeds the deterministic signal layer. If the classifier is non-deterministic, the signals are non-deterministic, and idempotency breaks. A 90%-accurate regex is better than a 99%-accurate LLM that occasionally flips |
+| **Delivery** | Email + filesystem | Slack bot, Telegram, etc. | Email is auditable (you have the .eml), has no API rate limits, and doesn't require a token. The filesystem copy is your "ground truth" archive |
+
+---
+
+## 9. Failure Modes and Mitigations
+
+| Failure | Impact | Mitigation |
+|---------|--------|-----------|
+| **Price API returns stale data** (e.g., yesterday's close instead of today's) | Signals computed on wrong data; digest is "correct" but meaningless | Validate: `ts` in response must be within expected window. If not, reject the batch and mark ingest as failed. The digest degrades for that sector. |
+| **News API returns a malformed JSON** | `ingest_news` fails for that batch | Retry with backoff (3×). If still failing, mark as failed. Signals that depend on news (e.g., "news_spike") won't fire. Digest degrades. |
+| **Disk full** | All writes fail | Monitor disk usage in the cron job; alert at 80%. Use `pg_size` checks. At this scale, data grows ~50 MB/year, so this is unlikely but cheap to guard against. |
+| **LLM provider is down** | Narration unavailable | `llm_narrate` job times out → `deliver_final` serves raw digest. No user-facing impact beyond "no narrative prose." |
+| **LLM hallucinates** | Invalid numbers in output | Validation job catches it (§6.3). Narration discarded. Raw digest served. |
+| **A signal function has a bug** (e.g., off-by-one in σ calculation) | All signals of that type are wrong | `code_version` (git SHA) is stored on every signal row. You can identify the exact version that produced a given signal and re-run with a fix. Old rows remain (append-only) so you can compare. |
+| **Clock skew / timezone bug** | Signals computed with wrong "today" | All timestamps are stored in UTC. The `ts_for` field on the digest is a `DATE` in UTC. The cron job runs at a fixed UTC time. No local-timezone logic anywhere. |
+| **The host machine reboots at 05:58** | The 06:00 cron never fires | The 06:05 SLA watchdog (a *separate* cron entry on a different host, or a systemd timer with `OnCalendar` + `Persistent=true`) fires, detects no `dag_trigger` row for today, and re-triggers the DAG. Idempotency makes this safe. |
+| **Someone edits a signal function and re-runs** | New signal rows appear alongside old ones | `code_version` distinguishes them. The digest job reads the **latest** `code_version` by default but can be pinned. The `job_run` table records who ran what when. |
+
+---
+
+## 10. Operational Checklist (Morning)
+
+```
+05:55  Price vendor publishes close data
+06:00  Cron fires → orchestrator starts DAG
+06:01  ingest_prices:  12 sectors × ~50 tickers = ~600 rows inserted
+06:02  ingest_news:    ~200 items (filtered to relevant sources)
+06:02  ingest_earnings: ~5 new 8-Ks this quarter
+06:03  classify_news_sectors: 200 items tagged
+06:04  compute_risk_signals: 7 new signals (2 severity-4, 1 severity-5)
+06:04  build_sector_snapshots: 12 rows
+06:05  rank_and_template: 12 entries, ranked by severity × sector_importance
+06:06  llm_narrate: 320 words, 12 [E-...] citations
+06:06  validate_narration: PASS
+06:07  deliver
+
+=================== ANSWER B ===================
+
+# Overnight AI-Infrastructure Research Pipeline — Architecture
+
+## Design Philosophy
+
+The system has one invariant that governs every decision:
+
+> **The LLM is a renderer, not a generator.** It operates exclusively on a fully-computed, provenance-annotated digest. It is architecturally incapable of introducing a fact that does not already exist in the structured input.
+
+Everything else — scheduling, idempotency, failure isolation — serves that invariant and the practical need for a deterministic, reproducible, auditable output.
+
+---
+
+## 1. Data Model
+
+### Core Entities
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        DATA MODEL (relational)                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  Sector(id, name, gics_code, is_active)                             │
+│  Ticker(id, symbol, name, sector_id, is_active)                     │
+│                                                                      │
+│  MarketData(                                                       │
+│    ticker_id, as_of_ts, close, adj_close, volume,                   │
+│    vwap, intraday_high, intraday_low,                               │
+│    source, ingestion_ts                                            │
+│  )                                                                  │
+│  UNIQUE(ticker_id, as_of_ts)                                        │
+│                                                                      │
+│  NewsItem(                                                         │
+│    id, source, url, url_hash, headline,                             │
+│    published_ts, ingested_ts, body_md,                              │
+│    entities_jsonb  -- [{type: "ticker"|"sector"|"person", ref}]     │
+│    sentiment_score, relevance_score                                 │
+│  )                                                                  │
+│  UNIQUE(source, url_hash)  -- natural dedup                         │
+│                                                                      │
+│  EarningsReport(                                                   │
+│    ticker_id, fiscal_period, reported_at,                           │
+│    revenue, eps, ebitda, guidance_jsonb,                            │
+│    beat_miss_jsonb  -- {revenue: "beat"|"miss"|"inline", ...},      │
+│    source_url, source_publisher                                     │
+│  )                                                                  │
+│  UNIQUE(ticker_id, fiscal_period)                                   │
+│                                                                      │
+│  Signal(                                                           │
+│    id, run_id, sector_id, type,                                     │
+│    triggered_at, value, threshold, direction,                       │
+│    window_start, window_end,                                        │
+│    context_jsonb  -- the exact inputs that produced this,           │
+│    severity  -- {info, watch, alert, critical}                     │
+│  )                                                                  │
+│  UNIQUE(run_id, sector_id, type, window_start, window_end)          │
+│    -- idempotency: re-running the same window produces no dup       │
+│                                                                      │
+│  Digest(                                                           │
+│    run_id, generated_at,                                            │
+│    sections_jsonb  -- ordered list of sections, each containing     │
+│                       an array of Claim objects (see below)         │
+│    narrative_text  -- LLM-rendered prose (nullable until rendered)  │
+│    schema_version                                                          │
+│  )                                                                  │
+│                                                                      │
+│  Claim(  -- embedded in Digest.sections_jsonb, not a separate table │
+│    id, section, text,                                               │
+│    provenance: {                                                    │
+│      kind: "computed" | "source" | "derived",                      │
+│      ref_type: "signal" | "market_data" | "news" | "earnings",     │
+│      ref_id: <uuid or composite key>,                              │
+│      computation: <optional: function_name + input hash>            │
+│    },                                                               │
+│    confidence: {level: "exact"|"derived"|"reported", detail}       │
+│  )                                                                  │
+│                                                                      │
+│  JobRun(                                                           │
+│    run_id, job_id, started_at, finished_at,                         │
+│    status: {pending, running, success, failed, skipped},           │
+│    error_msg, outputs_jsonb,                                        │
+│    parent_run_id  -- for nested jobs                                │
+│  )                                                                  │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Why `Claim` is embedded, not a table
+
+Claims are only meaningful in the context of a specific digest. They are append-only within a run and never modified. A separate table would complicate queries for no benefit. However, if you later want to cross-reference claims across runs (e.g., "when did this signal first appear?"), you promote it to a materialized view or a secondary index.
+
+### Provenance: the audit backbone
+
+Every claim in the digest carries a **provenance pointer**. This is what makes the digest auditable:
+
+- `computed` → a deterministic function was applied to known inputs. The `computation` field names the function and includes a hash of its inputs, so you can replay it.
+- `source` → a news article or earnings report. `ref_id` points to the row.
+- `derived` → a transformation of another claim (e.g., "sector aggregate = weighted average of constituents").
+
+A human (or an automated auditor) can always trace from a sentence in the digest back to the exact number or article that produced it.
+
+---
+
+## 2. Job Registry and Failure Isolation
+
+### Job Manifest
+
+Jobs are declared in a version-controlled YAML manifest. This is the single source of truth for the DAG.
+
+```yaml
+# jobs/pipeline.yaml
+version: 3
+schedule: "0 6 * * 1-5"   # 06:00 weekdays
+
+jobs:
+  - id: ingest_market_data
+    fn: pipelines.ingest.fetch_market_data
+    inputs:
+      - type: config
+        key: sector_tickers
+    outputs:
+      - type: table
+        ref: market_data
+      - type: count
+        ref: rows_ingested
+    timeout_s: 300
+    retries: {max: 3, backoff_s: [10, 30, 90]}
+    on_failure: degrade   # see failure policy below
+
+  - id: ingest_news
+    fn: pipelines.ingest.fetch_news
+    inputs:
+      - type: config
+        key: news_sources
+      - type: time_window
+        hours_back: 24
+    outputs:
+      - type: table
+        ref: news_items
+    timeout_s: 600
+    retries: {max: 2, backoff_s: [15, 45]}
+    on_failure: degrade
+
+  - id: ingest_earnings
+    fn: pipelines.ingest.fetch_earnings
+    inputs:
+      - type: time_window
+        hours_back: 48
+    outputs:
+      - type: table
+        ref: earnings_reports
+    timeout_s: 300
+    retries: {max: 2, backoff_s: [10, 30]}
+    on_failure: degrade
+
+  - id: compute_signals
+    fn: pipelines.signals.run_all
+    depends_on: [ingest_market_data, ingest_news, ingest_earnings]
+    inputs:
+      - type: table
+        ref: market_data
+        optional: true    # can run with partial data
+      - type: table
+        ref: news_items
+        optional: true
+      - type: table
+        ref: earnings_reports
+        optional: true
+    outputs:
+      - type: table
+        ref: signals
+    timeout_s: 120
+    retries: {max: 1, backoff_s: [30]}
+    on_failure: degrade
+
+  - id: compute_sector_aggregates
+    fn: pipelines.aggregates.sector_rollup
+    depends_on: [compute_signals, ingest_market_data]
+    inputs:
+      - type: table
+        ref: signals
+        optional: true
+      - type: table
+        ref: market_data
+        optional: true
+    outputs:
+      - type: json
+        ref: sector_aggregates
+    timeout_s: 60
+
+  - id: build_digest
+    fn: pipelines.digest.assemble
+    depends_on: [compute_signals, compute_sector_aggregates]
+    inputs:
+      - type: json
+        ref: sector_aggregates
+        optional: true
+      - type: table
+        ref: signals
+        optional: true
+    outputs:
+      - type: json
+        ref: digest_structure
+    timeout_s: 60
+    on_failure: abort   # if we can't build the digest, the pipeline failed
+
+  - id: render_narrative
+    fn: pipelines.llm.narrate
+    depends_on: [build_digest]
+    inputs:
+      - type: json
+        ref: digest_structure
+        optional: false
+    outputs:
+      - type: text
+        ref: narrative_text
+      - type: json
+        ref: validation_report
+    timeout_s: 120
+    retries: {max: 2, backoff_s: [10, 20]}
+    on_failure: degrade  # digest ships without narrative
+
+  - id: deliver
+    fn: pipelines.delivery.send
+    depends_on: [build_digest, render_narrative]
+    inputs:
+      - type: json
+        ref: digest_structure
+        optional: true
+      - type: text
+        ref: narrative_text
+        optional: true
+    outputs:
+      - type: confirmation
+        ref: delivery_status
+    timeout_s: 60
+    on_failure: alert    # human must know delivery failed
+```
+
+### Failure Policy Enum
+
+| Policy | Behavior |
+|--------|----------|
+| `degrade` | Job is marked `failed`. Downstream jobs that list this output as `optional: true` proceed with a `gap` annotation in the digest. Downstream jobs that list it as `optional: false` are marked `skipped`. |
+| `abort` | The entire run is marked `failed`. No partial delivery. An alert fires. |
+| `alert` | Same as `degrade` but additionally fires a human-facing alert (PagerDuty/Slack). |
+
+### Execution Model
+
+Each job runs as an **isolated subprocess** (or container, if you want heavier isolation). The scheduler:
+
+1. Resolves the DAG from the manifest.
+2. Topologically sorts jobs.
+3. For each ready job (all non-optional deps satisfied):
+   - Spawns a subprocess with a serialized input payload (via a temp file or a message queue).
+   - The subprocess writes its outputs to a run-scoped output directory.
+   - On exit code 0 → `success`. Non-zero or timeout → `failed`.
+4. After all jobs complete (or are skipped), the run is finalized.
+
+```
+Scheduler (long-lived process)
+  │
+  ├── spawn: ingest_market_data  (pid 12345)
+  ├── spawn: ingest_news         (pid 12346)
+  ├── spawn: ingest_earnings     (pid 12347)
+  │         (these three run in parallel)
+  │
+  │  wait for all three
+  │
+  ├── spawn: compute_signals     (pid 12348)
+  │
+  │  wait
+  │
+  ├── spawn: compute_sector_aggregates  (pid 12349)
+  │
+  │  wait
+  │
+  ├── spawn: build_digest        (pid 12350)
+  │
+  │  wait
+  │
+  ├── spawn: render_narrative    (pid 12351)
+  │
+  │  wait
+  │
+  └── spawn: deliver            (pid 12352)
+```
+
+**Why subprocess isolation?** A segfault, memory leak, or unhandled exception in one job cannot take down the scheduler or other jobs. The scheduler only sees the exit code and the output files.
+
+---
+
+## 3. Idempotency
+
+Idempotency is achieved at three levels:
+
+### Level 1: Natural-key upserts on ingest
+
+```python
+def upsert_market_data(rows: list[MarketData], conn):
+    for row in rows:
+        conn.execute("""
+            INSERT INTO market_data (ticker_id, as_of_ts, close, volume, ...)
+            VALUES (...)
+            ON CONFLICT (ticker_id, as_of_ts) DO UPDATE SET
+                close = EXCLUDED.close,
+                volume = EXCLUDED.volume,
+                ingestion_ts = now()
+        """)
+```
+
+Re-ingesting the same day's close is a no-op (or an overwrite with the same value). No duplicates.
+
+### Level 2: Signal deduplication
+
+Signals carry a composite natural key: `(run_id, sector_id, type, window_start, window_end)`. The `UNIQUE` constraint in the schema enforces this. If a job re-runs for the same data window, the `INSERT ... ON CONFLICT DO NOTHING` is a no-op.
+
+```python
+def upsert_signal(sig: Signal, conn):
+    conn.execute("""
+        INSERT INTO signals (run_id, sector_id, type, value, threshold,
+                             window_start, window_end, context, severity)
+        VALUES (...)
+        ON CONFLICT (run_id, sector_id, type, window_start, window_end)
+        DO UPDATE SET value = EXCLUDED.value, context = EXCLUDED.context
+    """)
+```
+
+### Level 3: Digest is a pure function of its inputs
+
+The `build_digest` job takes the current state of `signals` and `sector_aggregates` and produces a **new** digest row. It does not append to a previous digest. Each run produces exactly one digest. If the run is re-executed, the new digest supersedes the old one (or you can version them).
+
+```python
+def build_digest(run_id: str, signals: list, aggregates: dict) -> Digest:
+    sections = []
+    for sector in SECTORS:
+        sector_signals = [s for s in signals if s.sector_id == sector.id]
+        if sector_signals:
+            section = build_section(sector, sector_signals, aggregates)
+            sections.append(section)
+    return Digest(run_id=run_id, sections=sections, generated_at=now())
+```
+
+**Re-run guarantee**: Running the pipeline twice for the same day with the same inputs produces an identical digest (modulo timestamps). This is critical for debugging and for "what would the digest have looked like yesterday if we'd had the 15:00 data?"
+
+### Idempotency Key for the Run Itself
+
+Each run has a `run_id` derived from the **scheduled window**, not from wall-clock time:
+
+```python
+run_id = f"2025-01-15_06:00"   # the cron slot, not the actual start time
+```
+
+If the scheduler crashes and restarts at 06:03, it sees that a run for `2025-01-15_06:00` already exists and either resumes it or (if it completed) does nothing. This prevents double-delivery.
+
+---
+
+## 4. Scheduling
+
+### Why not Airflow/Prefect/Dagster?
+
+For ~8–12 jobs on a single machine (or a small pair), a full orchestration framework is overkill. The complexity you introduce (state management, UI, plugin system) exceeds the problem. A 200-line scheduler in Python is sufficient and gives you full control over failure semantics.
+
+That said, if you outgrow it, the job manifest is directly translatable to a Prefect `@flow` / `@task` DAG with `retries` and `trigger` semantics.
+
+### Scheduler Implementation Sketch
+
+```python
+class Scheduler:
+    def __init__(self, manifest: JobManifest, db: Connection):
+        self.manifest = manifest
+        self.db = db
+        self.cron = CronParser(manifest.schedule)
+
+    def tick(self):
+        """Called every 30s by the main loop."""
+        now = utcnow()
+        if not self.cron.should_fire(now):
+            return
+        run_id = self.cron.current_slot_id(now)
+        if self.db.run_exists(run_id, status="success"):
+            return  # already ran
+        self.execute_run(run_id)
+
+    def execute_run(self, run_id: str):
+        # Topologically sort
+        order = topo_sort(self.manifest.jobs)
+        results: dict[str, JobResult] = {}
+
+        for job in order:
+            deps = [j for j in job.depends_on]
+            # Check if all non-optional deps succeeded
+            unsatisfied = [
+                d for d in deps
+                if results[d].status == "failed"
+                and self.is_output_required(job, d)
+            ]
+            if unsatisfied:
+                results[job.id] = JobResult(status="skipped",
+                                            reason=f"dep failed: {unsatisfied}")
+                continue
+
+            result = self.spawn_and_wait(job, run_id, results)
+            results[job.id] = result
+
+        self.db.finalize_run(run_id, results)
+```
+
+### Parallelism
+
+Independent jobs (the three ingest jobs) run in parallel via `concurrent.futures.ProcessPoolExecutor` or simply by spawning them and using `asyncio.wait`. The scheduler uses a semaphore to cap concurrency if needed.
+
+### Catch-up Logic
+
+If the machine was off at 06:00 and comes back at 08:00, the scheduler checks: "Is there a cron slot that fired but has no completed run?" If yes, it executes it. This is the "catch-up" path. It uses the same `run_id` derivation, so it's idempotent.
+
+---
+
+## 5. The LLM Brain: Safe Integration
+
+This is the most delicate part of the system. The LLM is **not** a reasoner here. It is a **narrative renderer** for a pre-computed structure.
+
+### Architecture
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│  render_narrative job                                          │
+│                                                                │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  INPUT: digest_structure (JSON)                          │  │
+│  │  - Contains ONLY Claim objects with provenance           │  │
+│  │  - No raw data, no raw news text, no raw prices         │  │
+│  │  - Every fact is already a sentence with a ref           │  │
+│  └──────────────────────┬───────────────────────────────────┘  │
+│                         │                                      │
+│                         ▼                                      │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  LLM CALL                                                │  │
+│  │  - Model: (e.g., claude-sonnet, gpt-4o)                 │  │
+│  │  - Prompt: strict system prompt (see below)             │  │
+│  │  - Output: narrative text                               │  │
+│  └──────────────────────┬───────────────────────────────────┘  │
+│                         │                                      │
+│                         ▼                                      │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  VALIDATOR (deterministic, runs locally)                 │  │
+│  │  1. Extract all numeric tokens from LLM output           │  │
+│  │  2. Verify each appears in the input digest_structure   │  │
+│  │  3. Extract all entity mentions (tickers, dates)        │  │
+│  │  4. Verify each maps to a claim in the input            │  │
+│  │  5. Check for "hedging language" that implies            │  │
+│  │     uncertainty not present in the source               │  │
+│  │  6. If any check fails → strip the offending sentence   │  │
+│  │     or mark the narrative as "unvalidated"              │  │
+│  └──────────────────────┬───────────────────────────────────┘  │
+│                         │                                      │
+│                         ▼                                      │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  OUTPUT: narrative_text (validated) + validation_report  │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────┘
+```
+
+### The System Prompt
+
+```text
+You are a financial news narrative renderer. You receive a structured
+digest of pre-verified claims. Your ONLY task is to write a flowing
+morning brief that conveys the same information in prose.
+
+RULES:
+1. You may ONLY reference facts that appear in the input.
+2. You may NOT introduce any number, date, ticker, or entity that
+   is not in the input.
+3. You may rephrase, reorder, and combine sentences.
+4. You may add transitional language ("Meanwhile," "In contrast,").
+5. You must preserve the severity level of each claim.
+6. If a claim has low confidence, you must reflect that in your
+   language (e.g., "reported to be," "per [source]").
+7. Do NOT speculate. Do NOT extrapolate. Do NOT say "this could
+   lead to" or "analysts expect."
+8. Every factual assertion must be traceable to a claim ID.
+   Append a [C:claim_id] tag after each factual sentence.
+
+INPUT FORMAT:
+- claims: [{id, text, provenance, confidence}]
+- sections: [{title, claims: [ids]}]
+
+OUTPUT: A single narrative, 400-800 words, with [C:...] tags.
+```
+
+### The Validator (Deterministic, Local)
+
+```python
+class NarrativeValidator:
+    def __init__(self, digest_structure: DigestStructure):
+        self.valid_numbers = self._extract_numbers(digest_structure)
+        self.valid_entities = self._extract_entities(digest_structure)
+        self.valid_claim_texts = {c.text for c in digest_structure.all_claims()}
+        self.claim_id_to_text = {c.id: c.text for c in digest_structure.all_claims()}
+
+    def validate(self, narrative: str) -> ValidationReport:
+        issues = []
+        sentences = split_sentences(narrative)
+        
+        for sent in sentences:
+            # Check: every number in this sentence must be in valid_numbers
+            for num in extract_numbers(sent):
+                if num not in self.valid_numbers:
+                    issues.append(UnvalidatedNumber(sentence=sent, number=num))
+            
+            # Check: every ticker/entity must be in valid_entities
+            for ent in extract_entities(sent):
+                if ent not in self.valid_entities:
+                    issues.append(UnvalidatedEntity(sentence=sent, entity=ent))
+            
+            # Check: the sentence must map to at least one claim
+            claim_ids = extract_claim_tags(sent)
+            if not claim_ids:
+                issues.append(MissingProvenance(sentence=sent))
+            for cid in claim_ids:
+                if cid not in self.claim_id_to_text:
+                    issues.append(InvalidClaimRef(sentence=sent, ref=cid))
+        
+        return ValidationReport(
+            passed=len(issues) == 0,
+            issues=issues,
+            cleaned_text=self._strip_offending(sentences, issues)
+        )
+```
+
+**Key design choice**: The validator does NOT try to verify semantic entailment (that's what the LLM is for). It verifies **referential integrity** — every concrete reference (number, entity, date) in the output must exist in the input. This catches hallucinated numbers, phantom tickers, and fabricated sources without requiring a second LLM call.
+
+### What the LLM Can and Cannot Do
+
+| Capability | Allowed? | Enforcement |
+|-----------|----------|-------------|
+| Rephrase a claim | ✅ | Semantic — human review or spot-check |
+| Combine two claims into one sentence | ✅ | Each must carry its claim tag |
+| Add a transitional phrase | ✅ | Contains no factual content |
+| Introduce a new number | ❌ | Validator: number not in input → strip |
+| Mention a ticker not in the digest | ❌ | Validator: entity not in input → strip |
+| Add speculative language | ❌ | Prompt rule + validator flag (optional NLI check) |
+| Change the severity of a claim | ❌ | Prompt rule (hard to enforce automatically; rely on prompt + human review) |
+
+### Optional: NLI Spot-Check
+
+For high-stakes claims (severity `alert` or `critical`), you can run a small NLI model (e.g., DeBERTa-v3-mnli) to check that the narrative sentence **entails** the original claim. This is expensive and slow, so it's opt-in and only for the top-N most important claims.
+
+---
+
+## 6. The Digest: Structure and Auditability
+
+### Digest Structure (what the LLM sees)
+
+```json
+{
+  "run_id": "2025-01-15_06:00",
+  "generated_at": "2025-01-15T06:14:22Z",
+  "data_gaps": [
+    {"source": "ingest_news", "reason": "API timeout after 3 retries", "impact": "may be missing 2-3 stories from Reuters"}
+  ],
+  "sections": [
+    {
+      "title": "Sector Signals: AI Infrastructure",
+      "claims": [
+        {
+          "id": "c001",
+          "text": "NVIDIA's 20-day VWAP is 4.2% above its 50-day VWAP, exceeding the 3% tripwire threshold.",
+          "provenance": {
+            "kind": "computed",
+            "ref_type": "signal",
+            "ref_id": "sig_20250115_nvda_vwap_cross",
+            "computation": "vwap_cross_detector(ticker=NVDA, short=20, long=50, threshold=0.03)"
+          },
+          "confidence": {"level": "exact", "detail": "Computed from closing prices 2025-01-15 and prior 50 sessions."}
+        },
+        {
+          "id": "c002",
+          "text": "NVIDIA reported Q3 revenue of $35.1B, beating consensus by 8.3%. Source: NVIDIA IR, 2025-01-28.",
+          "provenance": {
+            "kind": "source",
+            "ref_type": "earnings",
+            "ref_id": "ern_nvda_2025q3"
+          },
+          "confidence": {"level": "reported", "detail": "Company-reported figure from official press release."}
+        }
+      ]
+    },
+    {
+      "title": "News Flow",
+      "claims": [
+        {
+          "id": "c003",
+          "text": "Reuters reported (2025-01-14) that three hyperscaler customers expanded their H100 purchase agreements by an undisclosed amount.",
+          "provenance": {
+            "kind": "source",
+            "ref_type": "news",
+            "ref_id": "news_reuters_20250114_h100"
+          },
+          "confidence": {"level": "reported", "detail": "Single-source report; no independent confirmation in ingested feed."}
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Audit Trail
+
+Given any sentence in the final narrative, you can trace:
+
+1. **Narrative sentence** → claim tag `[C:c001]`
+2. **Claim c001** → provenance: `computed`, function `vwap_cross_detector`, inputs hash `sha256:abc...`
+3. **Inputs** → exact `market_data` rows (ticker=NVIDIA, dates=...)
+4. **Raw source** → the original price feed entry with timestamp and source attribution
+
+This is a complete, deterministic audit chain from prose back to raw data.
+
+### Immutability
+
+Digests are **append-only**. Once written, they are never modified. The `narrative_text` field is filled in by the `render_narrative` job and is part of the digest row's final state. If you want to re-render (e.g., after a model upgrade), you create a new row with a `parent_digest_id` pointer.
+
+---
+
+## 7. Key Trade-offs
+
+### 1. Determinism vs. Intelligence
+
+| Choice | Pro | Con |
+|--------|-----|-----|
+| All-deterministic signals | Fully reproducible, auditable, fast | Misses nuance (e.g., "the tone of the earnings call shifted") |
+| LLM analyzes raw news | Catches subtleties | Introduces non-determinism, hallucination risk, cost |
+
+**Resolution**: Keep the signal layer fully deterministic. Use the LLM only for narrative. If you want the LLM to *contribute* to signal generation (e.g., "classify this news as a supply-chain risk"), do it in a **separate, sandboxed job** whose output is a structured classification that feeds into the deterministic signal layer. The LLM's output is then validated against a schema and can be overridden.
+
+### 2. Latency vs. Completeness
+
+By 06:00 EST, some data may not be available:
+- Earnings reported after 04:00 ET may not be in the feed yet.
+- News from AP/Reuters may have a 5–15 min ingestion lag.
+
+**Resolution**: The `data_gaps` field in the digest explicitly states what's missing and why. The reader knows the digest is a *snapshot*, not a guarantee of completeness. You can also add a "supplemental update" at 07:00 that picks up late-arriving data.
+
+### 3. Granularity: Sector vs. Ticker
+
+12 sectors × 5–15 tickers each = 60–180 tickers. Full per-ticker signal computation is feasible but produces a long digest.
+
+**Resolution**: Compute signals at the ticker level, but the digest is organized by sector. A sector section aggregates its tickers' signals, highlighting only those that crossed a threshold. Per-ticker detail is available in the raw data for drill-down.
+
+### 4. LLM Validation Strictness
+
+| Strictness | Effect |
+|-----------|--------|
+| Strip any unvalidated number | Very safe, but may produce awkward prose if the LLM "rounds" a number |
+| Allow numbers within 0.1% of a valid number | Handles rounding, but requires a tolerance parameter |
+| Only flag numbers that are wildly off (>1%) | Risky — a hallucinated "23%" vs. actual "3%" would pass |
+
+**Resolution**: Use exact matching for all numbers. The LLM is instructed to copy numbers verbatim. If it rounds, the validator strips the sentence. In practice, modern LLMs follow "copy verbatim" instructions well when the numbers are in the prompt.
+
+### 5. Single-Node vs. Distributed
+
+For 12 sectors and ~100 tickers, the entire pipeline runs in <2 minutes on a single mid-range machine. Distributed computing (Kafka, Spark, Kubernetes) adds operational complexity for no benefit at this scale.
+
+**Resolution**: Single process, single Postgres, single filesystem. If you scale to 50+ sectors or add real-time (sub-hour) signals, revisit.
+
+### 6. Storage Retention
+
+| Data | Retention | Rationale |
+|------|-----------|-----------|
+| Raw market data | 2 years | Needed for signal recomputation, backtesting |
+| News items | 1 year | Provenance for digests from the last year |
+| Digests | 5
+
+=================== ANSWER C ===================
+
+# Overnight AI-Infrastructure Research Pipeline
+
+## Design Philosophy
+
+The system has one invariant: **the digest is a deterministic function of (market state, news state, earnings state, config)**. The LLM is a post-hoc narrator that maps a verified artifact into natural language. If the LLM step fails or produces unvalidated output, the template-rendered digest ships unchanged. No human judgment is required for correctness; the LLM adds only readability.
+
+---
+
+## 1. Data Model
+
+### Core Entities
+
+```sql
+-- Universe definition (changes infrequently, versioned)
+CREATE TABLE sector (
+    id          UUID PRIMARY KEY,
+    name        TEXT NOT NULL,          -- e.g. 'AI-HW'
+    tickers     JSONB NOT NULL,        -- ["NVDA","AMD","AVGO",...]
+    config      JSONB NOT NULL,        -- thresholds, weights, per-ticker overrides
+    version     INT NOT NULL,
+    effective_from TIMESTAMPTZ NOT NULL,
+    UNIQUE(name, effective_from)
+);
+
+CREATE TABLE ticker (
+    id          UUID PRIMARY KEY,
+    symbol      TEXT NOT NULL UNIQUE,
+    sector_id   UUID REFERENCES sector(id),
+    name        TEXT NOT NULL
+);
+
+-- Observed market data (append-only, immutable)
+CREATE TABLE price_obs (
+    ticker_id   UUID REFERENCES ticker(id),
+    ts          TIMESTAMPTZ NOT NULL,   -- exchange time
+    open        NUMERIC(12,4),
+    high        NUMERIC(12,4),
+    low         NUMERIC(12,4),
+    close       NUMERIC(12,4),
+    volume      BIGINT,
+    source      TEXT NOT NULL,           -- 'polygon','alphavantage',...
+    ingested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (ticker_id, ts, source)
+);
+
+-- News events (deduplicated by content hash)
+CREATE TABLE news_item (
+    id          UUID PRIMARY KEY,
+    ts          TIMESTAMPTZ NOT NULL,   -- publication time
+    source      TEXT NOT NULL,
+    url         TEXT NOT NULL,
+    headline    TEXT NOT NULL,
+    body_hash   TEXT NOT NULL,           -- SHA256 of canonical body
+    entities    JSONB NOT NULL,         -- ["NVDA","data-center",...]
+    sector_id   UUID REFERENCES sector(id),
+    relevance   NUMERIC(4,3),           -- 0..1, computed by classifier
+    UNIQUE(source, url, ts)
+);
+
+-- Earnings events (one per ticker per fiscal quarter)
+CREATE TABLE earnings_event (
+    ticker_id   UUID REFERENCES ticker(id),
+    fiscal_q    TEXT NOT NULL,           -- '2025Q4'
+    ts          TIMESTAMPTZ NOT NULL,   -- announcement time
+    reported_eps   NUMERIC(10,4),
+    expected_eps   NUMERIC(10,4),
+    reported_rev   NUMERIC(16,2),
+    expected_rev   NUMERIC(16,2),
+    guidance     JSONB,                 -- next-quarter guidance if provided
+    source      TEXT NOT NULL,
+    ingested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (ticker_id, fiscal_q)
+);
+
+-- Computed signals (the core of the analysis)
+CREATE TABLE signal (
+    id          UUID PRIMARY KEY,
+    ts          TIMESTAMPTZ NOT NULL,   -- computed-at time
+    type        TEXT NOT NULL,           -- 'drawdown','volume_spike','earnings_miss',...
+    severity    SMALLINT NOT NULL,       -- 1=watch, 2=alert, 3=critical
+    ticker_id   UUID REFERENCES ticker(id),
+    sector_id   UUID REFERENCES sector(id),
+    trigger_val NUMERIC(12,6) NOT NULL,  -- the actual computed value
+    threshold   NUMERIC(12,6) NOT NULL,  -- the config threshold that was crossed
+    formula     TEXT NOT NULL,           -- human-readable: "close < sma_20 * (1 - 0.05)"
+    formula_hash TEXT NOT NULL,          -- SHA256 of formula + config version
+    inputs_snapshot JSONB NOT NULL,      -- the exact inputs used (for audit/replay)
+    job_run_id  UUID REFERENCES job_run(id)
+);
+
+-- The output: ranked digest entries
+CREATE TABLE digest_entry (
+    id          UUID PRIMARY KEY,
+    run_id      UUID REFERENCES digest_run(id),
+    rank        INT NOT NULL,
+    signal_id   UUID REFERENCES signal(id),
+    title       TEXT NOT NULL,
+    body        TEXT NOT NULL,           -- template-rendered (always true)
+    evidence    JSONB NOT NULL,          -- [{type:'price',ref:'NVDA 2025-01-15 close=128.44'},...]
+    provenance  TEXT NOT NULL,           -- SHA256(canonical_json(signal.inputs_snapshot))
+    confidence  NUMERIC(3,2) NOT NULL    -- 0..1, based on input completeness
+);
+
+CREATE TABLE digest_run (
+    id          UUID PRIMARY KEY,
+    generated_at TIMESTAMPTZ NOT NULL,
+    code_version TEXT NOT NULL,          -- git SHA
+    config_hash TEXT NOT NULL,           -- SHA256 of all sector configs
+    data_window JSONB NOT NULL,          -- {from: ts, to: ts}
+    completeness JSONB NOT NULL,         -- {sector: 0.87, ...} per-sector data availability
+    llm_narrated BOOLEAN NOT NULL DEFAULT false,
+    llm_model   TEXT,
+    entry_count INT NOT NULL
+);
+```
+
+### The Critical Design Decision: `inputs_snapshot`
+
+Every signal stores the *exact* inputs it was computed from. This is the backbone of auditability. If someone asks "why did you flag NVDA at 03:12 UTC?", you can replay the computation from the snapshot and reproduce the result bit-for-bit. This also makes backtesting and config changes testable: you can recompute all signals for a historical window with a new threshold and diff the results.
+
+---
+
+## 2. Job Registry and Failure Isolation
+
+### Job DAG
+
+The pipeline is a DAG of jobs, not a monolithic script. Each node is independently executable, independently retriable, and independently failure-tolerant.
+
+```yaml
+# jobs.yaml (the job graph definition)
+
+pipeline: overnight_research
+window:
+  start: "22:00"   # UTC, post-market-close
+  end:   "06:00"   # UTC, before market open
+  digest_deadline: "05:30"  # hard deadline; if missed, ship what you have
+
+jobs:
+  # ── Layer 0: Ingestion (parallel, one job per source×entity) ──
+  - id: ingest_prices:{sector}
+    type: stream_batch
+    inputs: [sector]
+    output: price_obs rows
+    timeout: 300s
+    retry: {max: 2, backoff: exponential}
+    idempotency_key: "ingest_prices:{sector}:{window_start}:{window_end}"
+
+  - id: ingest_news:{sector}
+    type: batch
+    inputs: [sector]
+    output: news_item rows
+    timeout: 600s
+    retry: {max: 3, backoff: exponential}
+    idempotency_key: "ingest_news:{sector}:{window_start}"
+
+  - id: ingest_earnings:{sector}
+    type: batch
+    inputs: [sector]
+    output: earnings_event rows
+    timeout: 300s
+    retry: {max: 1}  # earnings are rare; don't hammer
+    idempotency_key: "ingest_earnings:{sector}:{fiscal_quarter}"
+
+  # ── Layer 1: Signal Computation (parallel per sector) ──
+  - id: compute_signals:{sector}
+    type: transform
+    depends_on: [ingest_prices:{sector}, ingest_news:{sector}, ingest_earnings:{sector}]
+    inputs: [price_obs, news_item, earnings_event, sector_config]
+    output: signal rows
+    timeout: 120s
+    retry: {max: 1}  # deterministic; retry is only for I/O errors
+    idempotency_key: "compute_signals:{sector}:{code_version}:{config_hash}:{data_window}"
+
+  # ── Layer 2: Cross-sector aggregation ──
+  - id: aggregate_sector_risk
+    type: transform
+    depends_on: ["compute_signals:*"]   # wildcard: all sectors
+    inputs: [signals from all sectors]
+    output: sector_risk_scores
+    timeout: 60s
+    idempotency_key: "aggregate:{code_version}:{config_hash}:{data_window}"
+
+  # ── Layer 3: Digest Synthesis ──
+  - id: synthesize_digest
+    type: transform
+    depends_on: [aggregate_sector_risk, "compute_signals:*"]
+    inputs: [all signals, sector_risk_scores, completeness_map]
+    output: digest_entry rows + digest_run record
+    timeout: 60s
+    idempotency_key: "synthesize:{code_version}:{config_hash}:{data_window}"
+
+  # ── Layer 4: LLM Narration (optional, best-effort) ──
+  - id: narrate_digest
+    type: llm
+    depends_on: [synthesize_digest]
+    inputs: [digest entries, provenance data]
+    output: narrated text (or fallback to template)
+    timeout: 300s
+    retry: {max: 1}
+    failure_policy: degrade   # ← critical: failure here does NOT affect digest correctness
+    idempotency_key: "narrate:{digest_run_id}:{llm_model}:{code_version}"
+
+  # ── Layer 5: Delivery ──
+  - id: deliver_digest
+    type: emit
+    depends_on: [synthesize_digest, narrate_digest]  # uses narrate if available, else falls back
+    inputs: [digest, narration (optional)]
+    output: email / Slack / dashboard
+    timeout: 30s
+    failure_policy: retry_then_alert
+```
+
+### Failure Isolation: The "Partial Truth" Contract
+
+The critical insight is that **the digest is designed to be complete with partial input**. The `synthesize_digest` job receives a `completeness_map`:
+
+```python
+# Inside synthesize_digest
+def build_digest(signals, risk_scores, completeness_map):
+    """
+    completeness_map: {sector_id: float} where 1.0 = all expected data present.
+    A sector at 0.0 produces no signals but IS reported in the digest
+    with an explicit "DATA UNAVAILABLE" entry.
+    """
+    entries = []
+    for sector, completeness in completeness_map.items():
+        if completeness < MIN_VIABLE_THRESHOLD:  # e.g. 0.3
+            entries.append(
+                DataGapEntry(
+                    sector=sector,
+                    completeness=completeness,
+                    body=f"[{sector}] Data availability at {completeness:.0%}. "
+                         f"Signals for this sector are unreliable; "
+                         f"no risk assessment provided."
+                )
+            )
+            continue
+        # Normal path: rank signals for this sector
+        sector_signals = [s for s in signals if s.sector_id == sector]
+        entries.extend(rank_and_template(sector_signals, completeness))
+
+    # Cross-sector entries (systemic signals)
+    entries.extend(risk_scores.to_entries())
+
+    return rank_all(entries)  # global ranking
+```
+
+**The rule: a failed ingestion job reduces completeness for its sector. It never blocks downstream jobs. The digest always ships, always reflects what it knows, and always flags what it doesn't.**
+
+### Job Run Tracking
+
+```sql
+CREATE TABLE job_run (
+    id            UUID PRIMARY KEY,
+    job_id        TEXT NOT NULL,          -- "ingest_prices:AI-HW"
+    pipeline      TEXT NOT NULL,
+    scheduled_at  TIMESTAMPTZ NOT NULL,
+    started_at    TIMESTAMPTZ,
+    finished_at   TIMESTAMPTZ,
+    status        TEXT NOT NULL,          -- 'pending','running','success','failed','skipped','degraded'
+    error         JSONB,                  -- {type, message, traceback_hash}
+    inputs_hash   TEXT,                   -- SHA256 of canonical input snapshot
+    outputs_hash  TEXT,                   -- SHA256 of canonical output snapshot
+    code_version  TEXT NOT NULL,          -- git SHA at execution time
+    parent_run    UUID,                   -- for retry chain
+    UNIQUE(job_id, scheduled_at, code_version)
+);
+```
+
+The `status = 'degraded'` state is key: the job ran, produced output, but the output is known-incomplete (e.g., price feed was available but news feed wasn't, so signals are missing the news component). Downstream jobs receive the degraded output and factor it into their completeness calculation.
+
+---
+
+## 3. Idempotency
+
+### The Three Idempotency Layers
+
+| Layer | Key | Guarantee |
+|-------|-----|-----------|
+| **Input idempotency** | `(source, entity, timestamp)` for prices; `(source, url, ts)` for news; `(ticker, fiscal_q)` for earnings | Re-ingesting the same data does not create duplicates. We use `ON CONFLICT DO NOTHING`. |
+| **Computation idempotency** | `inputs_hash = SHA256(canonical_json(all_relevant_input_rows + config + code_version))` | If the job has already run with this exact input hash, skip. Store the hash in `job_run.inputs_hash`. |
+| **Output idempotency** | `idempotency_key` (the YAML string, rendered) | If a job with this key already produced a `success` or `degraded` run, the orchestrator skips re-dispatch. |
+
+### Implementation
+
+```python
+class IdempotentJob(ABC):
+    def execute(self, ctx: JobContext) -> JobResult:
+        # 1. Compute the canonical input hash
+        input_hash = sha256(canonical_json(self.gather_inputs(ctx)))
+
+        # 2. Check if we've already done this exact work
+        existing = self.db.query(
+            "SELECT outputs_hash FROM job_run "
+            "WHERE job_id = %s AND inputs_hash = %s AND status IN ('success','degraded')",
+            (self.id, input_hash)
+        )
+        if existing:
+            return JobResult(status='skipped', reason='idempotent_hit',
+                             outputs_hash=existing[0])
+
+        # 3. Execute
+        try:
+            outputs = self._do_work(ctx)
+            outputs_hash = sha256(canonical_json(outputs))
+            self.db.insert_job_run(
+                id=self.id, inputs_hash=input_hash,
+                outputs_hash=outputs_hash, status=self._assess_status(ctx)
+            )
+            return JobResult(status=self._assess_status(ctx), outputs_hash=outputs_hash)
+        except Exception as e:
+            self.db.insert_job_run(
+                id=self.id, inputs_hash=input_hash,
+                status='failed', error=serialize_error(e)
+            )
+            raise
+```
+
+### Why `code_version` Is in the Hash
+
+If you change the signal formula (e.g., adjust a moving-average window from 20 to 25), the inputs are the same but the correct output is different. Including the git SHA in the computation hash means a config/code change automatically invalidates all prior results. This is what makes "recompute with new config" safe: the old results remain (for audit) but new results get new hashes.
+
+---
+
+## 4. Scheduling
+
+### Cron Entry Point
+
+```cron
+# /etc/cron.d/research-pipeline (or systemd timer)
+# Runs at 22:00 UTC every trading day
+0 22 * * 1-5 /opt/research/bin/run_pipeline.sh
+```
+
+```bash
+#!/usr/bin/env bash
+# run_pipeline.sh — thin wrapper, all logic in Python
+set -euo pipefail
+
+PIPELINE="overnight_research"
+WINDOW_START="${PIPELINE_START:-$(date -u -d '0 22 hours' +%Y-%m-%dT%H:%M:%SZ)}"
+WINDOW_END="${PIPELINE_END:-$(date -u -d '0 23 hours' +%Y-%m-%dT%H:%M:%SZ)}"
+
+python -m research.orchestrator \
+    --pipeline "$PIPELINE" \
+    --window-start "$WINDOW_START" \
+    --window-end "$WINDOW_END" \
+    --config /opt/research/config/ \
+    --code-version "$(git -C /opt/research rev-parse HEAD)"
+```
+
+### The Orchestrator (Not Airflow, Not Prefect — Just Python)
+
+For a 12-sector, 5-layer pipeline with ~50 total jobs, a full orchestrator is overkill and adds its own failure modes. A lightweight DAG runner suffices:
+
+```python
+class DAGRunner:
+    """
+    Executes a job graph in topological order.
+    - Jobs with the same layer run in parallel (ThreadPoolExecutor).
+    - A failed job marks its downstream dependents as 'skipped' with reason.
+    - The digest job ALWAYS runs; it adapts to whatever is available.
+    """
+
+    def __init__(self, graph: JobGraph, db: DB, max_parallel: int = 12):
+        self.graph = graph
+        self.db = db
+        self.results: dict[str, JobResult] = {}
+
+    def run(self):
+        for layer in self.graph.layers():  # topological layers
+            runnable = []
+            for job in layer:
+                if self._should_skip(job):
+                    self.results[job.id] = JobResult(
+                        status='skipped',
+                        reason=f"upstream {job.depends_on[0]} did not succeed"
+                    )
+                    self.db.record_run(job.id, self.results[job.id])
+                    continue
+                runnable.append(job)
+
+            with ThreadPoolExecutor(max_workers=self.max_parallel) as pool:
+                futures = {pool.submit(job.execute, self.ctx): job for job in runnable}
+                for fut in as_completed(futures):
+                    job = futures[fut]
+                    try:
+                        self.results[job.id] = fut.result()
+                    except Exception as e:
+                        self.results[job.id] = JobResult(status='failed', error=str(e))
+                    self.db.record_run(job.id, self.results[job.id])
+
+        # The digest is the terminal node; it always gets called
+        digest_job = self.graph.terminal()
+        self.results[digest_job.id] = digest_job.execute(self.ctx)
+        self.db.record_run(digest_job.id, self.results[digest_job.id])
+```
+
+### Why Not Airflow?
+
+| Concern | Airflow | Custom DAG Runner |
+|---------|---------|-------------------|
+| Operational complexity | High (Postgres, scheduler, webserver, workers) | Low (one process, one DB connection) |
+| Failure semantics | Task retries, but the whole DAG can be in a broken state | Explicit per-job status; orchestrator never gets "stuck" |
+| Idempotency | You still have to implement it | Built into the job base class |
+| Partial execution | Requires custom logic to "skip but continue" | Native: the runner just checks dependents |
+| Scale | Overkill for ~50 jobs/night | Perfect fit |
+
+The only reason to use Airflow would be if you later want to scale to hundreds of sectors or add complex cross-pipeline dependencies. For 12 sectors, a 200-line Python orchestrator is the right tool.
+
+---
+
+## 5. The LLM Brain: Safe Integration
+
+### The Safety Contract
+
+The LLM operates under a strict contract with three rules:
+
+1. **Input is the ground truth.** The LLM receives the rendered digest (template-produced, factually verified) and a provenance manifest. It may *rephrase, reorder, summarize, or add transitional language*. It may not *assert new facts, add numbers, change severity, or introduce entities not in the input*.
+
+2. **Output is validated before use.** A validation step checks the LLM output against the input. Any claim in the output that doesn't map to a claim in the input is a violation.
+
+3. **Failure means fallback.** If validation fails, or the LLM call times out, or the model is unavailable, the template-rendered digest ships as-is. The user never sees a wrong number.
+
+### Prompt Structure
+
+```text
+SYSTEM:
+You are a financial research narrator. You will be given a structured digest
+of market signals. Your job is to rewrite it as a readable morning brief.
+
+RULES (absolute, no exceptions):
+- You may ONLY state facts that appear in the INPUT.
+- You may NOT introduce any ticker, number, date, or entity not in the INPUT.
+- You may NOT change any number, threshold, or severity level.
+- You may rephrase, reorder, group, and add transitional language.
+- You may say "no material signals for [sector]" if the input says so.
+- If a sector is marked "DATA UNAVAILABLE", you must preserve that status.
+- Output in the format: a single markdown document with ## headers per sector.
+
+INPUT:
+{structured_digest_json}
+
+PROVENANCE MANIFEST:
+{evidence_table}
+```
+
+### Validation
+
+```python
+class LLMValidator:
+    """
+    Post-LLM validation. Extracts all "factual claims" from the LLM output
+    and checks each one exists in the input digest.
+    """
+
+    def validate(self, llm_output: str, input_digest: list[DigestEntry]) -> ValidationReport:
+        claims = self._extract_claims(llm_output)
+        input_facts = self._extract_facts(input_digest)
+
+        violations = []
+        for claim in claims:
+            if not self._matches_any(claim, input_facts):
+                violations.append(claim)
+
+        return ValidationReport(
+            passed=len(violations) == 0,
+            violations=violations,
+            total_claims=len(claims)
+        )
+
+    def _extract_claims(self, text: str) -> list[FactClaim]:
+        """
+        Extracts: all numbers, all tickers, all dates, all named entities
+        from the LLM output. Uses regex + NER for tickers/dates.
+        """
+        ...
+
+    def _matches_any(self, claim: FactClaim, facts: set[FactClaim]) -> bool:
+        """
+        Numeric claims must match exactly (within floating-point tolerance).
+        Entity claims must match the entity in the input.
+        Date claims must match the timestamp in the input.
+        """
+        ...
+```
+
+### The "Never Fabricate" Guarantee, Formalized
+
+```
+Theorem: If the LLM output passes validation, every factual claim in the
+output is entailed by the input digest.
+
+Proof sketch: Validation extracts all atomic facts (numbers, entities, dates)
+from the output and requires each to have a matching fact in the input.
+Since the input digest was produced by deterministic computation from raw data,
+and each signal in the input has a provenance_hash back to its inputs,
+the transitive chain is:
+    LLM output claim → input digest fact → signal.inputs_snapshot → raw data
+∎
+```
+
+The practical risk is not in the proof but in the *extraction* step. If `_extract_claims` misses a claim (e.g., the LLM says "the stock fell sharply" where "sharply" implies a degree not in the input), validation passes but the claim is subtly ungrounded. Mitigation:
+
+- The validation step also checks for *degree words* and *hedges* that imply information not in the input.
+- We log all LLM inputs/outputs and sample 10% for human review weekly.
+- The template-rendered digest is always available as the "canonical" version; the LLM version is explicitly labeled "AI-narrated summary of the following verified data."
+
+---
+
+## 6. Accuracy and Auditability
+
+### The Provenance Chain
+
+Every claim in the final deliverable traces through this chain:
+
+```
+[Final digest text]
+    │
+    │  (LLM narration OR template)
+    ▼
+[Digest entry: "NVDA down 7.2% below 20-day SMA, volume 2.3× average"]
+    │
+    │  provenance_hash = SHA256(inputs_snapshot)
+    ▼
+[Signal row: type=drawdown, trigger_val=0.928, threshold=0.95]
+    │
+    │  inputs_snapshot = {close: 128.44, sma_20: 138.41, vol_20d_avg: 42M, vol_today: 97M}
+    ▼
+[Raw data: price_obs(NVDA, 2025-01-15, close=128.44, source=polygon)]
+              price_obs(NVDA, 2025-01-01..14, close=[...])  ← 20 observations
+    │
+    ▼
+[External source: Polygon.io API, timestamp 2025-01-15T21:12:00Z]
+```
+
+To audit: given any line in the digest, a human or script can follow the chain to the raw data and verify the computation. The `inputs_snapshot` in the signal table makes this a single DB query.
+
+### Reproducibility
+
+The `digest_run` table stores:
+- `code_version`: exact git SHA
+- `config_hash`: SHA256 of all sector configs at run time
+- `data_window`: exact time range
+
+Given these three values, the entire pipeline can be re-run and must produce bit-identical output (barring data source corrections). This is the "reproducibility key" — include it in every digest so a reader can request a replay.
+
+---
+
+## 7. Key Trade-offs
+
+### 7.1: Staleness vs. Completeness
+
+**The dilemma:** The pipeline starts at 22:00 UTC. If the news API is slow, do you wait for it or proceed without it?
+
+**Resolution:** Per-source deadlines. Each ingestion job has a `deadline` (e.g., news must arrive by 00:00 UTC). If the deadline passes without data, the job records `status='degraded'` and the pipeline continues. The digest explicitly states which sources were unavailable.
+
+The trade-off: you trade *recency* (you might miss a 23:58 news item that arrives at 00:02) for *availability* (the digest always ships on time). For an investing workstation, availability wins: a digest that says "no news data" is always better than a digest that's 4 hours late.
+
+### 7.2: Signal Granularity vs. Alert Fatigue
+
+**The dilemma:** With 12 sectors × ~15 tickers each × ~8 signal types, you could generate hundreds of signals per night. The user will ignore a 200-item digest.
+
+**Resolution:** A two-tier ranking:
+- **Tier 1 (Critical):** `severity=3` signals. Always included, ranked by magnitude of threshold breach.
+- **Tier 2 (Watch):** `severity=2` signals. Included only if the sector's aggregate risk score exceeds a threshold. Otherwise collapsed into a one-line sector summary.
+- **Tier 3 (Noise):** `severity=1` signals. Aggregated into a single "background" section with counts only.
+
+The user configures the ratio. The trade-off is between sensitivity (catching early warnings) and signal-to-noise ratio. For an overnight pipeline, I'd start with a bias toward fewer, higher-confidence signals and tune up over time.
+
+### 7.3: Deterministic Signals vs. LLM "Insight"
+
+**The dilemma:** Purely deterministic signals (threshold crossings, ratio changes) are auditable but may miss emergent patterns. An LLM could "see" that three different news items together imply a regulatory risk. But if the LLM identifies a pattern, how do you audit it?
+
+**Resolution:** The LLM does not identify new signals. It can only *narrate* existing ones. If you want the LLM to propose new signals, that's a separate pipeline (a "hypothesis generation" step) whose output goes to a human for review, not into the automated digest. The automated digest remains 100% deterministic.
+
+This is the most important trade-off in the system: **you sacrifice potential insight for guaranteed correctness.** In my view, for an investing workstation where a wrong number could lead to a bad trade, this is the right trade. The LLM's value is in *readability and synthesis* (grouping related signals, explaining *why* a cluster of signals matters), not in *discovery*.
+
+### 7.4: Idempotency vs. Data Corrections
+
+**The dilemma:** If Polygon later corrects a price (e.g., a bad tick was published and then retracted), the idempotency key says "already computed, skip." But the data has changed.
+
+**Resolution:** Distinguish between *initial ingestion* (idempotent by content) and *corrections* (a separate `ingest_corrections` job that watches for retracted/updated data). Corrections trigger a *recomputation* with a new `inputs_hash` (because the input rows changed), producing a *new* signal row alongside the old one (which is marked `superseded=true`). The digest uses the latest non-superseded signals.
+
+This preserves the audit trail: you can see the original signal, the correction, and the recomputed signal, all in the same table.
+
+### 7.5: Sector Independence vs. Systemic Risk
+
+**The dilemma:** The jobs are per-sector. But a macro event (Fed announcement, geopolitical shock) hits all 12 sectors simultaneously. Treating it as 12 independent "failures" or 12 independent "signals" is wrong — it's one event with 12 manifestations.
+
+**Resolution:** A `cross_sector_signal` layer (the `aggregate_sector_risk` job). It looks at the *correlation* of signals across sectors. If 8+ sectors have `severity ≥ 2` signals within the same 15-minute window, it emits a single `type=systemic` signal at `severity=3` that *supersedes* the individual sector signals in the digest (they're referenced as evidence but not listed individually).
+
+---
+
+##
