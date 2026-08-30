@@ -1,0 +1,4 @@
+  waiting for port 8089 to clear
+starting qwen3.8-gguf8 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)

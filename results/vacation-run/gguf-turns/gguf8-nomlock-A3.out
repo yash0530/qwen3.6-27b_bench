@@ -1,0 +1,1 @@
+I still can't find `scripts/llm-serve` in this workspace — it doesn't exist here. If you can share the file content or point me to the right repo/path, I'll be happy to break down which aliases route to llama.cpp vs MLX.

@@ -1,0 +1,8 @@
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS` defaults to **81920** (`${LLM_CTX:-81920}`, qwen-code:51) — note this is *not* the model's real context (llm-serve uses `LLM_CTX=262144` for the server; here 81920 is just the fallback if `LLM_CTX` isn't exported).
+
+Why not the full 262144: it's a guard against the Metal memory ceiling, not a model limit.
+
+- On **mlx4 + APC**, Metal OOMs from APC's snapshot clone (`apc.py:321`) start sporadically at ~40–50k real context and are total by ~75k (vacation-run, 2026-08-28).
+- On **mlx6**, the same pressure kernel-panicked the machine (`IOGPUMemory.cpp:550`).
+- Capping makes Claude Code compact before hitting the danger zone. The cap uses the `count_tokens` estimate (chars/3.5), which *overshoots* real tokens — so it can't be set too low, or fresh sessions get "Prompt is too long" client-side. 40960 and 49152 both blocked fresh sessions; at 65536 estimated, real ctx topped out ~35–45k.
+- It was raised 65536 → 81920 on 2026-08-29 after `apply-single-clone-patch` cut the per-store transient GPU spike by ~1/3, moving the expected OOM onset to ~55–70k real.

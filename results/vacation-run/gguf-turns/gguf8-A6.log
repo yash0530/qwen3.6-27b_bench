@@ -1,0 +1,36 @@
+4.45.427.849 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.988 (> 0.100 thold), f_keep = 0.981
+4.45.428.684 I slot launch_slot_: id  0 | task 797 | processing task, is_child = 0
+4.51.923.253 I slot print_timing: id  0 | task 797 | prompt eval time =    2601.77 ms /   403 tokens (    6.46 ms per token,   154.89 tokens per second)
+4.51.923.255 I slot print_timing: id  0 | task 797 |        eval time =    3892.54 ms /    67 tokens (   58.98 ms per token,    16.96 tokens per second)
+4.51.923.255 I slot print_timing: id  0 | task 797 |       total time =    6494.31 ms /   470 tokens
+4.51.923.256 I slot print_timing: id  0 | task 797 |    graphs reused =        752
+4.51.923.258 I slot print_timing: id  0 | task 797 | draft acceptance = 0.89583 (   43 accepted /    48 generated), mean len =  2.79
+4.51.923.925 I slot      release: id  0 | task 797 | stop processing: n_tokens = 34445, truncated = 0
+4.52.134.237 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.996 (> 0.100 thold), f_keep = 0.998
+4.52.135.068 I slot launch_slot_: id  0 | task 825 | processing task, is_child = 0
+5.00.357.377 I slot print_timing: id  0 | task 825 | n_gen =    100, tg =  14.18 t/s, tg_3s =  14.32 t/s
+5.03.438.821 I slot print_timing: id  0 | task 825 | n_gen =    152, tg =  15.00 t/s, tg_3s =  16.88 t/s
+5.06.524.606 I slot print_timing: id  0 | task 825 | n_gen =    209, tg =  15.82 t/s, tg_3s =  18.47 t/s
+5.06.687.110 I slot print_timing: id  0 | task 825 | prompt eval time =    1239.85 ms /   153 tokens (    8.10 ms per token,   123.40 tokens per second)
+5.06.687.112 I slot print_timing: id  0 | task 825 |        eval time =   13311.94 ms /   212 tokens (   63.09 ms per token,    15.85 tokens per second)
+5.06.687.112 I slot print_timing: id  0 | task 825 |       total time =   14551.79 ms /   365 tokens
+5.06.687.113 I slot print_timing: id  0 | task 825 |    graphs reused =        832
+5.06.687.114 I slot print_timing: id  0 | task 825 | draft acceptance = 0.78659 (  129 accepted /   164 generated), mean len =  2.57
+5.06.687.778 I slot      release: id  0 | task 825 | stop processing: n_tokens = 34738, truncated = 0
+5.06.756.718 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.976 (> 0.100 thold), f_keep = 0.994
+5.06.757.569 I slot launch_slot_: id  0 | task 910 | processing task, is_child = 0
+5.18.527.428 I slot print_timing: id  0 | task 910 | n_gen =    101, tg =  14.58 t/s, tg_3s =  14.72 t/s
+5.21.626.573 I slot print_timing: id  0 | task 910 | n_gen =    143, tg =  14.26 t/s, tg_3s =  13.55 t/s
+5.24.726.213 I slot print_timing: id  0 | task 910 | n_gen =    188, tg =  14.32 t/s, tg_3s =  14.52 t/s
+5.27.828.719 I slot print_timing: id  0 | task 910 | n_gen =    233, tg =  14.36 t/s, tg_3s =  14.50 t/s
+5.30.929.990 I slot print_timing: id  0 | task 910 | n_gen =    287, tg =  14.85 t/s, tg_3s =  17.41 t/s
+5.34.031.026 I slot print_timing: id  0 | task 910 | n_gen =    337, tg =  15.02 t/s, tg_3s =  16.12 t/s
+5.37.135.451 I slot print_timing: id  0 | task 910 | n_gen =    383, tg =  15.00 t/s, tg_3s =  14.82 t/s
+5.40.239.617 I slot print_timing: id  0 | task 910 | n_gen =    433, tg =  15.12 t/s, tg_3s =  16.11 t/s
+5.43.347.658 I slot print_timing: id  0 | task 910 | n_gen =    478, tg =  15.06 t/s, tg_3s =  14.48 t/s
+5.45.478.670 I slot print_timing: id  0 | task 910 | prompt eval time =    4910.41 ms /   857 tokens (    5.73 ms per token,   174.53 tokens per second)
+5.45.478.672 I slot print_timing: id  0 | task 910 |        eval time =   33810.43 ms /   508 tokens (   66.69 ms per token,    15.00 tokens per second)
+5.45.478.672 I slot print_timing: id  0 | task 910 |       total time =   38720.84 ms /  1365 tokens
+5.45.478.673 I slot print_timing: id  0 | task 910 |    graphs reused =       1036
+5.45.478.675 I slot print_timing: id  0 | task 910 | draft acceptance = 0.72464 (  300 accepted /   414 generated), mean len =  2.45
+5.45.479.361 I slot      release: id  0 | task 910 | stop processing: n_tokens = 35887, truncated = 0

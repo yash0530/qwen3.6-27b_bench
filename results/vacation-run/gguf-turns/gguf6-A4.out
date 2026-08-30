@@ -1,0 +1,6 @@
+From `llm-serve:35-36`:
+
+- **Model server**: port **8089** (`LLAMA_PORT`, override with `LLAMA_PORT=...`) — serves an OpenAI-compatible API on `127.0.0.1`
+- **Anthropic proxy**: port **8790** (`PROXY_PORT`, override with `PROXY_PORT=...`) — the `llm-proxy.mjs` that speaks the Anthropic API and forwards to the model server's `/v1`
+
+Both are localhost-only.

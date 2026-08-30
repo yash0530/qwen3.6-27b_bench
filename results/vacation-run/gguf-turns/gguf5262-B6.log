@@ -1,0 +1,7 @@
+131.54.073.182 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 189014, progress = 0.91, t = 2676.03 s / 70.63 tokens per second
+131.58.340.004 W srv          stop: cancel task, id_task = 754
+132.47.120.616 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 191062, progress = 0.92, t = 2728.98 s / 70.01 tokens per second
+133.40.747.423 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 193110, progress = 0.93, t = 2782.49 s / 69.40 tokens per second
+134.34.991.194 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 195158, progress = 0.94, t = 2836.61 s / 68.80 tokens per second
+135.29.571.372 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 197206, progress = 0.94, t = 2891.16 s / 68.21 tokens per second
+136.24.818.858 I slot print_timing: id  0 | task 663 | prompt processing, n_tokens = 199254, progress = 0.95, t = 2946.14 s / 67.63 tokens per second

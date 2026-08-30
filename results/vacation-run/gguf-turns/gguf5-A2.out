@@ -1,0 +1,16 @@
+From the `MODEL_ALIASES` list in the script (llm-serve:94):
+
+| Alias | Model | Engine |
+|---|---|---|
+| `35b` | Qwen 3.6 35B-A3B Q8 GGUF | llama-server |
+| `mlx8` | Qwen 3.8 27B MLX 8-bit | mlx_vlm.server |
+| `mlx6` | Qwen 3.8 27B MLX 6-bit | mlx_vlm.server |
+| `mlx4` | Qwen 3.8 27B MLX 4-bit | mlx_vlm.server |
+| `optiq4` | Qwen 3.8 27B MLX OptiQ mixed 4-bit (GDN layers 8-bit) | mlx_vlm.server |
+| `mxfp8` | Qwen 3.8 27B MLX mxfp8 (M5 FP8 blocks) | mlx_vlm.server |
+| `gguf8` | Qwen 3.8 27B Q8_0 GGUF (unsloth) | llama-server |
+| `gguf6` | Qwen 3.8 27B Q6_K_XL GGUF | llama-server |
+| `gguf5` | Qwen 3.8 27B Q5_K_XL GGUF | llama-server |
+| `gguf4` | Qwen 3.8 27B Q4_K_XL GGUF | llama-server |
+
+Ten aliases total; `35b` is the default when `start`/`restart` gets no argument. Anything else is rejected with "unknown model".

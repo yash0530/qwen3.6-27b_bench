@@ -1,0 +1,26 @@
+4.51.842.432 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.997 (> 0.100 thold), f_keep = 0.997
+4.51.843.292 I slot launch_slot_: id  0 | task 284 | processing task, is_child = 0
+4.55.757.258 I slot print_timing: id  0 | task 284 | prompt eval time =    1105.72 ms /   100 tokens (   11.06 ms per token,    90.44 tokens per second)
+4.55.757.260 I slot print_timing: id  0 | task 284 |        eval time =    2807.98 ms /    47 tokens (   61.04 ms per token,    16.38 tokens per second)
+4.55.757.260 I slot print_timing: id  0 | task 284 |       total time =    3913.70 ms /   147 tokens
+4.55.757.261 I slot print_timing: id  0 | task 284 |    graphs reused =        258
+4.55.757.262 I slot print_timing: id  0 | task 284 | draft acceptance = 1.00000 (   32 accepted /    32 generated), mean len =  3.00
+4.55.757.910 I slot      release: id  0 | task 284 | stop processing: n_tokens = 31434, truncated = 0
+4.55.808.670 I slot get_availabl: id  0 | task -1 | selected slot by LCP similarity, f_sim_best = 0.961 (> 0.100 thold), f_keep = 0.998
+4.55.809.535 I slot launch_slot_: id  0 | task 304 | processing task, is_child = 0
+5.02.391.688 I slot print_timing: id  0 | task 304 | prompt processing, n_tokens =   1263, progress = 1.00, t =   4.00 s / 316.05 tokens per second
+5.09.678.552 I slot print_timing: id  0 | task 304 | n_gen =    102, tg =  14.39 t/s, tg_3s =  14.53 t/s
+5.12.842.741 I slot print_timing: id  0 | task 304 | n_gen =    143, tg =  13.94 t/s, tg_3s =  12.96 t/s
+5.16.004.124 I slot print_timing: id  0 | task 304 | n_gen =    183, tg =  13.64 t/s, tg_3s =  12.65 t/s
+5.19.171.144 I slot print_timing: id  0 | task 304 | n_gen =    223, tg =  13.44 t/s, tg_3s =  12.63 t/s
+5.22.179.224 I slot print_timing: id  0 | task 304 | n_gen =    267, tg =  13.63 t/s, tg_3s =  14.63 t/s
+5.25.207.992 I slot print_timing: id  0 | task 304 | n_gen =    314, tg =  13.88 t/s, tg_3s =  15.52 t/s
+5.28.232.442 I slot print_timing: id  0 | task 304 | n_gen =    351, tg =  13.69 t/s, tg_3s =  12.23 t/s
+5.31.251.086 I slot print_timing: id  0 | task 304 | n_gen =    398, tg =  13.88 t/s, tg_3s =  15.57 t/s
+5.34.259.198 I slot print_timing: id  0 | task 304 | n_gen =    448, tg =  14.15 t/s, tg_3s =  16.62 t/s
+5.36.027.297 I slot print_timing: id  0 | task 304 | prompt eval time =    6848.15 ms /  1267 tokens (    5.41 ms per token,   185.01 tokens per second)
+5.36.027.299 I slot print_timing: id  0 | task 304 |        eval time =   33369.36 ms /   475 tokens (   70.40 ms per token,    14.20 tokens per second)
+5.36.027.300 I slot print_timing: id  0 | task 304 |       total time =   40217.50 ms /  1742 tokens
+5.36.027.300 I slot print_timing: id  0 | task 304 |    graphs reused =        444
+5.36.027.302 I slot print_timing: id  0 | task 304 | draft acceptance = 0.75926 (  287 accepted /   378 generated), mean len =  2.52
+5.36.027.926 I slot      release: id  0 | task 304 | stop processing: n_tokens = 33125, truncated = 0

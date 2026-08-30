@@ -1,0 +1,7 @@
+From `model_engine()` (line 118-123), MLX gets the explicit list and everything else falls through to llama.cpp:
+
+**MLX** (`mlx_vlm.server`): `mlx8`, `mlx6`, `mlx4`, `optiq4`, `mxfp8`
+
+**llama.cpp** (`llama-server`): `35b`, `gguf8`, `gguf6`, `gguf5`, `gguf4`
+
+Per the comment at line 114-117, MLX beat llama.cpp at every matched size in the 3.8 sweep (10% at 8-bit, 54–59% at 6/4-bit), so the Qwen 3.8 variants go to MLX; `35b` is the older Qwen 3.6 GGUF served by llama.cpp.

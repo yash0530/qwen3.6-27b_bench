@@ -1,0 +1,7 @@
+There are actually **three** patch scripts in `scripts/`, all patching the installed `mlx_vlm` venv (by string match, idempotent, with `--check`/`--revert`):
+
+1. **`apply-mlx-patches`** — chunks the APC store-side `mx.eval` (and related Apple Silicon GPU-stability fixes) so a single ~2.9 GB GPU dispatch isn't issued on every cache store.
+2. **`apply-latest-only-patch`** — drops the dead full-prompt APC snapshot so each cold prefill stores only the 16-token-guard checkpoint entry, halving per-store GPU copy churn.
+3. **`apply-single-clone-patch`** — makes `store_exact_cache` take ownership of the clone instead of cloning twice, cutting the ~8.7 GB transient spike per store to ~⅓ (the fix that let the context cap rise to 81920).
+
+If you meant specifically the two referenced in `llm-serve`'s MTP/APC comments, those are #1 and #2; #3 is newer (2026-08-29, referenced from `qwen-code`).

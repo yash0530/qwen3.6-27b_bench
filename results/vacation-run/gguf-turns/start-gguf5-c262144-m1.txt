@@ -1,0 +1,14 @@
+ARM=gguf5 CTX=262144 MLOCK=1 healthy=1 load_s=10
+--- llm-serve status ---
+llama-server  running   model=qwen3.8-gguf5  port=8089  rss=38.4 GB
+proxy         running   port=8790
+health        ok
+--- startup log lines of interest ---
+0.04.652.630 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf'
+0.04.726.839 W srv    load_model: cache_reuse is not supported by this context, it will be disabled
+0.04.954.730 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 262144, kv_unified = 'false'
+--- tail of serve stdout ---
+starting qwen3.8-gguf5 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+IDLE_AFTER_LOAD rss=38.35GB wired=42.39GB free=11.59GB

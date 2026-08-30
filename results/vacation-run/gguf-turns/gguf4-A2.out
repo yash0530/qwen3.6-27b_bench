@@ -1,0 +1,11 @@
+The script accepts these aliases (from `MODEL_ALIASES`, line 94):
+
+- `35b` — Qwen 3.6 35B-A3B, GGUF (Q8) via llama-server
+- `mlx8` — Qwen 3.8 27B, MLX 8-bit
+- `mlx6` — Qwen 3.8 27B, MLX 6-bit
+- `mlx4` — Qwen 3.8 27B, MLX 4-bit
+- `gguf6` — Qwen 3.8 27B, unsloth GGUF Q6_K_XL
+- `gguf5` — Qwen 3.8 27B, unsloth GGUF Q5_K_XL
+- `gguf4` — Qwen 3.8 27B, unsloth GGUF Q4_K_XL
+
+Anything else is rejected with `unknown model '<name>'` and this list printed back.

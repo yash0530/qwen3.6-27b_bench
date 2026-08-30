@@ -1,0 +1,8 @@
+The script accepts these 10 model aliases (from `MODEL_ALIASES` in `llm-serve:94`):
+
+- **35b** — Qwen 3.6 35B-A3B Q8 GGUF via llama-server
+- **mlx8**, **mlx6**, **mlx4** — Qwen 3.8 27B MLX (8/6/4-bit) via mlx_vlm.server
+- **optiq4**, **mxfp8** — Qwen 3.8 27B MLX research candidates (OptiQ mixed 4-bit, MXFP8)
+- **gguf8**, **gguf6**, **gguf5**, **gguf4** — Qwen 3.8 27B unsloth GGUF quantizations via llama-server
+
+`start` with no argument defaults to `35b`.

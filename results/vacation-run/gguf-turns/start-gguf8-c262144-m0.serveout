@@ -1,0 +1,5 @@
+starting qwen3.8-gguf8 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+/Users/yash/.local/bin/llm-serve: line 299: 14810 Terminated: 15          detach llama-server -m "$path" ${spec[@]+"${spec[@]}"} -c "$CTX" -ngl 99 -fa on -np 1 ${mlock[@]+"${mlock[@]}"} --cache-ram "$LLAMA_CACHE_RAM_MIB" --slot-save-path "$KV_DIR" --jinja --reasoning-format deepseek --reasoning-budget "$THINK_BUDGET" --temp "$(model_temp "$model")" --top-p 0.95 --top-k 20 -a qwen-local --host 127.0.0.1 --port "${LLAMA_PORT}" --no-webui > "$SERVER_LOG" 2>&1
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+/Users/yash/.local/bin/llm-serve: line 312: 14945 Terminated: 15          MODEL="$upstream_model" UPSTREAM="http://127.0.0.1:${LLAMA_PORT}/v1" PORT="${PROXY_PORT}" THINK_VIEW="${THINK_VIEW:-native}" REASONING_EFFORT="${LLM_EFFORT:-}" detach node "$PROXY_JS" > "$PROXY_LOG" 2>&1
+  proxy failed to start — see /Users/yash/.local/state/local-llm/logs/proxy.log

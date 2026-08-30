@@ -1,0 +1,10 @@
+**Default: 81920** — but only if `LLM_CTX` isn't already set (it's `${LLM_CTX:-81920}`, qwen-code:51).
+
+**Why:** it's a safety cap deliberately well below the model's actual 262144 context window, because the danger isn't the model — it's the prompt-cache's memory:
+
+- On `mlx4` + APC, Metal **OOMs** from APC's snapshot clone, starting sporadically at ~40–50k real context and total by ~75k (measured 2026-08-28); on `mlx6` the same pressure **kernel-panicked** the machine (`IOGPUMemory.cpp:550`).
+- So the cap is there to make Claude Code **compact before hitting that danger zone**, rather than let the machine die mid-session.
+- The value had to be tuned against Claude Code's own `count_tokens` estimate (chars/3.5), which **overshoots** real tokens: at 40960 and 49152 the estimate was too conservative and blocked *fresh* sessions client-side with "Prompt is too long"; at 65536 estimated, real context only reached ~35–45k.
+- It was **raised 65536 → 81920** on 2026-08-29, after `apply-single-clone-patch` cut the per-store transient memory spike by ~1/3, moving the expected OOM onset to ~55–70k real context — so 81920 estimated now lands just below the new onset.
+
+Note the interplay with llm-serve: `LLM_CTX` there defaults to 262144 (the model's real window), but if you set it, qwen-code inherits that same value as the context cap — so setting `LLM_CTX` in both places is what keeps the server window and the client-side compaction threshold in sync.

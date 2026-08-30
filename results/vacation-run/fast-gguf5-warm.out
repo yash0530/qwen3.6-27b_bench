@@ -1,0 +1,5 @@
+Hey! Just a heads-up: the previous session got interrupted by a context-overflow error (the request hit 370k tokens against a 262k limit — looks like the stress-corpus test data blew it up), so I don't have the earlier context.
+
+From the repo state, it looks like we were working in `local-setup` — recent activity around the stress-corpus (file1–file10.md) and the local LLM harness docs.
+
+What would you like to pick up?

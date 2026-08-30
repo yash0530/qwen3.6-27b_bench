@@ -1,0 +1,7 @@
+Small correction — there are actually **three** MLX patch scripts in `scripts/` (all string-match, idempotent, with `--check`/`--revert`, because mlx_vlm lives in a venv outside the repo):
+
+1. **`apply-mlx-patches`** — chunks APC's store-side `mx.eval` (apc.py), which otherwise dispatches ~2.9 GB of K/V copies in one eval per request and has crashed Apple Silicon hosts.
+2. **`apply-latest-only-patch`** — makes each cold prefill store only the APC checkpoint entry and skip the provably-dead full-prompt snapshot, halving the per-store GPU copy churn.
+3. **`apply-single-clone-patch`** — stops the server path from cloning the prompt cache twice per APC exact store (ar.py passes `take_ownership`), cutting the transient GPU spike by ~1/3 — the patch that let `CLAUDE_CODE_MAX_CONTEXT_TOKENS` rise to 81920.
+
+If you meant two of these specifically (e.g. the ones llm-serve's comments cite), it's #2 and #3 that the MTP/APC stability notes reference; #1 is the original chunking patch they build on.

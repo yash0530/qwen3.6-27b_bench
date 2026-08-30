@@ -1,0 +1,6 @@
+139.22.489.549 W srv          stop: cancel task, id_task = 785
+139.35.975.646 I slot print_timing: id  0 | task 695 | prompt processing, n_tokens = 186920, progress = 0.90, t = 2676.26 s / 69.84 tokens per second
+140.28.429.349 I slot print_timing: id  0 | task 695 | prompt processing, n_tokens = 188968, progress = 0.91, t = 2728.53 s / 69.26 tokens per second
+141.21.163.812 I slot print_timing: id  0 | task 695 | prompt processing, n_tokens = 191016, progress = 0.92, t = 2781.21 s / 68.68 tokens per second
+142.14.565.940 I slot print_timing: id  0 | task 695 | prompt processing, n_tokens = 193064, progress = 0.93, t = 2834.43 s / 68.11 tokens per second
+143.08.385.079 I slot print_timing: id  0 | task 695 | prompt processing, n_tokens = 195112, progress = 0.94, t = 2888.08 s / 67.56 tokens per second

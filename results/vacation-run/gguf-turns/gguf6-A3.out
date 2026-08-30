@@ -1,0 +1,7 @@
+From `model_engine()` (`llm-serve:118-123`):
+
+**MLX** (`mlx_vlm.server`): `mlx8`, `mlx6`, `mlx4`, `optiq4`, `mxfp8`
+
+**llama.cpp** (`llama-server`): `35b`, `gguf8`, `gguf6`, `gguf5`, `gguf4`
+
+The comment notes the split is performance-driven: MLX beat llama.cpp at every matched size in the 3.8 sweep (~10% faster at 8-bit, 54–59% at 6/4-bit), and its separate 8-bit drafter checkpoint keeps ~49% acceptance across all quantizations, unlike llama.cpp's inline MTP head which decays with the model's quantization.

@@ -1,0 +1,1 @@
+`scripts/llm-serve` is a start/stop/switch manager for your local LLM stack: it launches a Qwen model server (llama-server for GGUF, `mlx_vlm.server` for MLX) on :8089 with tuned speculative-decoding/APC settings, and an Anthropic-API-compatible proxy (`llm-proxy.mjs`) on :8790 in front of it, with commands for status, restart, logs, and cache cleanup.

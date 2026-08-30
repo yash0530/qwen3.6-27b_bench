@@ -1,0 +1,22 @@
+SID=cd17dd57-7cb0-46a2-8011-f02a8afb93c4
+TURN 1 rc=0 wall=312s recall=yes expect=TANGERINE-LYNX rss=45.15GB wired=40.21GB free=10.80GB
+  req1 task=1375 prompt=18855 cached=18339 (97%) reproc=516 f_keep=0.170 prefill=186.3t/s (3s) decode=17.44t/s gen=49 draft=0.941 ctx_end=18904
+  req2 task=1396 prompt=46253 cached=18339 (40%) reproc=27914 f_keep=0.990 prefill=187.8t/s (149s) decode=13.02t/s gen=156 draft=0.738 ctx_end=46409
+  req3 task=1477 prompt=65114 cached=46250 (71%) reproc=18864 f_keep=0.997 prefill=132.1t/s (143s) decode=12.24t/s gen=32 draft=0.875 ctx_end=65146
+  SUMMARY reqs=3 cached_frac=0.637 max_ctx=65146 prefill_s_total=294
+ANS: TANGERINE-LYNX 
+----
+TURN 2 rc=0 wall=844s recall=yes expect=COBALT-HERON rss=34.73GB wired=40.37GB free=4.77GB
+  req1 task=1501 prompt=65170 cached=65109 (100%) reproc=61 f_keep=0.999 prefill=41.7t/s (1s) decode=13.25t/s gen=51 draft=0.917 ctx_end=65221
+  req2 task=1523 prompt=91772 cached=18338 (20%) reproc=73434 f_keep=0.289 prefill=127.3t/s (577s) decode=10.44t/s gen=183 draft=0.782 ctx_end=91955
+  req3 task=1633 prompt=110165 cached=91770 (83%) reproc=18395 f_keep=0.998 prefill=77.0t/s (239s) decode=9.23t/s gen=43 draft=0.875 ctx_end=110208
+  SUMMARY reqs=3 cached_frac=0.656 max_ctx=110208 prefill_s_total=817
+ANS: COBALT-HERON 
+----
+TURN 3 rc=137 wall=1741s recall=NO expect=SAFFRON-MARMOT rss=37.46GB wired=39.55GB free=5.82GB
+  req1 task=1661 prompt=110205 cached=1 (0%) reproc=110204 f_keep=0.147 prefill=124.4t/s (886s) decode=9.13t/s gen=150 draft=0.680 ctx_end=110355
+  req2 task=1784 prompt=110408 cached=110200 (100%) reproc=208 f_keep=0.999 prefill=67.5t/s (3s) decode=9.73t/s gen=192 draft=0.747 ctx_end=110600
+  req3 task=1864 prompt=110650 cached=110404 (100%) reproc=246 f_keep=0.998 prefill=71.5t/s (3s) decode=8.71t/s gen=159 draft=0.620 ctx_end=110809
+  SUMMARY reqs=3 cached_frac=0.666 max_ctx=110809 prefill_s_total=892
+ANS: 
+----

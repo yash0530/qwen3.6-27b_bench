@@ -1,0 +1,16 @@
+ARM=gguf8 CTX=262144 MLOCK=0 healthy=1 load_s=18
+--- llm-serve status ---
+llama-server  running   model=qwen3.6-35b  port=8089  rss=41.6 GB
+proxy         running   port=8790
+health        ok
+--- startup log lines of interest ---
+0.00.063.816 I srv    load_model: loading model '/Users/yash/Models/qwen3.6-35b-a3b-mtp-q8/Qwen3.6-35B-A3B-Q8_0.gguf'
+0.06.025.537 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.6-35b-a3b-mtp-q8/Qwen3.6-35B-A3B-Q8_0.gguf'
+0.06.131.381 I srv    load_model: initializing, n_slots = 1, n_ctx_slot = 262144, kv_unified = 'false'
+--- tail of serve stdout ---
+starting qwen3.8-gguf8 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+/Users/yash/.local/bin/llm-serve: line 299: 14810 Terminated: 15          detach llama-server -m "$path" ${spec[@]+"${spec[@]}"} -c "$CTX" -ngl 99 -fa on -np 1 ${mlock[@]+"${mlock[@]}"} --cache-ram "$LLAMA_CACHE_RAM_MIB" --slot-save-path "$KV_DIR" --jinja --reasoning-format deepseek --reasoning-budget "$THINK_BUDGET" --temp "$(model_temp "$model")" --top-p 0.95 --top-k 20 -a qwen-local --host 127.0.0.1 --port "${LLAMA_PORT}" --no-webui > "$SERVER_LOG" 2>&1
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+/Users/yash/.local/bin/llm-serve: line 312: 14945 Terminated: 15          MODEL="$upstream_model" UPSTREAM="http://127.0.0.1:${LLAMA_PORT}/v1" PORT="${PROXY_PORT}" THINK_VIEW="${THINK_VIEW:-native}" REASONING_EFFORT="${LLM_EFFORT:-}" detach node "$PROXY_JS" > "$PROXY_LOG" 2>&1
+  proxy failed to start — see /Users/yash/.local/state/local-llm/logs/proxy.log
+IDLE_AFTER_LOAD rss=41.56GB wired=45.70GB free=9.91GB

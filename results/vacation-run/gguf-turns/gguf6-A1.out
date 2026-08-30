@@ -1,0 +1,3 @@
+It's a control script that starts/stops/switches the local Qwen LLM stack on macOS — launching either `llama-server` (GGUF) or `mlx_vlm.server` (MLX) with benchmarked speculative-decoding and prompt-cache settings, plus an Anthropic-API proxy in front of it, with commands like `start`, `stop`, `status`, `restart`, `logs`, and `clean-disk`.
+
+(Found it at `~/Desktop/Programming/local-setup/scripts/llm-serve`, since there's no `scripts/` dir in the current scratchpad.)

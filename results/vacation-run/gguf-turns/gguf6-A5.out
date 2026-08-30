@@ -1,0 +1,7 @@
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS` defaults to **81920** (`qwen-code:51`, overridable via `LLM_CTX`).
+
+**Why:** it's a Metal-OOM guard, not the model's actual 262144 context limit. With APC (the prompt cache) enabled, its per-store snapshot clone sporadically OOMs the GPU at ~40–50k real context on mlx4, and the same memory pressure kernel-panicked the machine on mlx6 (`IOGPUMemory.cpp:550`). Capping the context makes Claude Code compact its own conversation *before* entering that danger zone.
+
+Two calibration details from the comment block:
+- Claude Code's token estimate (chars/3.5) overshoots real tokens, so lower caps were useless: 40960 and 49152 blocked fresh sessions client-side with "Prompt is too long," while at 65536 estimated the real context topped out at only ~35–45k.
+- It was raised from 65536 to 81920 on 2026-08-29 after `apply-single-clone-patch` cut the per-store transient allocation spike by ~⅓, moving the expected OOM onset to ~55–70k real context.

@@ -1,0 +1,4 @@
+- **llama.cpp (llama-server)**: `35b`, `gguf8`, `gguf6`, `gguf5`, `gguf4`
+- **MLX (mlx_vlm.server)**: `mlx8`, `mlx6`, `mlx4`, `optiq4`, `mxfp8`
+
+That split comes from `model_engine()` (llm-serve:118), which routes the five MLX aliases to MLX and everything else (`35b` + the unsloth GGUFs) to llama.cpp — because MLX beat llama.cpp at every matched size in the 3.8 sweep (10% at 8-bit, 54–59% at 6/4-bit).

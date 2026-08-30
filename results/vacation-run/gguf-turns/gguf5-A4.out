@@ -1,0 +1,4 @@
+- **Anthropic proxy**: port **8790** (override with `PROXY_PORT`)
+- **Model server**: port **8089** (override with `LLAMA_PORT`)
+
+Both bind to 127.0.0.1 only. The proxy on :8790 speaks the Anthropic API and forwards to the model server's OpenAI-compatible `/v1` endpoint on :8089.

@@ -1,0 +1,19 @@
+SID=8ef7d06b-2984-4501-8e50-e885f8bef6c6
+TURN A1 rc=0 wall=24s rss=42.09GB wired=45.83GB q=In one sentence, what does scripts/llm-serve do?
+  req1 task=0 prompt=18641 cached=0 (0%) reproc=18641 f_keep=0.994 prefill=1008.4t/s (18s) decode=63.46t/s gen=111 draft=1.000 ctx_end=18751
+  req2 task=68 prompt=18811 cached=18637 (99%) reproc=174 f_keep=0.995 prefill=501.5t/s (0s) decode=60.34t/s gen=88 draft=0.913 ctx_end=18899
+  req3 task=117 prompt=18904 cached=18806 (99%) reproc=98 f_keep=nan prefill=375.9t/s (0s) decode=51.34t/s gen=62 draft=0.649 ctx_end=18966
+  SUMMARY reqs=3 cached_frac=0.664 max_ctx=18966 prefill_s_total=19
+ANS: The file `scripts/llm-serve` doesn't exist in this workspace. Could you clarify which repository or directory you're referring to? 
+----
+TURN A2 rc=0 wall=3s rss=42.23GB wired=45.83GB q=List every model alias scripts/llm-serve accepts.
+  req1 task=157 prompt=18947 cached=18124 (96%) reproc=823 f_keep=0.983 prefill=648.1t/s (1s) decode=54.71t/s gen=80 draft=0.756 ctx_end=19027
+  SUMMARY reqs=1 cached_frac=0.957 max_ctx=19027 prefill_s_total=1
+ANS: The file `scripts/llm-serve` doesn't exist in this workspace. Could you point me to the correct repository or path where this script lives? 
+----
+TURN A3 rc=0 wall=2s rss=42.33GB wired=45.81GB q=Which of those aliases route to llama.cpp and which to MLX?
+  req1 task=207 prompt=19004 cached=18944 (100%) reproc=60 f_keep=0.996 prefill=197.0t/s (0s) decode=56.56t/s gen=117 draft=0.828 ctx_end=19121
+  SUMMARY reqs=1 cached_frac=0.997 max_ctx=19121 prefill_s_total=0
+ANS: I still can't find `scripts/llm-serve` in this workspace — it doesn't exist here. If you can share the file content or point me to the right repo/path, I'll be happy to break down which aliases route to llama.cpp vs MLX. 
+----
+PHASE A DONE arm=gguf8-nomlock

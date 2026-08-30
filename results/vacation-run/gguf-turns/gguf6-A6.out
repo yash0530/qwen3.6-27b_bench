@@ -1,0 +1,7 @@
+There are actually **three** MLX patch scripts in `scripts/`, not two:
+
+1. **`apply-mlx-patches`** — chunks the APC store-side `mx.eval` (which upstream left as one ~2.9 GB all-at-once dispatch per store) to stop the kernel panics it caused.
+2. **`apply-single-clone-patch`** — makes `store_exact_cache` take ownership of the already-cloned cache instead of cloning it a second time, cutting the ~8.7 GB transient per-store spike by ~⅓.
+3. **`apply-latest-only-patch`** — skips storing the provably-unmatched full-prompt APC snapshot, keeping only the checkpoint entry so each cold prefill stores one snapshot instead of two.
+
+(If you're thinking of just two, `apply-mlx-patches` is the original and the other two are newer refinements of the same APC churn problem.)

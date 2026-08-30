@@ -1,0 +1,7 @@
+`CLAUDE_CODE_MAX_CONTEXT_TOKENS` defaults to **`${LLM_CTX:-81920}`** — line 51, so 81920 unless `LLM_CTX` is set.
+
+**Why 81920 and not the model's full 262144 context:** the cap exists to keep the working set under the GPU-memory limit imposed by APC (the prompt-cache), not to match model capability. Per the comment block (lines 52–60):
+
+- On mlx4 + APC, Metal OOMs from APC's snapshot clone start sporadically at ~40–50k *real* context and are total by ~75k; on mlx6 the same pressure kernel-panicked the machine (`IOGPUMemory.cpp:550`). Capping the context makes Claude Code compact *before* entering that danger zone.
+- The cap is an *estimate* (count_tokens ≈ chars/3.5), which overshoots real tokens. Lower values (40960, 49152) blocked fresh sessions client-side with "Prompt is too long"; at 65536 estimated, real context actually topped out at only ~35–45k.
+- It was raised from 65536 to **81920** on 2026-08-29 after `apply-single-clone-patch` cut the per-store transient GPU spike by ~⅓, moving the expected OOM onset to ~55–70k real tokens — so 81920 estimated (~55–60k real) sits below that with room to spare.

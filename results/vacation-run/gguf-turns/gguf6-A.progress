@@ -1,0 +1,39 @@
+SID=63b07192-b410-4c71-8b26-98a4346e890b
+TURN A1 rc=0 wall=167s rss=44.01GB wired=46.85GB q=In one sentence, what does scripts/llm-serve do?
+  req1 task=0 prompt=18641 cached=0 (0%) reproc=18641 f_keep=0.990 prefill=304.6t/s (61s) decode=17.41t/s gen=194 draft=0.926 ctx_end=18835
+  req2 task=81 prompt=18838 cached=18638 (99%) reproc=200 f_keep=0.995 prefill=177.7t/s (1s) decode=14.91t/s gen=96 draft=0.744 ctx_end=18934
+  req3 task=123 prompt=19156 cached=18832 (98%) reproc=324 f_keep=0.992 prefill=202.3t/s (2s) decode=16.25t/s gen=155 draft=0.828 ctx_end=19311
+  req4 task=184 prompt=19297 cached=19152 (99%) reproc=145 f_keep=0.997 prefill=143.4t/s (1s) decode=17.33t/s gen=52 draft=0.917 ctx_end=19349
+  req5 task=205 prompt=31949 cached=19294 (60%) reproc=12655 f_keep=nan prefill=217.4t/s (58s) decode=14.10t/s gen=177 draft=0.746 ctx_end=32126
+  SUMMARY reqs=5 cached_frac=0.704 max_ctx=32126 prefill_s_total=123
+ANS: It's a control script that starts/stops/switches the local Qwen LLM stack on macOS — launching either `llama-server` (GGUF) or `mlx_vlm.server` (MLX) with benchmarked speculative-decoding and prompt-cache settings, plus an Anthropic-API proxy in front of it, with commands like `start`, `stop`, `st
+----
+TURN A2 rc=0 wall=17s rss=44.55GB wired=46.84GB q=List every model alias scripts/llm-serve accepts.
+  req1 task=285 prompt=32100 cached=31946 (100%) reproc=154 f_keep=0.994 prefill=94.3t/s (2s) decode=15.35t/s gen=236 draft=0.862 ctx_end=32336
+  SUMMARY reqs=1 cached_frac=0.995 max_ctx=32336 prefill_s_total=2
+ANS: The script accepts these 10 model aliases (from `MODEL_ALIASES` in `llm-serve:94`):  - **35b** — Qwen 3.6 35B-A3B Q8 GGUF via llama-server - **mlx8**, **mlx6**, **mlx4** — Qwen 3.8 27B MLX (8/6/4-bit) via mlx_vlm.server - **optiq4**, **mxfp8** — Qwen 3.8 27B MLX research candidates (OptiQ mixe
+----
+TURN A3 rc=0 wall=17s rss=44.82GB wired=46.81GB q=Which of those aliases route to llama.cpp and which to MLX?
+  req1 task=376 prompt=32322 cached=32096 (99%) reproc=226 f_keep=0.993 prefill=128.6t/s (2s) decode=15.29t/s gen=238 draft=0.858 ctx_end=32560
+  SUMMARY reqs=1 cached_frac=0.993 max_ctx=32560 prefill_s_total=2
+ANS: From `model_engine()` (`llm-serve:118-123`):  **MLX** (`mlx_vlm.server`): `mlx8`, `mlx6`, `mlx4`, `optiq4`, `mxfp8`  **llama.cpp** (`llama-server`): `35b`, `gguf8`, `gguf6`, `gguf5`, `gguf4`  The comment notes the split is performance-driven: MLX beat llama.cpp at every matched size in the 3.8 sweep
+----
+TURN A4 rc=0 wall=13s rss=44.94GB wired=46.84GB q=What port does the Anthropic proxy listen on, and what port does the model server listen on?
+  req1 task=468 prompt=32536 cached=32318 (99%) reproc=218 f_keep=0.993 prefill=125.3t/s (2s) decode=14.57t/s gen=150 draft=0.802 ctx_end=32686
+  SUMMARY reqs=1 cached_frac=0.993 max_ctx=32686 prefill_s_total=2
+ANS: From `llm-serve:35-36`:  - **Model server**: port **8089** (`LLAMA_PORT`, override with `LLAMA_PORT=...`) — serves an OpenAI-compatible API on `127.0.0.1` - **Anthropic proxy**: port **8790** (`PROXY_PORT`, override with `PROXY_PORT=...`) — the `llm-proxy.mjs` that speaks the Anthropic API and f
+----
+TURN A5 rc=0 wall=49s rss=45.08GB wired=46.84GB q=Read scripts/qwen-code and tell me what CLAUDE_CODE_MAX_CONTEXT_TOKENS defaults to and why.
+  req1 task=530 prompt=32691 cached=32532 (100%) reproc=159 f_keep=0.995 prefill=122.2t/s (1s) decode=15.65t/s gen=73 draft=0.923 ctx_end=32764
+  req2 task=560 prompt=32839 cached=32687 (100%) reproc=152 f_keep=0.998 prefill=123.9t/s (1s) decode=15.47t/s gen=45 draft=0.938 ctx_end=32884
+  req3 task=579 prompt=34101 cached=32834 (96%) reproc=1267 f_keep=0.999 prefill=183.9t/s (7s) decode=13.96t/s gen=446 draft=0.746 ctx_end=34547
+  SUMMARY reqs=3 cached_frac=0.984 max_ctx=34547 prefill_s_total=9
+ANS: `CLAUDE_CODE_MAX_CONTEXT_TOKENS` defaults to **81920** (`qwen-code:51`, overridable via `LLM_CTX`).  **Why:** it's a Metal-OOM guard, not the model's actual 262144 context limit. With APC (the prompt cache) enabled, its per-store snapshot clone sporadically OOMs the GPU at ~40–50k real context on 
+----
+TURN A6 rc=0 wall=48s rss=45.37GB wired=46.80GB q=Name the two local MLX patch scripts in scripts/ and say in one line what each patches.
+  req1 task=762 prompt=34431 cached=34097 (99%) reproc=334 f_keep=0.987 prefill=139.1t/s (2s) decode=14.57t/s gen=188 draft=0.806 ctx_end=34619
+  req2 task=838 prompt=35857 cached=34427 (96%) reproc=1430 f_keep=0.995 prefill=175.0t/s (8s) decode=13.00t/s gen=305 draft=0.673 ctx_end=36162
+  SUMMARY reqs=2 cached_frac=0.975 max_ctx=36162 prefill_s_total=11
+ANS: There are actually **three** MLX patch scripts in `scripts/`, not two:  1. **`apply-mlx-patches`** — chunks the APC store-side `mx.eval` (which upstream left as one ~2.9 GB all-at-once dispatch per store) to stop the kernel panics it caused. 2. **`apply-single-clone-patch`** — makes `store_exact
+----
+PHASE A DONE arm=gguf6

@@ -1,0 +1,2 @@
+- **Anthropic proxy**: 8790 (`PROXY_PORT`, overridable via env) — llm-serve:36
+- **Model server**: 8089 (`LLAMA_PORT`, overridable via env) — llm-serve:35

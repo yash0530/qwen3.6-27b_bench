@@ -1,0 +1,12 @@
+The script accepts these 10 aliases (from `MODEL_ALIASES` at line 94, matched by `model_path`):
+
+1. `35b`
+2. `mlx8`
+3. `mlx6`
+4. `mlx4`
+5. `optiq4`
+6. `mxfp8`
+7. `gguf8`
+8. `gguf6`
+9. `gguf5`
+10. `gguf4`

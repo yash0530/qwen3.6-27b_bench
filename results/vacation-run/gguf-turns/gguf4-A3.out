@@ -1,0 +1,4 @@
+From `model_engine()` (line 114):
+
+- **MLX** (`mlx_vlm.server`): `mlx8`, `mlx6`, `mlx4`
+- **llama.cpp** (`llama-server`): `35b`, `gguf6`, `gguf5`, `gguf4`

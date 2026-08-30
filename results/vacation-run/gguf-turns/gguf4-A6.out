@@ -1,0 +1,6 @@
+There are actually three `apply-*` scripts, but two are the active pair (llm-serve:133-134 documents them as the `.mlxenv-0617` setup — "latest-only patch applied 2026-08-28" plus the single-clone patch adopted in 5272b14):
+
+1. **`apply-latest-only-patch`** — makes APC stores only the 16-token-earlier checkpoint snapshot and drops the dead full-prompt snapshot (which can never match a continuation), halving per-cold-prefill GPU copy churn.
+2. **`apply-single-clone-patch`** — adds `take_ownership` to `store_exact_cache` so each exact store keeps the clone it was given instead of cloning it a second time, cutting the transient per-store GPU spike by ~1/3 (the local analogue of upstream mlx-vlm PR #2072).
+
+The third, **`apply-mlx-patches`**, is the older original (chunked the APC store-side `mx.eval`, commit 5271c64); its eval-chunking approach didn't prevent the panics and was superseded — llm-serve's panic note at lines 410-411 explicitly says the chunked store-side eval "did not help, so that patch was reverted."

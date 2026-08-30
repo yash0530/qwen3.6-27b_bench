@@ -1,0 +1,1 @@
+`llm-serve` is a service manager that starts, stops, switches, and monitors your local Qwen LLM stack — launching either llama-server (GGUF) or mlx_vlm.server (MLX) with benchmarked MTP speculative decoding and APC prompt-caching settings, plus an Anthropic-API-compatible proxy in front, with subcommands for start/stop/restart/switch/status/logs/which and APC disk-cache cleanup.

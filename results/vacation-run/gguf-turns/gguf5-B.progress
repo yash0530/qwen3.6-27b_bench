@@ -1,0 +1,27 @@
+SID=c6d5fc8b-a8b0-4535-90b9-3336e415bbcb
+TURN 1 rc=0 wall=462s recall=yes expect=TANGERINE-LYNX rss=45.27GB wired=42.82GB free=9.53GB
+  req1 task=1216 prompt=18668 cached=0 (0%) reproc=18668 f_keep=0.409 prefill=290.6t/s (64s) decode=15.84t/s gen=92 draft=0.968 ctx_end=18759
+  req2 task=1260 prompt=18838 cached=18663 (99%) reproc=175 f_keep=0.995 prefill=161.5t/s (1s) decode=15.30t/s gen=161 draft=0.904 ctx_end=18999
+  req3 task=1320 prompt=20298 cached=18834 (93%) reproc=1464 f_keep=0.992 prefill=221.9t/s (7s) decode=14.40t/s gen=119 draft=0.841 ctx_end=20417
+  req4 task=1368 prompt=20420 cached=20295 (99%) reproc=125 f_keep=0.994 prefill=166.8t/s (1s) decode=16.00t/s gen=86 draft=0.983 ctx_end=20506
+  req5 task=1400 prompt=20925 cached=20417 (98%) reproc=508 f_keep=0.996 prefill=214.6t/s (2s) decode=14.53t/s gen=64 draft=0.913 ctx_end=20989
+  req6 task=1426 prompt=48323 cached=18153 (38%) reproc=30170 f_keep=0.883 prefill=176.2t/s (171s) decode=11.58t/s gen=210 draft=0.756 ctx_end=48533
+  req7 task=1529 prompt=67194 cached=48319 (72%) reproc=18875 f_keep=0.996 prefill=121.2t/s (156s) decode=9.73t/s gen=65 draft=0.679 ctx_end=67259
+  SUMMARY reqs=7 cached_frac=0.674 max_ctx=67259 prefill_s_total=402
+ANS: TANGERINE-LYNX 
+----
+TURN 2 rc=0 wall=874s recall=yes expect=COBALT-HERON rss=43.73GB wired=42.85GB free=6.97GB
+  req1 task=1569 prompt=67250 cached=67189 (100%) reproc=61 f_keep=0.999 prefill=42.6t/s (1s) decode=11.55t/s gen=78 draft=0.845 ctx_end=67328
+  req2 task=1602 prompt=93852 cached=18151 (19%) reproc=75701 f_keep=0.277 prefill=124.2t/s (609s) decode=11.04t/s gen=88 draft=0.950 ctx_end=93940
+  req3 task=1672 prompt=112229 cached=93848 (84%) reproc=18381 f_keep=0.999 prefill=77.3t/s (238s) decode=9.33t/s gen=75 draft=0.776 ctx_end=112304
+  SUMMARY reqs=3 cached_frac=0.656 max_ctx=112304 prefill_s_total=848
+ANS: COBALT-HERON 
+----
+TURN 3 rc=0 wall=1533s recall=yes expect=SAFFRON-MARMOT rss=40.70GB wired=42.72GB free=5.18GB
+  req1 task=1713 prompt=112290 cached=112227 (100%) reproc=63 f_keep=0.999 prefill=29.0t/s (2s) decode=10.16t/s gen=51 draft=0.944 ctx_end=112341
+  req2 task=1735 prompt=139984 cached=18152 (13%) reproc=121832 f_keep=0.167 prefill=101.5t/s (1200s) decode=8.09t/s gen=104 draft=0.738 ctx_end=140088
+  req3 task=1841 prompt=158708 cached=139981 (88%) reproc=18727 f_keep=0.999 prefill=61.2t/s (306s) decode=7.83t/s gen=58 draft=0.841 ctx_end=158766
+  SUMMARY reqs=3 cached_frac=0.658 max_ctx=158766 prefill_s_total=1508
+ANS: SAFFRON-MARMOT 
+----
+DRIVER DONE arm=gguf5

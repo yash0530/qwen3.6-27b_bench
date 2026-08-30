@@ -1,0 +1,41 @@
+SID=b6ee816a-b7be-4741-bbb6-a416917f6e3b
+TURN 1 rc=0 wall=459s recall=yes expect=TANGERINE-LYNX rss=20.45GB wired=39.44GB free=19.12GB
+  req1 task=0 prompt=18820 cached=0 (0%) reproc=18820 f_keep=0.990 prefill=280.5t/s (67s) decode=15.60t/s gen=51 draft=1.000 ctx_end=18871
+  req2 task=30 prompt=46219 cached=18305 (40%) reproc=27914 f_keep=0.988 prefill=163.7t/s (170s) decode=10.70t/s gen=536 draft=0.688 ctx_end=46755
+  req3 task=274 prompt=65105 cached=46213 (71%) reproc=18892 f_keep=nan prefill=115.7t/s (163s) decode=10.15t/s gen=47 draft=0.711 ctx_end=65152
+  SUMMARY reqs=3 cached_frac=0.496 max_ctx=65152 prefill_s_total=401
+ANS: TANGERINE-LYNX 
+----
+TURN 2 rc=0 wall=898s recall=yes expect=COBALT-HERON rss=29.51GB wired=39.40GB free=14.45GB
+  req1 task=305 prompt=65162 cached=65101 (100%) reproc=61 f_keep=0.999 prefill=41.5t/s (1s) decode=11.26t/s gen=111 draft=0.841 ctx_end=65273
+  req2 task=350 prompt=91766 cached=18304 (20%) reproc=73462 f_keep=0.288 prefill=117.4t/s (626s) decode=10.17t/s gen=113 draft=0.845 ctx_end=91879
+  req3 task=431 prompt=110158 cached=91763 (83%) reproc=18395 f_keep=0.999 prefill=75.0t/s (245s) decode=8.06t/s gen=37 draft=0.688 ctx_end=110195
+  SUMMARY reqs=3 cached_frac=0.656 max_ctx=110195 prefill_s_total=872
+ANS: COBALT-HERON 
+----
+TURN 3 rc=0 wall=1658s recall=yes expect=SAFFRON-MARMOT rss=24.06GB wired=39.42GB free=5.11GB
+  req1 task=459 prompt=110215 cached=110152 (100%) reproc=63 f_keep=1.000 prefill=32.5t/s (2s) decode=7.95t/s gen=112 draft=0.610 ctx_end=110327
+  req2 task=513 prompt=137912 cached=18305 (13%) reproc=119607 f_keep=0.171 prefill=93.1t/s (1285s) decode=9.42t/s gen=97 draft=0.985 ctx_end=138009
+  req3 task=608 prompt=156636 cached=137908 (88%) reproc=18728 f_keep=0.999 prefill=54.8t/s (342s) decode=8.01t/s gen=17 draft=1.000 ctx_end=156653
+  SUMMARY reqs=3 cached_frac=0.658 max_ctx=156653 prefill_s_total=1628
+ANS: SAFFRON-MARMOT 
+----
+TURN 4 rc=137 wall=2700s recall=NO expect=INDIGO-PANGOLIN rss=27.74GB wired=39.37GB free=6.55GB
+  req1 task=626 prompt=156691 cached=156631 (100%) reproc=60 f_keep=1.000 prefill=23.1t/s (3s) decode=7.80t/s gen=60 draft=0.804 ctx_end=156751
+  req2 task=653 prompt=182992 cached=18305 (10%) reproc=164687 f_keep=0.121 prefill=73.5t/s (2242s) decode=7.25t/s gen=148 draft=0.855 ctx_end=183140
+  req3 task=733 prompt=182992 cached=182988 (100%) reproc=4 f_keep=0.999 prefill=8.5t/s (0s) decode=7.59t/s gen=105 draft=0.932 ctx_end=183097
+  SUMMARY reqs=3 cached_frac=0.685 max_ctx=183140 prefill_s_total=2245
+ANS: 
+----
+TURN 5 rc=137 wall=2700s recall=NO expect=VERMILION-OSPREY rss=25.68GB wired=39.41GB free=7.06GB
+  req1 task=832 prompt=201091 cached=182986 (91%) reproc=18105 f_keep=1.000 prefill=41.5t/s (436s) decode=6.86t/s gen=25 draft=0.833 ctx_end=201116
+  req2 task=842 prompt=201160 cached=201087 (100%) reproc=73 f_keep=nan prefill=23.8t/s (3s) decode=7.44t/s gen=67 draft=0.935 ctx_end=201227
+  SUMMARY reqs=2 cached_frac=0.955 max_ctx=201227 prefill_s_total=439
+ANS: 
+----
+TURN 6 rc=0 wall=302s recall=NO expect=CHARTREUSE-BADGER rss=25.73GB wired=39.44GB free=6.92GB
+  SUMMARY reqs=0 cached_frac=0.000 max_ctx=0 prefill_s_total=0
+ANS:  [proxy] cannot reach llama-server at http://127.0.0.1:8089/v1 — is it running? (fetch failed) 
+----
+STOP: 3 consecutive failures at turn 6
+DRIVER DONE arm=gguf4262

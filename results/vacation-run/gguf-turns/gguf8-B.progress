@@ -1,0 +1,19 @@
+SID=a529fbba-303a-4cb8-9fd2-56c7bb790e87
+TURN 1 rc=0 wall=286s recall=yes expect=TANGERINE-LYNX rss=46.82GB wired=50.24GB free=4.46GB
+  req1 task=1121 prompt=18668 cached=0 (0%) reproc=18668 f_keep=0.411 prefill=312.1t/s (60s) decode=20.38t/s gen=94 draft=1.000 ctx_end=18761
+  req2 task=1165 prompt=18838 cached=18663 (99%) reproc=175 f_keep=0.995 prefill=166.4t/s (1s) decode=19.65t/s gen=134 draft=0.946 ctx_end=18972
+  req3 task=1214 prompt=18980 cached=18836 (99%) reproc=144 f_keep=0.993 prefill=145.2t/s (1s) decode=18.99t/s gen=116 draft=0.927 ctx_end=19096
+  req4 task=1258 prompt=20392 cached=18975 (93%) reproc=1417 f_keep=0.994 prefill=232.4t/s (6s) decode=17.59t/s gen=158 draft=0.817 ctx_end=20550
+  req5 task=1322 prompt=20537 cached=20387 (99%) reproc=150 f_keep=0.992 prefill=146.1t/s (1s) decode=18.07t/s gen=278 draft=0.845 ctx_end=20815
+  req6 task=1428 prompt=21004 cached=20535 (98%) reproc=469 f_keep=0.987 prefill=214.3t/s (2s) decode=19.15t/s gen=67 draft=0.978 ctx_end=21071
+  req7 task=1454 prompt=48400 cached=18151 (38%) reproc=30249 f_keep=0.880 prefill=187.3t/s (161s) decode=12.93t/s gen=92 draft=0.637 ctx_end=48492
+  SUMMARY reqs=7 cached_frac=0.693 max_ctx=48492 prefill_s_total=233
+ANS: TANGERINE-LYNX 
+----
+TURN 2 rc=0 wall=596s recall=yes expect=COBALT-HERON rss=48.47GB wired=50.30GB free=4.03GB
+  req1 task=1513 prompt=48459 cached=48398 (100%) reproc=61 f_keep=0.998 prefill=50.9t/s (1s) decode=15.46t/s gen=72 draft=0.904 ctx_end=48531
+  req2 task=1543 prompt=75061 cached=18152 (24%) reproc=56909 f_keep=0.384 prefill=149.7t/s (380s) decode=11.42t/s gen=189 draft=0.667 ctx_end=75250
+  req3 task=1655 prompt=93437 cached=75056 (80%) reproc=18381 f_keep=0.997 prefill=96.7t/s (190s) decode=11.25t/s gen=26 draft=0.750 ctx_end=93463
+  SUMMARY reqs=3 cached_frac=0.653 max_ctx=93463 prefill_s_total=571
+ANS: COBALT-HERON 
+----

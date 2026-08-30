@@ -1,0 +1,153 @@
+[17:32:10] === run_remaining start; panic_files=1 boottime={ sec = 1787982452, usec = 817570 } Fri Aug 28 22:47:32 2026
+[17:35:09] === run_remaining start; panic_files=1 boottime={ sec = 1787982452, usec = 817570 } Fri Aug 28 22:47:32 2026
+[17:42:57] ########## FAST cold(read)/warm(hi) test  Sat Aug 29 17:42:57 PDT 2026
+[17:43:01] === gguf5 START (cap=262144 panic=1)
+starting qwen3.8-gguf5 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.03.816.211 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf'
+[19:15:00] gguf5 COLD rc=0 wall=5513s max_prompt_tokens=0 ans=LOADED 
+[19:32:38] gguf5 WARM rc=0 wall=1058s ans=Hi! The big250k.txt file is fully read (
+[19:32:38] gguf5 done; panic_files=1
+[19:32:38] GATE: gguf5 cold ingested only 0 tokens (<120k) — Read under-ingests; SWITCH TO MULTI-FILE. Aborting.
+[19:32:39] ALL REMAINING ARMS DONE; panic_files=1
+[19:38:25] ########## FAST3 stdin cold/warm test  Sat Aug 29 19:38:25 PDT 2026
+[19:38:28] === gguf5 START (cap=262144 panic=1 doc=big250k.txt)
+starting qwen3.8-gguf5 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.03.742.162 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf'
+[19:38:34] gguf5 COLD rc=1 wall=0s ingest_tokens=0 ans=Prompt is too long 
+[19:39:45] gguf5 WARM rc=0 wall=71s ans=Hi! I'm here and ready to continue. What
+1.17.305.996 I slot print_timing: id  0 | task 3 | prompt eval time =   57501.43 ms / 17212 tokens (    3.34 ms per token,   299.33 tokens per second)
+[19:39:45] gguf5 done; panic_files=1
+[19:39:45] GATE FAIL: gguf5 ingested 0 (<120k) via stdin — investigate. Aborting.
+[19:39:46] ALL REMAINING ARMS DONE; panic_files=1
+[19:41:05] ########## FAST3 stdin cold/warm test  Sat Aug 29 19:41:05 PDT 2026
+[19:41:08] === gguf5 START (cap=400000 panic=1 doc=big250k.txt)
+starting qwen3.8-gguf5 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.03.757.892 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf'
+[19:41:15] gguf5 COLD rc=1 wall=1s ingest_tokens=0 ans=Prompt is too long 
+[19:44:04] gguf5 WARM rc=0 wall=169s ans=Hey! Just a heads-up: the previous sessi
+1.53.721.542 I slot print_timing: id  0 | task 3 | prompt eval time =   57498.77 ms / 17213 tokens (    3.34 ms per token,   299.36 tokens per second)
+2.19.551.970 I slot print_timing: id  0 | task 298 | prompt eval time =    2099.09 ms /   442 tokens (    4.75 ms per token,   210.57 tokens per second)
+2.36.661.621 I slot print_timing: id  0 | task 434 | prompt eval time =    2734.16 ms /   619 tokens (    4.42 ms per token,   226.40 tokens per second)
+2.55.425.759 I slot print_timing: id  0 | task 518 | prompt eval time =    2764.36 ms /   607 tokens (    4.55 ms per token,   219.58 tokens per second)
+[19:44:04] gguf5 done; panic_files=1
+[19:44:04] GATE FAIL: gguf5 ingested 0 (<120k) via stdin — investigate. Aborting.
+[19:44:04] ALL REMAINING ARMS DONE; panic_files=1
+[19:55:02] ########## LADDER262 (cache-ram fix, push to window)  Sat Aug 29 19:55:02 PDT 2026
+[19:55:05] === LADDER262 gguf5 START (cache_ram=24576 client_cap=400000 panic=1)
+starting qwen3.8-gguf5 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.03.775.424 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q5_K_XL.gguf'
+[22:17:51] gguf5 HI(warm@depth) wall=365s ans=Hi! The file6.md task got cut off by a proxy error
+141.33.024.916 I slot print_timing: id  0 | task 663 | prompt eval time = 3253714.22 ms / 209757 tokens (   15.51 ms per token,    64.47 tokens per second)
+142.45.395.230 I slot print_timing: id  0 | task 770 | prompt eval time =    4913.01 ms /   122 tokens (   40.27 ms per token,    24.83 tokens per second)
+[22:17:51] gguf5 done; panic_files=1
+  SUMMARY reqs=3 cached_frac=0.658 max_ctx=156650 prefill_s_total=1518
+ANS: SAFFRON-MARMOT 
+----
+TURN 4 rc=0 wall=2472s recall=yes expect=INDIGO-PANGOLIN rss=43.19GB wired=42.47GB free=4.85GB
+  req1 task=438 prompt=156663 cached=156603 (100%) reproc=60 f_keep=1.000 prefill=21.5t/s (3s) decode=8.31t/s gen=69 draft=0.880 ctx_end=156732
+  req2 task=467 prompt=182964 cached=18305 (10%) reproc=164659 f_keep=0.121 prefill=80.9t/s (2035s) decode=6.99t/s gen=107 draft=0.786 ctx_end=183071
+  req3 task=593 prompt=201065 cached=182960 (91%) reproc=18105 f_keep=0.999 prefill=46.0t/s (393s) decode=6.32t/s gen=54 draft=0.750 ctx_end=201119
+  SUMMARY reqs=3 cached_frac=0.662 max_ctx=201119 prefill_s_total=2431
+ANS: INDIGO-PANGOLIN 
+----
+TURN 5 rc=137 wall=2700s recall=NO expect=VERMILION-OSPREY rss=41.48GB wired=42.48GB free=4.37GB
+  req1 task=627 prompt=201124 cached=201061 (100%) reproc=63 f_keep=1.000 prefill=19.1t/s (3s) decode=6.56t/s gen=81 draft=0.781 ctx_end=201205
+  SUMMARY reqs=1 cached_frac=1.000 max_ctx=201205 prefill_s_total=3
+ANS: 
+----
+TURN 6 rc=0 wall=302s recall=NO expect=CHARTREUSE-BADGER rss=41.50GB wired=42.48GB free=4.34GB
+  SUMMARY reqs=0 cached_frac=0.000 max_ctx=0 prefill_s_total=0
+ANS:  [proxy] cannot reach llama-server at http://127.0.0.1:8089/v1 — is it running? (fetch failed) 
+----
+DRIVER DONE arm=gguf5262
+[22:17:55] === LADDER262 gguf6 START (cache_ram=24576 client_cap=400000 panic=1)
+  waiting for port 8089 to clear
+starting qwen3.8-gguf6 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.04.919.907 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q6_K_XL.gguf'
+[00:48:03] gguf6 HI(warm@depth) wall=301s ans= [proxy] cannot reach llama-server at http://127.0
+[00:48:03] gguf6 done; panic_files=1
+----
+TURN 4 rc=137 wall=2700s recall=NO expect=INDIGO-PANGOLIN rss=45.15GB wired=46.62GB free=3.49GB
+  req1 task=561 prompt=156760 cached=156700 (100%) reproc=60 f_keep=0.999 prefill=22.5t/s (3s) decode=7.97t/s gen=75 draft=0.839 ctx_end=156835
+  req2 task=593 prompt=183061 cached=18305 (10%) reproc=164756 f_keep=0.121 prefill=73.6t/s (2238s) decode=7.26t/s gen=128 draft=0.816 ctx_end=183189
+  req3 task=673 prompt=183061 cached=183057 (100%) reproc=4 f_keep=0.999 prefill=9.1t/s (0s) decode=7.91t/s gen=137 draft=0.938 ctx_end=183198
+  SUMMARY reqs=3 cached_frac=0.685 max_ctx=183198 prefill_s_total=2241
+ANS: 
+----
+TURN 5 rc=137 wall=2701s recall=NO expect=VERMILION-OSPREY rss=45.07GB wired=46.78GB free=3.49GB
+  req1 task=777 prompt=201194 cached=183057 (91%) reproc=18137 f_keep=1.000 prefill=43.2t/s (420s) decode=6.48t/s gen=69 draft=0.750 ctx_end=201263
+  req2 task=787 prompt=201263 cached=201190 (100%) reproc=73 f_keep=nan prefill=24.9t/s (3s) decode=7.31t/s gen=67 draft=0.917 ctx_end=201330
+  SUMMARY reqs=2 cached_frac=0.955 max_ctx=201330 prefill_s_total=423
+ANS: 
+----
+TURN 6 rc=0 wall=302s recall=NO expect=CHARTREUSE-BADGER rss=45.11GB wired=46.78GB free=3.39GB
+  SUMMARY reqs=0 cached_frac=0.000 max_ctx=0 prefill_s_total=0
+ANS:  [proxy] cannot reach llama-server at http://127.0.0.1:8089/v1 — is it running? (fetch failed) 
+----
+STOP: 3 consecutive failures at turn 6
+DRIVER DONE arm=gguf6262
+[00:48:17] === LADDER262 gguf8 START (cache_ram=24576 client_cap=400000 panic=1)
+starting qwen3.8-gguf8 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.13.761.053 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-Q8_0.gguf'
+[03:17:06] gguf8 HI(warm@depth) wall=301s ans= [proxy] cannot reach llama-server at http://127.0
+[03:17:06] gguf8 done; panic_files=1
+----
+TURN 4 rc=137 wall=2700s recall=NO expect=INDIGO-PANGOLIN rss=32.88GB wired=50.08GB free=2.80GB
+  req1 task=415 prompt=156622 cached=156562 (100%) reproc=60 f_keep=1.000 prefill=22.5t/s (3s) decode=8.57t/s gen=59 draft=0.864 ctx_end=156681
+  req2 task=441 prompt=182920 cached=18303 (10%) reproc=164617 f_keep=0.121 prefill=73.8t/s (2230s) decode=8.12t/s gen=78 draft=0.875 ctx_end=182998
+  req3 task=520 prompt=182921 cached=182917 (100%) reproc=4 f_keep=1.000 prefill=8.8t/s (0s) decode=7.53t/s gen=83 draft=0.797 ctx_end=183004
+  SUMMARY reqs=3 cached_frac=0.685 max_ctx=183004 prefill_s_total=2233
+ANS: 
+----
+TURN 5 rc=137 wall=2700s recall=NO expect=VERMILION-OSPREY rss=32.58GB wired=50.19GB free=2.78GB
+  req1 task=587 prompt=201007 cached=182916 (91%) reproc=18091 f_keep=0.999 prefill=42.6t/s (425s) decode=7.36t/s gen=188 draft=0.817 ctx_end=201195
+  req2 task=609 prompt=201078 cached=201005 (100%) reproc=73 f_keep=nan prefill=23.7t/s (3s) decode=7.43t/s gen=57 draft=0.881 ctx_end=201135
+  SUMMARY reqs=2 cached_frac=0.955 max_ctx=201195 prefill_s_total=428
+ANS: 
+----
+TURN 6 rc=0 wall=302s recall=NO expect=CHARTREUSE-BADGER rss=32.47GB wired=50.16GB free=2.79GB
+  SUMMARY reqs=0 cached_frac=0.000 max_ctx=0 prefill_s_total=0
+ANS:  [proxy] cannot reach llama-server at http://127.0.0.1:8089/v1 — is it running? (fetch failed) 
+----
+STOP: 3 consecutive failures at turn 6
+DRIVER DONE arm=gguf8262
+[03:17:20] === LADDER262 gguf4 START (cache_ram=24576 client_cap=400000 panic=1)
+starting qwen3.8-gguf4 (Q8, MTP draft-n=2, ctx 262144, think budget -1)
+  llama-server up on http://127.0.0.1:8089  (OpenAI API)
+  proxy    up on http://127.0.0.1:8790  (Anthropic API)
+0.34.724.510 I common_speculative_init_result: creating MTP draft context against the target model '/Users/yash/Models/qwen3.8-27b-gguf/Qwen3.8-27B-UD-Q4_K_XL.gguf'
+[05:48:16] gguf4 HI(warm@depth) wall=301s ans= [proxy] cannot reach llama-server at http://127.0
+[05:48:16] gguf4 done; panic_files=1
+----
+TURN 4 rc=137 wall=2700s recall=NO expect=INDIGO-PANGOLIN rss=27.74GB wired=39.37GB free=6.55GB
+  req1 task=626 prompt=156691 cached=156631 (100%) reproc=60 f_keep=1.000 prefill=23.1t/s (3s) decode=7.80t/s gen=60 draft=0.804 ctx_end=156751
+  req2 task=653 prompt=182992 cached=18305 (10%) reproc=164687 f_keep=0.121 prefill=73.5t/s (2242s) decode=7.25t/s gen=148 draft=0.855 ctx_end=183140
+  req3 task=733 prompt=182992 cached=182988 (100%) reproc=4 f_keep=0.999 prefill=8.5t/s (0s) decode=7.59t/s gen=105 draft=0.932 ctx_end=183097
+  SUMMARY reqs=3 cached_frac=0.685 max_ctx=183140 prefill_s_total=2245
+ANS: 
+----
+TURN 5 rc=137 wall=2700s recall=NO expect=VERMILION-OSPREY rss=25.68GB wired=39.41GB free=7.06GB
+  req1 task=832 prompt=201091 cached=182986 (91%) reproc=18105 f_keep=1.000 prefill=41.5t/s (436s) decode=6.86t/s gen=25 draft=0.833 ctx_end=201116
+  req2 task=842 prompt=201160 cached=201087 (100%) reproc=73 f_keep=nan prefill=23.8t/s (3s) decode=7.44t/s gen=67 draft=0.935 ctx_end=201227
+  SUMMARY reqs=2 cached_frac=0.955 max_ctx=201227 prefill_s_total=439
+ANS: 
+----
+TURN 6 rc=0 wall=302s recall=NO expect=CHARTREUSE-BADGER rss=25.73GB wired=39.44GB free=6.92GB
+  SUMMARY reqs=0 cached_frac=0.000 max_ctx=0 prefill_s_total=0
+ANS:  [proxy] cannot reach llama-server at http://127.0.0.1:8089/v1 — is it running? (fetch failed) 
+----
+STOP: 3 consecutive failures at turn 6
+DRIVER DONE arm=gguf4262
+[05:48:27] ALL REMAINING ARMS DONE; panic_files=1
